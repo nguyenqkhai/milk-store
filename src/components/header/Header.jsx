@@ -52,6 +52,12 @@ const Header = () => {
           >
             Về chúng tôi
           </Link>
+          <Link to='/contact'
+            className={`${headerClass.nav} ${isActive('/about') ? 'font-semibold text-blue-600' : ''}`}
+          >
+            Liên hệ
+          </Link>
+
         </nav>
 
         {/* buttons */}
@@ -60,7 +66,9 @@ const Header = () => {
             <FiSearch className='h-5 w-5' />
           </button>
           <button className='flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-gray-700 transition-all hover:bg-gray-100'>
-            <FiUser className='h-5 w-5' />
+            <Link to="/login">
+              <FiUser className="h-5 w-5" />
+            </Link>
           </button>
           <button
             className={`${headerClass.button} flex cursor-pointer items-center gap-2`}
