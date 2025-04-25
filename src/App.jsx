@@ -41,6 +41,7 @@ const App = () => {
             <Route path='/contact' element={<Contact />} />
             <Route path='/product/:slug' element={<ProductDetail />} />
             <Route path='/checkout' element={<Checkout/>}/>
+            <Route path='/cart' element={<Cart />} />
             <Route path='/payment' element={<Payment/>}/>
           </Routes>
         </Layout>
@@ -50,3 +51,4 @@ const App = () => {
 }
 
 export default App
+
