@@ -12,6 +12,8 @@ import Products from './pages/Products/Products'
 import ProductDetail from './pages/ProductDetail/ProductDetail'
 import About from './pages/About/About'
 import Footer from './components/Footer/Footer'
+import Payment from './pages/Payment/Payment'
+import Checkout from './pages/Order/Checkout'
 const Layout = ({ children }) => {
   const location = useLocation()
   const hideHeaderRoutes = ['/login', '/register', '/forgot-password']
@@ -38,6 +40,8 @@ const App = () => {
             <Route path='/product' element={<Products />} />
             <Route path='/contact' element={<Contact />} />
             <Route path='/product/:slug' element={<ProductDetail />} />
+            <Route path='/checkout' element={<Checkout/>}/>
+            <Route path='/payment' element={<Payment/>}/>
           </Routes>
         </Layout>
       </Router>

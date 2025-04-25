@@ -123,9 +123,13 @@ const Contact = () => {
           />
         </div>
       </div>
-      <div className='absolute -mt-230 w-full'>
+      {/* <div className='absolute -mt-230 w-full'>
         <hr className='border-t-12 border-gray-700' />
+      </div> */}
+      <div className='absolute top-[460px] left-0 right-0 z-1000'>
+        <hr className='border-t-[8px] border-gray-700' />
       </div>
+      
       <div className='h-[70vh]' /> {/*Tạo khoảng trống để có cái để cuộn*/}
       <div
         id='target-section'
@@ -199,7 +203,7 @@ const Contact = () => {
             </div>
           </div>
         </div>
-        <div className='mt-6 flex w-full flex-col items-center px-6'>
+        <div className='mt-6 flex w-full flex-col items-center px-6 mb-10'>
           <h2 className='mb-6 text-5xl font-semibold text-blue-950'>
             CÁC TIỆN ÍCH TẠI SHOWROOM MILKSTORE
           </h2>
