@@ -1,70 +1,257 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useLocation } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import {
-  fetchProducts,
-  selectProducts,
-} from '../../redux/products/productSlice'
-import { toSlug } from '../../utils/slug'
 import ProductImages from './Components/ProductImages'
 import ProductInfo from './Components/ProductInfo'
 import RelatedProducts from './Components/RelatedProducts'
 import LoadingState from '../Products/Components/LoadingState'
 import ErrorState from '../Products/Components/ErrorState'
 
-const ProductDetail = () => {
-  const { slug } = useParams()
-  const location = useLocation()
-  const dispatch = useDispatch()
-  const products = useSelector(selectProducts)
-  const loading = useSelector(state => state.products.loading)
-  const error = useSelector(state => state.products.error)
+const mockProducts = [
+  {
+    id: 1,
+    title: 'Sữa Tươi Có Đường Vinamilk 1L',
+    category: 'Sữa tươi',
+    description: 'Sữa tươi tiệt trùng có đường Vinamilk giàu dinh dưỡng',
+    price: 30.000,
+    rating: 4.7,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 0
+  },
+  {
+    id: 2,
+    title: 'Sữa Tươi Không Đường Vinamilk 1L',
+    category: 'Sữa tươi',
+    description: 'Sữa tươi tiệt trùng không đường Vinamilk, tốt cho sức khỏe',
+    price: 30.000,
+    rating: 4.6,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 5
+  },
+  {
+    id: 3,
+    title: 'Sữa Hạt Óc Chó Vinamilk',
+    category: 'Sữa hạt',
+    description: 'Sữa óc chó thơm ngon, bổ dưỡng từ Vinamilk',
+    price: 32.000,
+    rating: 4.8,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 10
+  },
+  {
+    id: 4,
+    title: 'Sữa Đậu Nành Vinamilk 1L',
+    category: 'Sữa hạt',
+    description: 'Sữa đậu nành nguyên chất, ít đường',
+    price: 27.000,
+    rating: 4.5,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 0
+  },
+  {
+    id: 5,
+    title: 'Sữa Tươi TH True Milk 1L',
+    category: 'Sữa tươi',
+    description: 'Sữa tươi sạch từ trang trại TH',
+    price: 31.000,
+    rating: 4.6,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 0
+  },
+  {
+    id: 6,
+    title: 'Sữa Tươi Ít Đường TH True Milk 1L',
+    category: 'Sữa tươi',
+    description: 'Sữa ít đường từ thương hiệu TH True Milk',
+    price: 31.000,
+    rating: 4.7,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 3
+  },
+  {
+    id: 7,
+    title: 'Sữa Hạt TH True Nut Óc Chó',
+    category: 'Sữa hạt',
+    description: 'Sữa hạt óc chó thơm ngon từ TH True Nut',
+    price: 34.000,
+    rating: 4.6,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 5
+  },
+  {
+    id: 8,
+    title: 'Sữa Đậu Đen TH True Nut',
+    category: 'Sữa hạt',
+    description: 'Sữa đậu đen nguyên chất, thơm ngon và lành mạnh',
+    price: 35.000,
+    rating: 4.4,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 0
+  },
+  {
+    id: 9,
+    title: 'Sữa Tươi Có Đường Dutch Lady 1L',
+    category: 'Sữa tươi',
+    description: 'Sữa tươi thơm ngon từ Hà Lan',
+    price: 29.000,
+    rating: 4.5,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 0
+  },
+  {
+    id: 10,
+    title: 'Sữa Tươi Không Đường Dutch Lady 1L',
+    category: 'Sữa tươi',
+    description: 'Sữa không đường phù hợp người ăn kiêng',
+    price: 29.000,
+    rating: 4.3,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 0
+  },
+  {
+    id: 11,
+    title: 'Sữa Bắp Nutifood 1L',
+    category: 'Sữa hạt',
+    description: 'Sữa bắp Nutifood thơm ngon tự nhiên',
+    price: 28.000,
+    rating: 4.4,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 0
+  },
+  {
+    id: 12,
+    title: 'Sữa Dinh Dưỡng Nuti IQ Gold',
+    category: 'Sữa bột',
+    description: 'Sữa dành cho trẻ em phát triển trí tuệ và chiều cao',
+    price: 250.000,
+    rating: 4.9,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 15
+  },
+  {
+    id: 13,
+    title: 'Sữa Dielac Alpha Vinamilk 900g',
+    category: 'Sữa bột',
+    description: 'Sữa bột cho trẻ từ 1-6 tuổi hỗ trợ phát triển trí não',
+    price: 220.000,
+    rating: 4.7,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 10
+  },
+  {
+    id: 14,
+    title: 'Sữa Dinh Dưỡng GrowPLUS+ 1L',
+    category: 'Sữa dinh dưỡng',
+    description: 'Hỗ trợ tăng cân và chiều cao cho trẻ em suy dinh dưỡng',
+    price: 33.000,
+    rating: 4.6,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 7
+  },
+  {
+    id: 15,
+    title: 'Sữa Nuti EnPlus Diamond',
+    category: 'Sữa dinh dưỡng',
+    description: 'Sữa dành cho người lớn tuổi và người bệnh',
+    price: 230.000,
+    rating: 4.7,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 5
+  },
+  {
+    id: 16,
+    title: 'Sữa Sure Prevent Gold Vinamilk',
+    category: 'Sữa dinh dưỡng',
+    description: 'Hỗ trợ tim mạch, bổ sung canxi cho người cao tuổi',
+    price: 255.000,
+    rating: 4.8,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 10
+  },
+  {
+    id: 17,
+    title: 'Sữa Đặc Ông Thọ Trắng 380g',
+    category: 'Sữa đặc',
+    description: 'Sữa đặc có đường ông Thọ dùng pha cà phê hoặc làm bánh',
+    price: 25.000,
+    rating: 4.9,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 0
+  },
+  {
+    id: 18,
+    title: 'Sữa Đặc Ông Thọ Xanh 380g',
+    category: 'Sữa đặc',
+    description: 'Sữa đặc ít đường thích hợp với người ăn kiêng',
+    price: 26.000,
+    rating: 4.6,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 0
+  },
+  {
+    id: 19,
+    title: 'Sữa Tươi Nguyên Kem Meadow Fresh 1L',
+    category: 'Sữa tươi',
+    description: 'Sữa nguyên kem nhập khẩu từ New Zealand',
+    price: 35.000,
+    rating: 4.5,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 8
+  },
+  {
+    id: 20,
+    title: 'Sữa Hạt Ngũ Cốc TH True Nut',
+    category: 'Sữa hạt',
+    description: 'Kết hợp dinh dưỡng từ 5 loại hạt tốt cho sức khỏe',
+    price: 36.000,
+    rating: 4.7,
+    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
+    discountPercentage: 6
+  }
+];
 
+const ProductDetail = () => {
+  const { id } = useParams()
+  const location = useLocation()
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [product, setProduct] = useState(null)
   const [relatedProducts, setRelatedProducts] = useState([])
 
   useEffect(() => {
-    if (location.state?.product) {
-      setProduct(location.state.product)
-    }
-  }, [location.state])
-
-  useEffect(() => {
-    if (!product && products.length > 0) {
-      const foundProduct = products.find(p => toSlug(p.title) === slug)
-      if (foundProduct) {
-        setProduct(foundProduct)
+    // Simulate loading time
+    setTimeout(() => {
+      if (location.state?.product) {
+        // If coming from Products page
+        setProduct(location.state.product)
+        const related = (location.state.allProducts || mockProducts)
+          .filter(p => p.category === location.state.product.category && p.id !== location.state.product.id)
+          .slice(0, 4)
+        setRelatedProducts(related)
+      } else {
+        // If accessing directly via URL
+        const foundProduct = mockProducts.find(p => p.id === parseInt(id))
+        if (foundProduct) {
+          setProduct(foundProduct)
+          const related = mockProducts
+            .filter(p => p.category === foundProduct.category && p.id !== foundProduct.id)
+            .slice(0, 4)
+          setRelatedProducts(related)
+        } else {
+          setError('Không tìm thấy sản phẩm')
+        }
       }
-    }
-  }, [slug, products, product])
-
-  useEffect(() => {
-    if (products.length === 0) {
-      dispatch(fetchProducts())
-    }
-  }, [dispatch, products])
-
-  useEffect(() => {
-    if (product && products.length > 0) {
-      const related = products
-        .filter(p => p.category === product.category && p.id !== product.id)
-        .slice(0, 4)
-      setRelatedProducts(related)
-    }
-  }, [product, products])
+      setLoading(false)
+    }, 500) // Add 500ms delay to simulate network request
+  }, [id, location.state])
 
   if (loading) return <LoadingState />
-  if (error)
-    return (
-      <ErrorState error={error} onRetry={() => dispatch(fetchProducts())} />
-    )
+  if (error) return <ErrorState error={error} onRetry={() => window.location.href = '/products'} />
   if (!product) return <ProductNotFound />
 
   return (
     <div className='container mx-auto mt-20 px-4 py-8'>
       <div className='mb-12 grid grid-cols-1 gap-8 md:grid-cols-2'>
         <ProductImages product={product} />
-
         <ProductInfo product={product} />
       </div>
 
@@ -75,7 +262,9 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      <RelatedProducts products={relatedProducts} />
+      {relatedProducts.length > 0 && (
+        <RelatedProducts products={relatedProducts} />
+      )}
     </div>
   )
 }
@@ -102,7 +291,7 @@ const ProductNotFound = () => (
       Sản phẩm này không tồn tại hoặc đã bị xóa
     </p>
     <a
-      href='/product'
+      href='/products'
       className='rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none'
     >
       Xem tất cả sản phẩm

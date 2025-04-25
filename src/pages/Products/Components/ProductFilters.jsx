@@ -7,11 +7,24 @@ const ProductFilters = ({
   onCategoryChange,
   sortBy,
   onSortChange,
+  searchText,
+  onSearchChange,
 }) => {
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false)
 
   return (
     <div className='mb-8 flex flex-col justify-between space-y-4 rounded-lg bg-gray-50 p-4 md:flex-row md:items-center md:space-y-0'>
+      {/* Search Input - Desktop */}
+      <div className='w-full md:w-64'>
+        <input
+          type='text'
+          placeholder='Tìm kiếm sản phẩm...'
+          value={searchText}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className='w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-blue-500'
+        />
+      </div>
+
       {/* Categories - Desktop */}
       <div className='hidden md:block'>
         <div className='flex flex-wrap items-center gap-2'>
@@ -48,6 +61,17 @@ const ProductFilters = ({
 
         {isFilterMenuOpen && (
           <div className='absolute right-0 left-0 z-10 mt-2 rounded-lg bg-white p-4 shadow-lg'>
+            {/* Search Input - Mobile */}
+            <div className='mb-4'>
+              <input
+                type='text'
+                placeholder='Tìm kiếm sản phẩm...'
+                value={searchText}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className='w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-blue-500'
+              />
+            </div>
+
             <div className='mb-4'>
               <p className='mb-2 font-medium text-gray-700'>Danh mục:</p>
               <div className='flex flex-wrap gap-2'>
@@ -72,7 +96,7 @@ const ProductFilters = ({
               <select
                 value={sortBy}
                 onChange={onSortChange}
-                className='block w-full rounded-lg border border-gray-300 bg-white p-2.5 text-sm text-gray-700 focus:border-blue-500 focus:ring-blue-500 focus:outline-none'
+                className='block w-full rounded-lg border border-gray-300 bg-white p-2.5 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-blue-500'
               >
                 <option value='default'>Mặc định</option>
                 <option value='price-low-high'>Giá: Thấp - Cao</option>
@@ -94,7 +118,7 @@ const ProductFilters = ({
             id='sort'
             value={sortBy}
             onChange={onSortChange}
-            className='rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 focus:border-blue-500 focus:ring-blue-500 focus:outline-none'
+            className='rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-blue-500'
           >
             <option value='default'>Mặc định</option>
             <option value='price-low-high'>Giá: Thấp - Cao</option>
