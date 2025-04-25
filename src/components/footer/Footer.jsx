@@ -7,7 +7,7 @@ import face from '/src/assets/facebook.png'
 
 const Footer = () => {
   return (
-    <footer className='mt-10 bg-gray-900 py-8 text-white'>
+    <footer className=' bg-gray-900 py-8 text-white'>
       <div className='container mx-auto grid grid-cols-1 gap-10 px-4 md:grid-cols-4'>
         {/* Danh mục hàng */}
         <div>
