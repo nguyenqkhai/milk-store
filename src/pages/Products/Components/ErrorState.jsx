@@ -1,6 +1,9 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
-const ErrorState = ({ error, onRetry }) => {
+const ErrorState = ({ error }) => {
+  const navigate = useNavigate();
+
   return (
     <div className='flex min-h-[500px] items-center justify-center'>
       <div className='max-w-md rounded-xl bg-red-50 p-6 text-center shadow-md'>
@@ -24,7 +27,7 @@ const ErrorState = ({ error, onRetry }) => {
         </h3>
         <p className='mb-4 text-gray-600'>{error}</p>
         <button
-          onClick={onRetry}
+          onClick={() => navigate('/product')}
           className='rounded-lg bg-blue-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 focus:outline-none'
         >
           Thử lại

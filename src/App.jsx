@@ -17,6 +17,7 @@ import Checkout from './pages/Order/Checkout'
 import Cart from './pages/Cart/Cart'
 import PurchaseGuide from './pages/Guide/PurchaseGuide'
 import NotFound from './pages/NotFound/NotFound'
+
 const Layout = ({ children }) => {
   const location = useLocation()
   const hideHeaderRoutes = ['/login', '/register', '/forgot-password']
@@ -56,4 +57,3 @@ const App = () => {
 }
 
 export default App
-
