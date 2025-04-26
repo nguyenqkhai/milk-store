@@ -218,6 +218,9 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState([])
 
   useEffect(() => {
+    // Scroll to top when component mounts
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+
     // Simulate loading time
     setTimeout(() => {
       if (location.state?.product) {

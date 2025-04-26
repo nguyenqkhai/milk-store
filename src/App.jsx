@@ -15,6 +15,8 @@ import Footer from './components/Footer/Footer'
 import Payment from './pages/Payment/Payment'
 import Checkout from './pages/Order/Checkout'
 import Cart from './pages/Cart/Cart'
+import PurchaseGuide from './pages/Guide/PurchaseGuide'
+import NotFound from './pages/NotFound/NotFound'
 const Layout = ({ children }) => {
   const location = useLocation()
   const hideHeaderRoutes = ['/login', '/register', '/forgot-password']
@@ -40,10 +42,12 @@ const App = () => {
             <Route path='/about' element={<About />} />
             <Route path='/product' element={<Products />} />
             <Route path='/contact' element={<Contact />} />
-            <Route path='/product/:slug' element={<ProductDetail />} />
+            <Route path='/product/:id' element={<ProductDetail />} />
             <Route path='/checkout' element={<Checkout/>}/>
             <Route path='/cart' element={<Cart />} />
             <Route path='/payment' element={<Payment/>}/>
+            <Route path='/purchase-guide' element={<PurchaseGuide />} />
+            <Route path='/not-found' element={<NotFound/>}/>
           </Routes>
         </Layout>
       </Router>
