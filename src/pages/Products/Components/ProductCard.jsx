@@ -1,8 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { FiShoppingCart, FiHeart, FiEye } from 'react-icons/fi'
-import { toSlug } from '../../../utils/slug'
-import { productPageConfig } from '../../../components/products/data'
 
 const ProductCard = ({ product, onAddToCart, allProducts }) => {
   return (
@@ -13,15 +11,14 @@ const ProductCard = ({ product, onAddToCart, allProducts }) => {
         className="block"
       >
         <div className="relative overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg">
-          {/* Discount Badge */}
-          {product.discountPercentage > 0 && (
-            <div className="absolute top-0 right-0 z-10 rounded-bl-lg bg-red-500 px-2 py-1 text-xs font-bold text-white">
-              -{Math.round(product.discountPercentage)}%
-            </div>
-          )}
-
           {/* Product Image */}
           <div className="relative aspect-square overflow-hidden">
+            {/* Discount Badge */}
+            {product.discountPercentage > 0 && (
+              <div className="absolute top-2 left-2 z-10 rounded-lg bg-red-500 px-2 py-1 text-xs font-bold text-white">
+                -{Math.round(product.discountPercentage)}%
+              </div>
+            )}
             <img
               src={product.thumbnail}
               alt={product.title}
