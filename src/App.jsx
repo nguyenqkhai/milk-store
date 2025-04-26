@@ -14,6 +14,7 @@ import About from './pages/About/About'
 import Footer from './components/Footer/Footer'
 import Payment from './pages/Payment/Payment'
 import Checkout from './pages/Order/Checkout'
+import Cart from './pages/Cart/Cart'
 const Layout = ({ children }) => {
   const location = useLocation()
   const hideHeaderRoutes = ['/login', '/register', '/forgot-password']
