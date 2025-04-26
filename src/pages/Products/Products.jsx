@@ -15,7 +15,7 @@ const Products = () => {
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [categories, setCategories] = useState(['Tất cả']);
   const [sortBy, setSortBy] = useState('default');
-  const productsPerPage = 12;
+  const productsPerPage = 8;
 
   // Fetch products data
   useEffect(() => {
@@ -426,23 +426,6 @@ const Products = () => {
 
         {/* Main Content */}
         <div className="flex-1">
-          <div className="mb-6 flex items-center justify-between">
-            {/* <h1 className="text-2xl font-bold">Danh sách sản phẩm</h1> */}
-            <div className="flex items-center gap-2">
-              <label htmlFor="sort" className="text-sm text-gray-600">Sắp xếp:</label>
-              <select
-                id="sort"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="rounded border px-2 py-1 text-sm focus:outline-none"
-              >
-                <option value="default">Mặc định</option>
-                <option value="price-low-high">Giá: Thấp đến Cao</option>
-                <option value="price-high-low">Giá: Cao đến Thấp</option>
-                <option value="rating">Xếp hạng cao nhất</option>
-              </select>
-            </div>
-          </div>
 
           {filteredProducts.length === 0 ? (
             <div className="rounded-lg bg-gray-50 p-8 text-center">
@@ -470,7 +453,7 @@ const Products = () => {
                 {currentProducts.map((product) => (
                   <Link
                     key={product.id}
-                    to={`/products/${product.id}`}
+                    to={`/product/${product.id}`}
                     state={{ product, allProducts: products }}
                   >
                     <ProductCard product={product} />
