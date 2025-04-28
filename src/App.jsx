@@ -15,7 +15,8 @@ import Footer from './components/Footer/Footer'
 import Payment from './pages/Payment/Payment'
 import Checkout from './pages/Order/Checkout'
 import Cart from './pages/Cart/Cart'
-
+import TransferPolicy from './components/footer/TransferPolicy'
+import ReturnPolicy from './components/footer/ReturnPolicy'
 const Layout = ({ children }) => {
   const location = useLocation()
   const hideHeaderRoutes = ['/login', '/register', '/forgot-password']
@@ -45,6 +46,8 @@ const App = () => {
             <Route path='/checkout' element={<Checkout/>}/>
             <Route path='/cart' element={<Cart />} />
             <Route path='/payment' element={<Payment/>}/>
+            <Route path='/transfer-policy' element={<TransferPolicy/>}/>
+            <Route path='/return-policy' element={<ReturnPolicy/>}/>
           </Routes>
         </Layout>
       </Router>
