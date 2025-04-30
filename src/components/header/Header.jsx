@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { headerClass } from './data'
-import { FiShoppingCart, FiSearch, FiUser } from 'react-icons/fi'
-import SearchBox from '../Products/Search'
+import { FiShoppingCart, FiUser } from 'react-icons/fi'
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const location = useLocation()
-  const [showSearch, setShowSearch] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,33 +15,7 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  useEffect(() => {
-    // Close search when location changes (user navigates to another page)
-    setShowSearch(false)
-  }, [location.pathname])
-
   const isActive = path => location.pathname === path
-
-  // Handle click outside to close search
-  useEffect(() => {
-    const handleClickOutside = event => {
-      const searchContainer = document.getElementById('search-container')
-      const searchButton = document.getElementById('search-button')
-
-      if (
-        showSearch &&
-        searchContainer &&
-        !searchContainer.contains(event.target) &&
-        searchButton &&
-        !searchButton.contains(event.target)
-      ) {
-        setShowSearch(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [showSearch])
 
   return (
     <>
@@ -91,13 +63,6 @@ const Header = () => {
 
           {/* buttons */}
           <div className='flex items-center space-x-4'>
-            <button
-              id='search-button'
-              onClick={() => setShowSearch(!showSearch)}
-              className='flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-gray-700 transition-all hover:bg-gray-100'
-            >
-              <FiSearch className='h-5 w-5' />
-            </button>
             <button className='flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-gray-700 transition-all hover:bg-gray-100'>
               <Link to='/login'>
                 <FiUser className='h-5 w-5' />
@@ -115,33 +80,6 @@ const Header = () => {
           </div>
         </div>
       </header>
-
-      {/* Search dropdown that appears below the header */}
-      {showSearch && (
-        <div
-          id='search-container'
-          className='absolute right-0 left-0 z-10 mx-auto w-full max-w-3xl transform px-4 transition-all duration-300 ease-in-out'
-          style={{
-            top: isScrolled ? '4.5rem' : '5.5rem', // Adjust top based on header height
-            boxShadow:
-              '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-          }}
-        >
-          <div className='rounded-lg bg-white p-4'>
-            <SearchBox
-              label='Tìm kiếm sản phẩm'
-              placeholder='Nhập tên sản phẩm...'
-              onSearchChange={text => console.log(text)}
-              error={''}
-              required={false}
-              disabled={false}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Add a spacer div when search is showing to prevent content overlap */}
-      {showSearch && <div className='h-20'></div>}
     </>
   )
 }
