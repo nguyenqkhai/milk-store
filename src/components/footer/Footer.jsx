@@ -53,12 +53,12 @@ const Footer = () => {
               </a>
             </li>
             <li>
-              <a href='#' className='hover:text-blue-300'>
+              <a href='/transfer-policy' className='hover:text-blue-300'>
                 Chính sách vận chuyển
               </a>
             </li>
             <li>
-              <a href='#' className='hover:text-blue-300'>
+              <a href='/return-policy' className='hover:text-blue-300'>
                 Chính sách trả hàng
               </a>
             </li>

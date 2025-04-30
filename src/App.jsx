@@ -15,6 +15,10 @@ import Footer from './components/Footer/Footer'
 import Payment from './pages/Payment/Payment'
 import Checkout from './pages/Order/Checkout'
 import Cart from './pages/Cart/Cart'
+import TransferPolicy from './components/footer/TransferPolicy'
+import ReturnPolicy from './components/footer/ReturnPolicy'
+import PurchaseGuide from './pages/Guide/PurchaseGuide'
+import NotFound from './pages/NotFound/NotFound'
 
 const Layout = ({ children }) => {
   const location = useLocation()
@@ -45,6 +49,10 @@ const App = () => {
             <Route path='/checkout' element={<Checkout/>}/>
             <Route path='/cart' element={<Cart />} />
             <Route path='/payment' element={<Payment/>}/>
+            <Route path='/transfer-policy' element={<TransferPolicy/>}/>
+            <Route path='/return-policy' element={<ReturnPolicy/>}/>
+            <Route path='/purchase-guide' element={<PurchaseGuide />} />
+            <Route path='/not-found' element={<NotFound/>}/>
           </Routes>
         </Layout>
       </Router>
@@ -53,4 +61,3 @@ const App = () => {
 }
 
 export default App
-

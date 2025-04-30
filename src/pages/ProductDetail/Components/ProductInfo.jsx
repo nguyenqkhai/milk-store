@@ -19,35 +19,6 @@ const ProductInfo = ({ product }) => {
 
   return (
     <div className='space-y-6'>
-      <nav className='text-sm text-gray-500'>
-        <ol className='flex flex-wrap items-center'>
-          <li className='flex items-center'>
-            <a href='/' className='hover:text-blue-500'>
-              Trang chủ
-            </a>
-            <span className='mx-2'>/</span>
-          </li>
-          <li className='flex items-center'>
-            <a href='/products' className='hover:text-blue-500'>
-              Sản phẩm
-            </a>
-            <span className='mx-2'>/</span>
-          </li>
-          <li className='flex items-center'>
-            <a
-              href={`/products?category=${product.category}`}
-              className='hover:text-blue-500'
-            >
-              {product.category}
-            </a>
-            <span className='mx-2'>/</span>
-          </li>
-          <li className='truncate font-medium text-gray-700'>
-            {product.title}
-          </li>
-        </ol>
-      </nav>
-
       <div>
         <h1 className='mb-2 text-2xl font-bold text-gray-800 md:text-3xl'>
           {product.title}

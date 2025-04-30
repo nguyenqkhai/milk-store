@@ -408,7 +408,7 @@ const Products = () => {
                     </div>
                     <div className="flex-1">
                       <Link 
-                        to={`/product /${product.id}`}
+                        to={`/product/${product.id}`}
                         state={{ product, allProducts: products }}
                         className="text-sm font-medium text-gray-700 hover:text-blue-600"
                       >
