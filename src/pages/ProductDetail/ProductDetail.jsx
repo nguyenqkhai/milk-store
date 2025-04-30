@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useLocation } from 'react-router-dom'
+import { useParams, useLocation, Link, useNavigate } from 'react-router-dom'
 import ProductImages from './Components/ProductImages'
 import ProductInfo from './Components/ProductInfo'
 import RelatedProducts from './Components/RelatedProducts'
 import LoadingState from '../Products/Components/LoadingState'
 import ErrorState from '../Products/Components/ErrorState'
+import { toSlug } from '../../utils/stringUtils'
 
 const mockProducts = [
   {
@@ -210,95 +211,79 @@ const mockProducts = [
 ];
 
 const ProductDetail = () => {
-  const { id } = useParams()
-  const location = useLocation()
+  const { category, productName } = useParams()
+  const navigate = useNavigate()
+  const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [product, setProduct] = useState(null)
-  const [relatedProducts, setRelatedProducts] = useState([])
 
   useEffect(() => {
-    // Scroll to top when component mounts
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-
-    // Simulate loading time
-    setTimeout(() => {
-      if (location.state?.product) {
-        // If coming from Products page
-        setProduct(location.state.product)
-        const related = (location.state.allProducts || mockProducts)
-          .filter(p => p.category === location.state.product.category && p.id !== location.state.product.id)
-          .slice(0, 4)
-        setRelatedProducts(related)
-      } else {
-        // If accessing directly via URL
-        const foundProduct = mockProducts.find(p => p.id === parseInt(id))
-        if (foundProduct) {
-          setProduct(foundProduct)
-          const related = mockProducts
-            .filter(p => p.category === foundProduct.category && p.id !== foundProduct.id)
-            .slice(0, 4)
-          setRelatedProducts(related)
-        } else {
-          setError('Không tìm thấy sản phẩm')
-        }
+    // Check if this is an old URL format (using ID)
+    const id = parseInt(productName)
+    if (!isNaN(id)) {
+      const productById = mockProducts.find(p => p.id === id)
+      if (productById) {
+        // Redirect to new URL format immediately
+        navigate(`/${toSlug(productById.category)}/${toSlug(productById.title)}`, { replace: true })
+        return
       }
-      setLoading(false)
-    }, 500) // Add 500ms delay to simulate network request
-  }, [id, location.state])
+    }
+
+    const fetchProduct = () => {
+      try {
+        // Simulate API call
+        setTimeout(() => {
+          const foundProduct = mockProducts.find(
+            p => toSlug(p.category) === category && toSlug(p.title) === productName
+          )
+          
+          if (foundProduct) {
+            setProduct(foundProduct)
+          } else {
+            setError('Không tìm thấy sản phẩm')
+          }
+          setLoading(false)
+        }, 1000)
+      } catch (err) {
+        setError('Có lỗi xảy ra khi tải sản phẩm')
+        setLoading(false)
+      }
+    }
+
+    fetchProduct()
+  }, [category, productName, navigate])
 
   if (loading) return <LoadingState />
-  if (error) return <ErrorState error={error} onRetry={() => window.location.href = '/products'} />
+  if (error) return <ErrorState message={error} />
   if (!product) return <ProductNotFound />
 
   return (
-    <div className='container mx-auto mt-20 px-4 py-8'>
-      <div className='mb-12 grid grid-cols-1 gap-8 md:grid-cols-2'>
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <ProductImages product={product} />
         <ProductInfo product={product} />
       </div>
-
-      <div className='mb-12'>
-        <h2 className='mb-4 text-2xl font-semibold'>Thông tin chi tiết</h2>
-        <div className='prose max-w-none rounded-lg bg-white p-6 shadow-sm'>
-          <p>{product.description}</p>
-        </div>
-      </div>
-
-      {relatedProducts.length > 0 && (
-        <RelatedProducts products={relatedProducts} />
-      )}
+      <RelatedProducts 
+        currentProductId={product.id} 
+        category={product.category}
+        products={mockProducts} 
+      />
     </div>
   )
 }
 
 const ProductNotFound = () => (
-  <div className='flex min-h-[400px] flex-col items-center justify-center rounded-xl bg-gray-50 p-8'>
-    <svg
-      className='mb-4 h-16 w-16 text-gray-400'
-      fill='none'
-      viewBox='0 0 24 24'
-      stroke='currentColor'
-    >
-      <path
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        strokeWidth={1.5}
-        d='M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
-      />
-    </svg>
-    <p className='mb-1 text-xl font-medium text-gray-800'>
-      Không tìm thấy sản phẩm
-    </p>
-    <p className='mb-4 text-center text-gray-500'>
-      Sản phẩm này không tồn tại hoặc đã bị xóa
-    </p>
-    <a
-      href='/products'
-      className='rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none'
-    >
-      Xem tất cả sản phẩm
-    </a>
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="text-center">
+      <h1 className="text-4xl font-bold text-gray-800 mb-4">Không tìm thấy sản phẩm</h1>
+      <p className="text-gray-600 mb-6">Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+      <Link
+        to="/product"
+        className="inline-block bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"
+      >
+        Quay về trang sản phẩm
+      </Link>
+    </div>
   </div>
 )
 
