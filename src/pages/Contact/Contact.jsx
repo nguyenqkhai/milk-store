@@ -1,7 +1,6 @@
 import shipper from '/src/assets/shipper.webp'
 import bgcity from '/src/assets/bgcity5.jpg'
 import milkstore from '/src/assets/store2.png'
-import milkstore2 from '/src/assets/milkstore.jpg'
 import { MdLocalPhone } from 'react-icons/md'
 import { MdEmail } from 'react-icons/md'
 import { IoLocationSharp } from 'react-icons/io5'
@@ -76,9 +75,9 @@ const utilities = [
   },
 ]
 const urlImg = [
-  { img: milkstore2, alt: 'image1' },
-  { img: milkstore2, alt: 'image2' },
-  { img: milkstore2, alt: 'image3' },
+  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1745990380/milkstore_qildau.jpg", alt: 'image1' },
+  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1745990380/milkstore_qildau.jpg", alt: 'image2' },
+  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1745990380/milkstore_qildau.jpg", alt: 'image3' },
 ]
 const Contact = () => {
   const scrollToSection = () => {

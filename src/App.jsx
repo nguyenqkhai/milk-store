@@ -6,8 +6,9 @@ import {
 } from 'react-router-dom'
 import Header from './components/Header/Header'
 import Login from './pages/Auth/Login'
+import Register from './pages/Auth/Register'
 import Home from './pages/Home/Home'
-import Contact from './pages/contact/Contact'
+import Contact from './pages/Contact/Contact'
 import Products from './pages/Products/Products'
 import ProductDetail from './pages/ProductDetail/ProductDetail'
 import About from './pages/About/About'
@@ -19,6 +20,7 @@ import TransferPolicy from './components/footer/TransferPolicy'
 import ReturnPolicy from './components/footer/ReturnPolicy'
 import PurchaseGuide from './pages/Guide/PurchaseGuide'
 import NotFound from './pages/NotFound/NotFound'
+import { AuthProvider } from './context/AuthContext'
 
 const Layout = ({ children }) => {
   const location = useLocation()
@@ -37,24 +39,27 @@ const App = () => {
   return (
     <div>
       <Router>
-        <Layout>
-          <Routes>
-            <Route path='/' element={<Home />} />
-            <Route path='/home' element={<Home />} />
-            <Route path='/login' element={<Login />} />
-            <Route path='/about' element={<About />} />
-            <Route path='/product' element={<Products />} />
-            <Route path='/contact' element={<Contact />} />
-            <Route path='/product/:id' element={<ProductDetail />} />
-            <Route path='/checkout' element={<Checkout/>}/>
-            <Route path='/cart' element={<Cart />} />
-            <Route path='/payment' element={<Payment/>}/>
-            <Route path='/transfer-policy' element={<TransferPolicy/>}/>
-            <Route path='/return-policy' element={<ReturnPolicy/>}/>
-            <Route path='/purchase-guide' element={<PurchaseGuide />} />
-            <Route path='/not-found' element={<NotFound/>}/>
-          </Routes>
-        </Layout>
+        <AuthProvider>
+          <Layout>
+            <Routes>
+              <Route path='/' element={<Home />} />
+              <Route path='/home' element={<Home />} />
+              <Route path='/login' element={<Login />} />
+              <Route path='/register' element={<Register />} />
+              <Route path='/about' element={<About />} />
+              <Route path='/product' element={<Products />} />
+              <Route path='/contact' element={<Contact />} />
+              <Route path='/product/:id' element={<ProductDetail />} />
+              <Route path='/checkout' element={<Checkout/>}/>
+              <Route path='/cart' element={<Cart />} />
+              <Route path='/payment' element={<Payment/>}/>
+              <Route path='/transfer-policy' element={<TransferPolicy/>}/>
+              <Route path='/return-policy' element={<ReturnPolicy/>}/>
+              <Route path='/purchase-guide' element={<PurchaseGuide />} />
+              <Route path='/not-found' element={<NotFound/>}/>
+            </Routes>
+          </Layout>
+        </AuthProvider>
       </Router>
     </div>
   )

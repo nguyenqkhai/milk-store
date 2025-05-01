@@ -1,65 +1,142 @@
-import React from 'react';
-import { Button, Checkbox, Form, Input } from 'antd';
+import React, { useState } from 'react';
+import { Form, Input, message } from 'antd';
 import milkstore from '/src/assets/milkstore.jpg';
-// const onFinish = (values) => {
-//     console.log('Success:', values);
-// };
-
-// const onFinishFailed = (errorInfo) => {
-//     console.log('Failed:', errorInfo);
-// };
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 function Login() {
+    const { login } = useAuth();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+
+    const onFinish = async (values) => {
+        setLoading(true);
+        try {
+            const result = await login(values.username, values.password);
+            if (result.success) {
+                message.success('Login successful!');
+            } else {
+                message.error(result.error || 'Login failed');
+            }
+        } catch (error) {
+            message.error('An error occurred during login');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const onFinishFailed = (errorInfo) => {
+        console.log('Failed:', errorInfo);
+    };
+
     return (
-        <div className="h-screen">
-            <div className="h-full bg-gradient-to-b from-[#4A90E2] to-[#1E3A8A] flex justify-center items-center ">
-                <div className="flex flex-col gap-8 bg-white py-10 px-10 rounded-tl-2xl rounded-bl-2xl shadow-2xl">
-                    <h1 className="text-5xl text-center font-bold">Welcome</h1>
-
-                    <Form
-                        className='flex flex-col gap-1'
-                        name="basic"
-                        labelCol={{ span: 7 }}
-                        wrapperCol={{ span: 16 }}
-                        style={{ maxWidth: 600 }}
-                        initialValues={{ remember: true }}
-                        // onFinish={onFinish}
-                        // onFinishFailed={onFinishFailed}
-                        autoComplete="off"
-                    >
-                        <Form.Item
-                            label="Username"
-                            name="username"
-                            rules={[{ required: true, message: 'Please input your username!' }]}
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-600 flex items-center justify-center p-4">
+            <motion.div 
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row"
+            >
+                {/* Left Side - Form */}
+                <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col">
+                    <div className="text-center mb-6">
+                        <motion.h1 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-3xl font-bold text-gray-800"
                         >
-                            <Input />
-                        </Form.Item>
-
-                        <Form.Item
-                            label="Password"
-                            name="password"
-                            rules={[{ required: true, message: 'Please input your password!' }]}
-                        >
-                            <Input.Password />
-                        </Form.Item>
-                        <div className="flex justify-center">
-                            <button className=" bg-blue-500 hover:bg-blue-600 text-white border-blue-500 border-2 py-1 px-[112px] rounded-md">
-                                Login
-                            </button>
-                        </div>
-                        
-                    </Form>
-                    <hr/>
-                    <div className='flex'>
-                        <span className=''>Don't have account?</span>
-                        <button className="text-sm ml-12 bg-blue-500 hover:bg-blue-600 text-white border-blue-500 border-2 py-[2px] px-[15px] rounded-md">
-                                Register
-                        </button>
+                            Welcome Back
+                        </motion.h1>
+                        <p className="text-gray-600 text-sm mt-1">Sign in to continue</p>
                     </div>
 
+                    <Form
+                        name="basic"
+                        layout="vertical"
+                        initialValues={{ remember: true }}
+                        onFinish={onFinish}
+                        onFinishFailed={onFinishFailed}
+                        autoComplete="off"
+                        className="flex-1"
+                    >
+                        <Form.Item
+                            label={<span className="text-sm font-medium">Username</span>}
+                            name="username"
+                            rules={[{ required: true, message: 'Please input your username!' }]}
+                            className="mb-3"
+                        >
+                            <Input 
+                                size="middle" 
+                                className="rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500"
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            label={<span className="text-sm font-medium">Password</span>}
+                            name="password"
+                            rules={[{ required: true, message: 'Please input your password!' }]}
+                            className="mb-4"
+                        >
+                            <Input.Password 
+                                size="middle" 
+                                className="rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500"
+                            />
+                        </Form.Item>
+
+                        <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
+                            >
+                                {loading ? (
+                                    <span className="flex items-center justify-center">
+                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Logging in...
+                                    </span>
+                                ) : 'Login'}
+                            </button>
+                        </motion.div>
+                    </Form>
+
+                    <div className="mt-5 text-center">
+                        <p className="text-gray-600 text-sm mb-2">Don't have an account?</p>
+                        <motion.button 
+                            onClick={() => navigate('/register')}
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                            className="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-200"
+                        >
+                            Create account
+                        </motion.button>
+                    </div>
                 </div>
-                <img src={milkstore} alt="" className='block-hidden w-[450px] h-[407px] object-cover rounded-tr-2xl rounded-br-2xl' />
-            </div>
+
+                {/* Right Side - Image */}
+                <div className="hidden md:block w-1/2 relative bg-blue-600">
+                    <img 
+                        src={"https://res.cloudinary.com/dwbcqjupj/image/upload/v1745990380/milkstore_qildau.jpg"} 
+                        alt="Milk Store" 
+                        className="w-full h-full object-cover opacity-90"
+                    />
+                    {/* <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20">
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.4 }}
+                            className="text-white text-center px-6"
+                        >
+                            <h2 className="text-2xl font-bold mb-1">Milk Store</h2>
+                            <p className="text-sm">Premium dairy products</p>
+                        </motion.div>
+                    </div> */}
+                </div>
+            </motion.div>
         </div>
     );
 }
