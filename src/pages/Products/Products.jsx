@@ -408,7 +408,7 @@ const Products = () => {
                     </div>
                     <div className="flex-1">
                       <Link 
-                        to={`/product/${product.id}`}
+                        to={`/san-pham/${product.id}`}
                         state={{ product, allProducts: products }}
                         className="text-sm font-medium text-gray-700 hover:text-blue-600"
                       >
@@ -453,7 +453,7 @@ const Products = () => {
                 {currentProducts.map((product) => (
                   <Link
                     key={product.id}
-                    to={`/product/${product.id}`}
+                    to={`/san-pham/${product.id}`}
                     state={{ product, allProducts: products }}
                   >
                     <ProductCard product={product} />

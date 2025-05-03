@@ -40,18 +40,18 @@ const App = () => {
         <Layout>
           <Routes>
             <Route path='/' element={<Home />} />
-            <Route path='/home' element={<Home />} />
-            <Route path='/login' element={<Login />} />
-            <Route path='/about' element={<About />} />
-            <Route path='/product' element={<Products />} />
-            <Route path='/contact' element={<Contact />} />
+            <Route path='/trang-chu' element={<Home />} />
+            <Route path='/dang-nhap' element={<Login />} />
+            <Route path='/ve-chung-toi' element={<About />} />
+            <Route path='/san-pham' element={<Products />} />
+            <Route path='/lien-he' element={<Contact />} />
             <Route path='/:category/:productName' element={<ProductDetail />} />
-            <Route path='/checkout' element={<Checkout/>}/>
-            <Route path='/cart' element={<Cart />} />
-            <Route path='/payment' element={<Payment/>}/>
-            <Route path='/transfer-policy' element={<TransferPolicy/>}/>
-            <Route path='/purchase-guide' element={<PurchaseGuide />} />
-            <Route path='/return-policy' element={<ReturnPolicy />} />
+            <Route path='/thanh-toan' element={<Checkout/>}/>
+            <Route path='/gio-hang' element={<Cart />} />
+            <Route path='/xac-nhan-thanh-toan' element={<Payment/>}/>
+            <Route path='/chinh-sach-van-chuyen' element={<TransferPolicy/>}/>
+            <Route path='/huong-dan-mua-hang' element={<PurchaseGuide />} />
+            <Route path='/chinh-sach-doi-tra' element={<ReturnPolicy />} />
             <Route path='*' element={<NotFound/>}/>
           </Routes>
         </Layout>
