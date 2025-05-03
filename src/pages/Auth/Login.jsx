@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Form, Input, message } from 'antd';
-import milkstore from '/src/assets/milkstore.jpg';
-import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../context/AuthContext';
 
 function Login() {
     const { login } = useAuth();
@@ -16,6 +15,7 @@ function Login() {
             const result = await login(values.username, values.password);
             if (result.success) {
                 message.success('Login successful!');
+                navigate('/');
             } else {
                 message.error(result.error || 'Login failed');
             }
@@ -107,7 +107,7 @@ function Login() {
                     <div className="mt-5 text-center">
                         <p className="text-gray-600 text-sm mb-2">Don't have an account?</p>
                         <motion.button 
-                            onClick={() => navigate('/register')}
+                            onClick={() => navigate('/dang-ky')}
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
                             className="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-200"
