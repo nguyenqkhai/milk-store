@@ -124,17 +124,6 @@ function Login() {
                         alt="Milk Store" 
                         className="w-full h-full object-cover opacity-90"
                     />
-                    {/* <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20">
-                        <motion.div 
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.4 }}
-                            className="text-white text-center px-6"
-                        >
-                            <h2 className="text-2xl font-bold mb-1">Milk Store</h2>
-                            <p className="text-sm">Premium dairy products</p>
-                        </motion.div>
-                    </div> */}
                 </div>
             </motion.div>
         </div>
