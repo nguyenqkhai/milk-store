@@ -6,8 +6,9 @@ import {
 } from 'react-router-dom'
 import Header from './components/Header/Header'
 import Login from './pages/Auth/Login'
+import Register from './pages/Auth/Register'
 import Home from './pages/Home/Home'
-import Contact from './pages/contact/Contact'
+import Contact from './pages/Contact/Contact'
 import Products from './pages/Products/Products'
 import ProductDetail from './pages/ProductDetail/ProductDetail'
 import About from './pages/About/About'
@@ -19,6 +20,7 @@ import TransferPolicy from './components/footer/TransferPolicy'
 import ReturnPolicy from './components/footer/ReturnPolicy'
 import PurchaseGuide from './pages/Guide/PurchaseGuide'
 import NotFound from './pages/NotFound/NotFound'
+import { AuthProvider } from './context/AuthContext'
 
 const Layout = ({ children }) => {
   const location = useLocation()
