@@ -36,25 +36,25 @@ const Header = () => {
           {/* navigation */}
           <nav className='flex items-center space-x-8'>
             <Link
-              to='/'
+              to='/trang-chu'
               className={`${headerClass.nav} ${isActive('/') ? 'font-semibold text-blue-600' : ''}`}
             >
               Trang chủ
             </Link>
             <Link
-              to='/product'
+              to='/san-pham'
               className={`${headerClass.nav} ${isActive('/product') ? 'font-semibold text-blue-600' : ''}`}
             >
               Sản phẩm
             </Link>
             <Link
-              to='/about'
+              to='/ve-chung-toi'
               className={`${headerClass.nav} ${isActive('/about') ? 'font-semibold text-blue-600' : ''}`}
             >
               Về chúng tôi
             </Link>
             <Link
-              to='/contact'
+              to='/lien-he'
               className={`${headerClass.nav} ${isActive('/contact') ? 'font-semibold text-blue-600' : ''}`}
             >
               Liên hệ
