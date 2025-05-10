@@ -1,21 +1,70 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   FiShoppingCart,
   FiHeart,
   FiShare2,
   FiMinus,
   FiPlus,
+  FiAlertCircle,
+  FiCheckCircle,
+  FiXCircle,
 } from 'react-icons/fi'
 
 const ProductInfo = ({ product }) => {
   const [quantity, setQuantity] = useState(1)
+  const [maxQuantity, setMaxQuantity] = useState(10) // Default max quantity
 
-  const increaseQuantity = () => setQuantity(prev => prev + 1)
+  // Determine the maximum quantity based on stock
+  useEffect(() => {
+    if (product.stockquantity !== undefined && product.stockquantity !== null) {
+      setMaxQuantity(product.stockquantity);
+      // If current quantity is more than available stock, adjust it
+      if (quantity > product.stockquantity) {
+        setQuantity(product.stockquantity > 0 ? product.stockquantity : 1);
+      }
+    }
+  }, [product.stockquantity, quantity]);
+
+  const increaseQuantity = () => {
+    if (quantity < maxQuantity) {
+      setQuantity(prev => prev + 1);
+    }
+  }
+
   const decreaseQuantity = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1))
+
+  // Handle direct input of quantity
+  const handleQuantityChange = (e) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value)) {
+      if (value > maxQuantity) {
+        setQuantity(maxQuantity);
+      } else if (value < 1) {
+        setQuantity(1);
+      } else {
+        setQuantity(value);
+      }
+    }
+  };
 
   const discountedPrice = product.discountPercentage
     ? Math.round(product.price * (1 - product.discountPercentage / 100))
     : product.price
+
+  // Determine stock status
+  const getStockStatus = () => {
+    if (product.stockquantity === undefined || product.stockquantity === null) {
+      return { text: 'Không xác định', color: 'text-gray-500', icon: <FiAlertCircle className="mr-1" /> };
+    } else if (product.stockquantity <= 0) {
+      return { text: 'Hết hàng', color: 'text-red-500', icon: <FiXCircle className="mr-1" /> };
+    } else if (product.stockquantity < 10) {
+      return { text: 'Sắp hết hàng', color: 'text-orange-500', icon: <FiAlertCircle className="mr-1" /> };
+    } else {
+      return { text: 'Còn hàng', color: 'text-green-500', icon: <FiCheckCircle className="mr-1" /> };
+    }
+  }
+
+  const stockStatus = getStockStatus();
 
   return (
     <div className='space-y-6'>
@@ -54,7 +103,10 @@ const ProductInfo = ({ product }) => {
           <span className='text-gray-500'>|</span>
           <span className='text-gray-500'>Đã bán: 120</span>
           <span className='text-gray-500'>|</span>
-          <span className='text-gray-500'>Kho: {product.stock}</span>
+          <div className={`flex items-center ${stockStatus.color}`}>
+            {stockStatus.icon}
+            <span>Kho: {product.stockquantity !== undefined ? product.stockquantity : 'N/A'} ({stockStatus.text})</span>
+          </div>
         </div>
       </div>
 
@@ -80,35 +132,70 @@ const ProductInfo = ({ product }) => {
 
       <p className='text-gray-600'>{product.description}</p>
 
-      <div className='flex items-center'>
-        <span className='mr-4 font-medium text-gray-700'>Số lượng:</span>
-        <div className='flex items-center overflow-hidden rounded-lg border border-gray-300'>
-          <button
-            onClick={decreaseQuantity}
-            className='flex items-center justify-center bg-gray-100 px-3 py-2 text-gray-600 hover:bg-gray-200'
-          >
-            <FiMinus />
-          </button>
-          <input
-            type='text'
-            value={quantity}
-            readOnly
-            className='w-12 border-none text-center focus:outline-none'
-          />
-          <button
-            onClick={increaseQuantity}
-            className='flex items-center justify-center bg-gray-100 px-3 py-2 text-gray-600 hover:bg-gray-200'
-          >
-            <FiPlus />
-          </button>
+      <div className='flex flex-col space-y-2'>
+        <div className='flex items-center'>
+          <span className='mr-4 font-medium text-gray-700'>Số lượng:</span>
+          <div className='flex items-center overflow-hidden rounded-lg border border-gray-300'>
+            <button
+              onClick={decreaseQuantity}
+              className='flex items-center justify-center bg-gray-100 px-3 py-2 text-gray-600 hover:bg-gray-200 disabled:opacity-50'
+              disabled={product.stockquantity <= 0}
+            >
+              <FiMinus />
+            </button>
+            <input
+              type='text'
+              value={quantity}
+              onChange={handleQuantityChange}
+              className='w-12 border-none text-center focus:outline-none'
+              disabled={product.stockquantity <= 0}
+            />
+            <button
+              onClick={increaseQuantity}
+              className={`flex items-center justify-center bg-gray-100 px-3 py-2 text-gray-600 hover:bg-gray-200 disabled:opacity-50 ${
+                quantity >= maxQuantity ? 'cursor-not-allowed opacity-50' : ''
+              }`}
+              disabled={quantity >= maxQuantity || product.stockquantity <= 0}
+            >
+              <FiPlus />
+            </button>
+          </div>
         </div>
+
+        {product.stockquantity > 0 && (
+          <div className='text-sm text-gray-500'>
+            Còn {product.stockquantity} sản phẩm
+          </div>
+        )}
+
+        {product.stockquantity <= 0 && (
+          <div className='text-sm text-red-500 font-medium'>
+            Sản phẩm hiện đang hết hàng
+          </div>
+        )}
       </div>
 
       <div className='flex flex-wrap gap-4'>
-        <button className='flex flex-1 items-center justify-center rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700'>
+        <button
+          className={`flex flex-1 items-center justify-center rounded-lg px-6 py-3 font-medium text-white ${
+            product.stockquantity > 0
+              ? 'bg-blue-600 hover:bg-blue-700'
+              : 'bg-gray-400 cursor-not-allowed'
+          }`}
+          disabled={product.stockquantity <= 0}
+          title={product.stockquantity <= 0 ? 'Sản phẩm hiện đang hết hàng' : ''}
+        >
           <FiShoppingCart className='mr-2' /> Thêm vào giỏ hàng
         </button>
-        <button className='flex flex-1 items-center justify-center rounded-lg bg-orange-500 px-6 py-3 font-medium text-white hover:bg-orange-600'>
+        <button
+          className={`flex flex-1 items-center justify-center rounded-lg px-6 py-3 font-medium text-white ${
+            product.stockquantity > 0
+              ? 'bg-orange-500 hover:bg-orange-600'
+              : 'bg-gray-400 cursor-not-allowed'
+          }`}
+          disabled={product.stockquantity <= 0}
+          title={product.stockquantity <= 0 ? 'Sản phẩm hiện đang hết hàng' : ''}
+        >
           Mua ngay
         </button>
         <button className='flex h-12 w-12 items-center justify-center rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100'>

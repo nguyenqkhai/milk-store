@@ -4,236 +4,106 @@ import ProductCard from './Components/ProductCard';
 import LoadingState from './Components/LoadingState';
 import ErrorState from './Components/ErrorState';
 import Pagination from './Components/Pagination';
+import { fetchProducts, fetchPaginatedProducts } from '../../services/productService';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [categories, setCategories] = useState(['Tất cả']);
-  const [sortBy, setSortBy] = useState('default');
-  const productsPerPage = 8;
+  const [sortBy, setSortBy] = useState('ProductName');
+  const [sortAscending, setSortAscending] = useState(true);
+  const [metadata, setMetadata] = useState({
+    pageNumber: 1,
+    pageSize: 10,
+    totalCount: 0,
+    totalPages: 0,
+    hasPrevious: false,
+    hasNext: false
+  });
+  const pageSize = 10;
 
-  // Fetch products data
+  // Fetch featured products for sidebar
   useEffect(() => {
-    const fetchProducts = async () => {
+    const getFeaturedProducts = async () => {
       try {
-        setLoading(true);
-        // Mock data - in a real app, this would be an API call
-        const mockProducts = [
-          {
-            id: 1,
-            title: 'Sữa Tươi Có Đường Vinamilk 1L',
-            category: 'Sữa tươi',
-            description: 'Sữa tươi tiệt trùng có đường Vinamilk giàu dinh dưỡng',
-            price: 30.000,
-            rating: 4.7,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 0
-          },
-          {
-            id: 2,
-            title: 'Sữa Tươi Không Đường Vinamilk 1L',
-            category: 'Sữa tươi',
-            description: 'Sữa tươi tiệt trùng không đường Vinamilk, tốt cho sức khỏe',
-            price: 30.000,
-            rating: 4.6,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 5
-          },
-          {
-            id: 3,
-            title: 'Sữa Hạt Óc Chó Vinamilk',
-            category: 'Sữa hạt',
-            description: 'Sữa óc chó thơm ngon, bổ dưỡng từ Vinamilk',
-            price: 32.000,
-            rating: 4.8,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 10
-          },
-          {
-            id: 4,
-            title: 'Sữa Đậu Nành Vinamilk 1L',
-            category: 'Sữa hạt',
-            description: 'Sữa đậu nành nguyên chất, ít đường',
-            price: 27.000,
-            rating: 4.5,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 0
-          },
-          {
-            id: 5,
-            title: 'Sữa Tươi TH True Milk 1L',
-            category: 'Sữa tươi',
-            description: 'Sữa tươi sạch từ trang trại TH',
-            price: 31.000,
-            rating: 4.6,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 0
-          },
-          {
-            id: 6,
-            title: 'Sữa Tươi Ít Đường TH True Milk 1L',
-            category: 'Sữa tươi',
-            description: 'Sữa ít đường từ thương hiệu TH True Milk',
-            price: 31.000,
-            rating: 4.7,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 3
-          },
-          {
-            id: 7,
-            title: 'Sữa Hạt TH True Nut Óc Chó',
-            category: 'Sữa hạt',
-            description: 'Sữa hạt óc chó thơm ngon từ TH True Nut',
-            price: 34.000,
-            rating: 4.6,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 5
-          },
-          {
-            id: 8,
-            title: 'Sữa Đậu Đen TH True Nut',
-            category: 'Sữa hạt',
-            description: 'Sữa đậu đen nguyên chất, thơm ngon và lành mạnh',
-            price: 35.000,
-            rating: 4.4,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 0
-          },
-          {
-            id: 9,
-            title: 'Sữa Tươi Có Đường Dutch Lady 1L',
-            category: 'Sữa tươi',
-            description: 'Sữa tươi thơm ngon từ Hà Lan',
-            price: 29.000,
-            rating: 4.5,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 0
-          },
-          {
-            id: 10,
-            title: 'Sữa Tươi Không Đường Dutch Lady 1L',
-            category: 'Sữa tươi',
-            description: 'Sữa không đường phù hợp người ăn kiêng',
-            price: 29.000,
-            rating: 4.3,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 0
-          },
-          {
-            id: 11,
-            title: 'Sữa Bắp Nutifood 1L',
-            category: 'Sữa hạt',
-            description: 'Sữa bắp Nutifood thơm ngon tự nhiên',
-            price: 28.000,
-            rating: 4.4,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 0
-          },
-          {
-            id: 12,
-            title: 'Sữa Dinh Dưỡng Nuti IQ Gold',
-            category: 'Sữa bột',
-            description: 'Sữa dành cho trẻ em phát triển trí tuệ và chiều cao',
-            price: 250.000,
-            rating: 4.9,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 15
-          },
-          {
-            id: 13,
-            title: 'Sữa Dielac Alpha Vinamilk 900g',
-            category: 'Sữa bột',
-            description: 'Sữa bột cho trẻ từ 1-6 tuổi hỗ trợ phát triển trí não',
-            price: 220.000,
-            rating: 4.7,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 10
-          },
-          {
-            id: 14,
-            title: 'Sữa Dinh Dưỡng GrowPLUS+ 1L',
-            category: 'Sữa dinh dưỡng',
-            description: 'Hỗ trợ tăng cân và chiều cao cho trẻ em suy dinh dưỡng',
-            price: 33.000,
-            rating: 4.6,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 7
-          },
-          {
-            id: 15,
-            title: 'Sữa Nuti EnPlus Diamond',
-            category: 'Sữa dinh dưỡng',
-            description: 'Sữa dành cho người lớn tuổi và người bệnh',
-            price: 230.000,
-            rating: 4.7,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 5
-          },
-          {
-            id: 16,
-            title: 'Sữa Sure Prevent Gold Vinamilk',
-            category: 'Sữa dinh dưỡng',
-            description: 'Hỗ trợ tim mạch, bổ sung canxi cho người cao tuổi',
-            price: 255.000,
-            rating: 4.8,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 10
-          },
-          {
-            id: 17,
-            title: 'Sữa Đặc Ông Thọ Trắng 380g',
-            category: 'Sữa đặc',
-            description: 'Sữa đặc có đường ông Thọ dùng pha cà phê hoặc làm bánh',
-            price: 25.000,
-            rating: 4.9,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 0
-          },
-          {
-            id: 18,
-            title: 'Sữa Đặc Ông Thọ Xanh 380g',
-            category: 'Sữa đặc',
-            description: 'Sữa đặc ít đường thích hợp với người ăn kiêng',
-            price: 26.000,
-            rating: 4.6,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 0
-          },
-          {
-            id: 19,
-            title: 'Sữa Tươi Nguyên Kem Meadow Fresh 1L',
-            category: 'Sữa tươi',
-            description: 'Sữa nguyên kem nhập khẩu từ New Zealand',
-            price: 35.000,
-            rating: 4.5,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 8
-          },
-          {
-            id: 20,
-            title: 'Sữa Hạt Ngũ Cốc TH True Nut',
-            category: 'Sữa hạt',
-            description: 'Kết hợp dinh dưỡng từ 5 loại hạt tốt cho sức khỏe',
-            price: 36.000,
-            rating: 4.7,
-            thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-            discountPercentage: 6
-          }
-        ];
-        setProducts(mockProducts);
-        setFilteredProducts(mockProducts);
-        
+        // Call the API to get a small set of products for the featured section
+        const productData = await fetchProducts();
+
+        // Get products with high ratings for the featured section
+        const featured = productData
+          .filter(product => product.rating >= 4.5)
+          .slice(0, 4);
+
+        setFeaturedProducts(featured);
+
         // Extract unique categories
         const uniqueCategories = [
           'Tất cả',
-          ...new Set(mockProducts.map(product => product.category))
+          ...new Set(productData.map(product => product.category))
         ];
         setCategories(uniqueCategories);
+      } catch (err) {
+        console.error('Error fetching featured products:', err);
+      }
+    };
+
+    getFeaturedProducts();
+  }, []);
+
+  // Fetch paginated products
+  useEffect(() => {
+    const getProducts = async () => {
+      try {
+        setLoading(true);
+
+        // Map frontend sort options to backend sort fields
+        let backendSortBy = 'ProductName';
+        let backendSortAscending = true;
+
+        if (sortBy === 'price-low-high') {
+          backendSortBy = 'PriceActive';
+          backendSortAscending = true;
+        } else if (sortBy === 'price-high-low') {
+          backendSortBy = 'PriceActive';
+          backendSortAscending = false;
+        } else if (sortBy === 'rating') {
+          backendSortBy = 'ProductName'; // Backend doesn't support rating sort, fallback to name
+          backendSortAscending = true;
+        } else if (sortBy === 'default') {
+          backendSortBy = 'ProductName';
+          backendSortAscending = true;
+        }
+
+        // Prepare search parameters
+        const searchParams = {
+          pageNumber: currentPage,
+          pageSize: pageSize,
+          sortBy: backendSortBy,
+          sortAscending: backendSortAscending
+        };
+
+        // Add search term if provided
+        if (searchText.trim() !== '') {
+          searchParams.searchTerm = searchText.trim();
+        }
+
+        // Add category filter if selected
+        if (selectedCategory !== 'Tất cả') {
+          // Note: Backend expects categoryId, but we're using category names
+          // This is a simplification - in a real app, you'd map category names to IDs
+          // searchParams.categoryId = selectedCategory;
+        }
+
+        // Call the API with the search parameters
+        const result = await fetchPaginatedProducts(searchParams);
+
+        setProducts(result.items);
+        setMetadata(result.metadata);
       } catch (err) {
         setError('Có lỗi xảy ra khi tải dữ liệu');
         console.error('Error fetching products:', err);
@@ -242,49 +112,8 @@ const Products = () => {
       }
     };
 
-    // Add a small delay to simulate loading
-    const timer = setTimeout(() => {
-      fetchProducts();
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Filter and sort products
-  useEffect(() => {
-    let result = [...products];
-
-    // Apply category filter
-    if (selectedCategory !== 'Tất cả') {
-      result = result.filter(product => product.category === selectedCategory);
-    }
-
-    // Apply search filter
-    if (searchText.trim() !== '') {
-      result = result.filter(product => 
-        product.title.toLowerCase().includes(searchText.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchText.toLowerCase())
-      );
-    }
-
-    // Apply sorting
-    if (sortBy === 'price-low-high') {
-      result.sort((a, b) => a.price - b.price);
-    } else if (sortBy === 'price-high-low') {
-      result.sort((a, b) => b.price - a.price);
-    } else if (sortBy === 'rating') {
-      result.sort((a, b) => b.rating - a.rating);
-    }
-
-    setFilteredProducts(result);
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [products, selectedCategory, searchText, sortBy]);
-
-  // Calculate pagination
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+    getProducts();
+  }, [currentPage, searchText, selectedCategory, sortBy, pageSize]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -316,7 +145,7 @@ const Products = () => {
               </button>
             </div>
           </div>
-          
+
           {/* Categories */}
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Danh mục sản phẩm</h3>
@@ -326,15 +155,15 @@ const Products = () => {
                   <button
                     onClick={() => setSelectedCategory(category)}
                     className={`text-sm w-full text-left py-1 ${
-                      selectedCategory === category 
-                        ? 'font-semibold text-blue-600' 
+                      selectedCategory === category
+                        ? 'font-semibold text-blue-600'
                         : 'text-gray-700 hover:text-blue-600'
                     }`}
                   >
                     {category}
                     {selectedCategory === category && (
                       <span className="ml-1 text-xs">
-                        ({filteredProducts.length})
+                        ({metadata.totalCount})
                       </span>
                     )}
                   </button>
@@ -342,46 +171,46 @@ const Products = () => {
               ))}
             </ul>
           </div>
-          
+
           {/* Filter by Price */}
           <div className="mb-6">
             <h3 className="text-lg font-medium mb-3">Lọc theo giá</h3>
             <div className="space-y-2">
-              <button 
+              <button
                 onClick={() => setSortBy('price-low-high')}
                 className={`block px-3 py-2 text-sm rounded border ${
-                  sortBy === 'price-low-high' 
-                    ? 'bg-blue-50 border-blue-500 text-blue-600' 
+                  sortBy === 'price-low-high'
+                    ? 'bg-blue-50 border-blue-500 text-blue-600'
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
               >
                 Giá: Thấp đến Cao
               </button>
-              <button 
+              <button
                 onClick={() => setSortBy('price-high-low')}
                 className={`block px-3 py-2 text-sm rounded border ${
-                  sortBy === 'price-high-low' 
-                    ? 'bg-blue-50 border-blue-500 text-blue-600' 
+                  sortBy === 'price-high-low'
+                    ? 'bg-blue-50 border-blue-500 text-blue-600'
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
               >
                 Giá: Cao đến Thấp
               </button>
-              <button 
+              <button
                 onClick={() => setSortBy('rating')}
                 className={`block px-3 py-2 text-sm rounded border ${
-                  sortBy === 'rating' 
-                    ? 'bg-blue-50 border-blue-500 text-blue-600' 
+                  sortBy === 'rating'
+                    ? 'bg-blue-50 border-blue-500 text-blue-600'
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
               >
                 Xếp hạng cao nhất
               </button>
-              <button 
+              <button
                 onClick={() => setSortBy('default')}
                 className={`block px-3 py-2 text-sm rounded border ${
-                  sortBy === 'default' 
-                    ? 'bg-blue-50 border-blue-500 text-blue-600' 
+                  sortBy === 'default'
+                    ? 'bg-blue-50 border-blue-500 text-blue-600'
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
               >
@@ -389,37 +218,34 @@ const Products = () => {
               </button>
             </div>
           </div>
-          
+
           {/* Featured Products */}
           <div>
             <h3 className="text-lg font-medium mb-3">Sản phẩm nổi bật</h3>
             <div className="space-y-4">
-              {products
-                .filter(product => product.rating >= 4.7)
-                .slice(0, 4)
-                .map(product => (
-                  <div key={product.id} className="flex items-center gap-3">
-                    <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border">
-                      <img
-                        src={product.thumbnail}
-                        alt={product.title}
-                        className="h-full w-full object-cover object-center"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <Link 
-                        to={`/product/${product.id}`}
-                        state={{ product, allProducts: products }}
-                        className="text-sm font-medium text-gray-700 hover:text-blue-600"
-                      >
-                        {product.title}
-                      </Link>
-                      <p className="text-sm font-medium text-blue-600">
-                        {product.price.toLocaleString()}đ
-                      </p>
-                    </div>
+              {featuredProducts.map(product => (
+                <div key={product.id} className="flex items-center gap-3">
+                  <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border">
+                    <img
+                      src={product.thumbnail}
+                      alt={product.title}
+                      className="h-full w-full object-cover object-center"
+                    />
                   </div>
-                ))}
+                  <div className="flex-1">
+                    <Link
+                      to={`/san-pham/${product.id}`}
+                      state={{ product, allProducts: products }}
+                      className="text-sm font-medium text-gray-700 hover:text-blue-600"
+                    >
+                      {product.title}
+                    </Link>
+                    <p className="text-sm font-medium text-blue-600">
+                      {product.price.toLocaleString()}đ
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -427,7 +253,7 @@ const Products = () => {
         {/* Main Content */}
         <div className="flex-1">
 
-          {filteredProducts.length === 0 ? (
+          {products.length === 0 ? (
             <div className="rounded-lg bg-gray-50 p-8 text-center">
               <svg className="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -450,25 +276,25 @@ const Products = () => {
           ) : (
             <>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {currentProducts.map((product) => (
+                {products.map((product) => (
                   <Link
                     key={product.id}
-                    to={`/product/${product.id}`}
+                    to={`/san-pham/${product.id}`}
                     state={{ product, allProducts: products }}
                   >
-                    <ProductCard product={product} />
+                    <ProductCard product={product} renderLink={false} allProducts={products} />
                   </Link>
                 ))}
               </div>
 
               {/* Pagination */}
-              {totalPages > 1 && (
+              {metadata.totalPages > 1 && (
                 <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
+                  currentPage={metadata.pageNumber}
+                  totalPages={metadata.totalPages}
                   onPageChange={handlePageChange}
-                  itemsPerPage={productsPerPage}
-                  totalItems={filteredProducts.length}
+                  itemsPerPage={pageSize}
+                  totalItems={metadata.totalCount}
                 />
               )}
             </>

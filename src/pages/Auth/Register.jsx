@@ -34,7 +34,7 @@ function Register() {
             
             if (result.success) {
                 message.success('Đăng ký thành công!');
-                navigate('/login');
+                navigate('/dang-nhap');
             } else {
                 message.error(result.error || 'Đăng ký thất bại');
             }
@@ -158,11 +158,6 @@ function Register() {
                         delay: 8
                     }}
                 />
-            </div>
-
-            {/* Header */}
-            <div className='absolute top-0 left-0 w-full bg-gradient-to-b from-blue-50 to-blue-100 py-4 px-6 shadow-sm'>
-                <h1 className='text-2xl font-bold text-gray-800'>Đăng ký</h1>
             </div>
 
             {/* Register card */}
@@ -331,7 +326,7 @@ function Register() {
                     <div className="mt-4 text-center">
                         <span className="text-gray-600 text-sm mr-2">Đã có tài khoản?</span>
                         <motion.button 
-                            onClick={() => navigate('/login')}
+                            onClick={() => navigate('/dang-nhap')}
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
                             className="text-[#219ebc] hover:text-[#023047] font-medium text-sm transition duration-200"

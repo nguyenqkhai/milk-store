@@ -14,11 +14,12 @@ const ProductList = ({ products, selectedCategory, onAddToCart }) => {
 
       <div className={productPageConfig.gridClasses}>
         {products.map(product => (
-          <ProductCard 
-            key={product.id} 
-            product={product} 
+          <ProductCard
+            key={product.id}
+            product={product}
             onAddToCart={onAddToCart}
             allProducts={products}
+            renderLink={true}
           />
         ))}
       </div>

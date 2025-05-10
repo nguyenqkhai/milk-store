@@ -1,37 +1,57 @@
 import React, { useState } from 'react';
 import { Form, Input, message } from 'antd';
-import milkstore from '/src/assets/milkstore.jpg';
-import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useAuth } from '../../context/AuthContext';
 
 function Login() {
     const { login } = useAuth();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [messageApi, contextHolder] = message.useMessage();
 
     const onFinish = async (values) => {
         setLoading(true);
         try {
             const result = await login(values.username, values.password);
             if (result.success) {
-                message.success('Login successful!');
+                messageApi.open({
+                    type: 'success',
+                    content: 'Đăng nhập thành công!',
+                    duration: 4,
+                });
+                setTimeout(() => {
+                    navigate('/');
+                }, 1500);
             } else {
-                message.error(result.error || 'Login failed');
+                messageApi.open({
+                    type: 'error',
+                    content: result.error || 'Đăng nhập thất bại',
+                    duration: 3,
+                });
             }
         } catch (error) {
-            message.error('An error occurred during login');
+            messageApi.open({
+                type: 'error',
+                content: 'Có lỗi xảy ra khi đăng nhập',
+                duration: 3,
+            });
         } finally {
             setLoading(false);
         }
     };
 
     const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+        messageApi.open({
+            type: 'warning',
+            content: 'Vui lòng kiểm tra lại thông tin đăng nhập',
+            duration: 3,
+        });
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-600 flex items-center justify-center p-4">
+            {contextHolder}
             <motion.div 
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -107,7 +127,7 @@ function Login() {
                     <div className="mt-5 text-center">
                         <p className="text-gray-600 text-sm mb-2">Don't have an account?</p>
                         <motion.button 
-                            onClick={() => navigate('/register')}
+                            onClick={() => navigate('/dang-ky')}
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
                             className="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-200"
