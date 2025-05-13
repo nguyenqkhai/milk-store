@@ -64,7 +64,7 @@ const Header = () => {
           {/* buttons */}
           <div className='flex items-center space-x-4'>
             <button className='flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-gray-700 transition-all hover:bg-gray-100'>
-              <Link to='/login'>
+              <Link to='/dang-nhap'>
                 <FiUser className='h-5 w-5' />
               </Link>
             </button>

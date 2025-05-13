@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Login from './pages/Auth/Login';
-import Register from './pages/Auth/Register';
+import Register from './pages/Auth/Register/Register';
 import Home from './pages/Home/Home';
 import Contact from './pages/Contact/Contact';
 import Products from './pages/Products/Products';
@@ -23,14 +23,24 @@ import ReturnPolicy from './components/footer/ReturnPolicy';
 import PurchaseGuide from './pages/Guide/PurchaseGuide';
 import NotFound from './pages/NotFound/NotFound';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import Profile from './pages/Profile/Profile';
 
-// Thêm component bảo vệ route
+// Thêm component bảo vệ route - đã sửa để sử dụng state isAuthenticated từ AuthContext
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
-  if (!isAuthenticated()) {
-    // Chuyển hướng đến trang đăng nhập, lưu lại trang người dùng đang cố truy cập
+  // Hiển thị loading state khi đang kiểm tra xác thực
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  // Kiểm tra nếu người dùng đã xác thực
+  if (!isAuthenticated) {
     return <Navigate to="/dang-nhap" state={{ from: location }} replace />;
   }
 
@@ -50,7 +60,6 @@ const Layout = ({ children }) => {
   );
 };
 
-// Component AppRoutes bên trong AuthProvider
 const AppRoutes = () => {
   return (
     <Layout>
@@ -64,7 +73,6 @@ const AppRoutes = () => {
         <Route path='/lien-he' element={<Contact />} />
         <Route path='/:category/:productName' element={<ProductDetail />} />
         
-        {/* Ví dụ các route cần xác thực */}
         <Route path='/thanh-toan' element={
           <ProtectedRoute>
             <Checkout/>
@@ -84,6 +92,11 @@ const AppRoutes = () => {
         <Route path='/chinh-sach-van-chuyen' element={<TransferPolicy/>}/>
         <Route path='/huong-dan-mua-hang' element={<PurchaseGuide />} />
         <Route path='/chinh-sach-doi-tra' element={<ReturnPolicy />} />
+        <Route path='/trang-ca-nhan' element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }/>
         <Route path='*' element={<NotFound/>}/>
       </Routes>
     </Layout>
