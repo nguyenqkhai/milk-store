@@ -4,7 +4,7 @@
 import axios from 'axios';
 
 // Base URL for the API
-const API_BASE_URL = 'https://milkstore-grbpfnduezbpgvgc.eastasia-01.azurewebsites.net/api';
+const API_BASE_URL = 'https://localhost:5000/api';
 
 /**
  * Creates an axios instance with common configuration
