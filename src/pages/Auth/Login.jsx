@@ -3,6 +3,8 @@ import { Form, Input, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
+import axios from 'axios';
+import apiConfig from '../../config/apiConfig';
 
 function Login() {
     const { login } = useAuth();
@@ -12,22 +14,54 @@ function Login() {
     const onFinish = async (values) => {
         setLoading(true);
         try {
-            const result = await login(values.username, values.password);
-            if (result.success) {
-                message.success('Login successful!');
-                navigate('/');
-            } else {
-                message.error(result.error || 'Login failed');
+            // Gọi API đăng nhập
+            const response = await axios.post(
+                `${apiConfig.API_BASE_URL}${apiConfig.AUTH.LOGIN}`, 
+                {
+                    username: values.username,
+                    password: values.password
+                }
+            );
+            
+            if (response.status === 200 && response.data) {
+                // Gọi hàm login từ context để lưu token và cập nhật trạng thái
+                const result = login(response.data);
+                
+                if (result.success) {
+                    message.success('Đăng nhập thành công!');
+                    navigate('/');
+                } else {
+                    message.error(result.error || 'Đăng nhập thất bại');
+                }
             }
         } catch (error) {
-            message.error('An error occurred during login');
+            console.error('Lỗi đăng nhập:', error);
+            
+            if (error.response) {
+                // Hiển thị thông báo lỗi từ server nếu có
+                message.error(error.response.data.message || 'Thông tin đăng nhập không chính xác');
+            } else {
+                message.error('Không thể kết nối đến máy chủ, vui lòng thử lại sau');
+                
+                // Tạm thời đăng nhập với thông tin giả nếu đang trong môi trường phát triển
+                if (import.meta.env.DEV) {
+                    // Fake login cho development
+                    const fakeData = {
+                        accessToken: 'fake-token',
+                        refreshToken: 'fake-refresh-token'
+                    };
+                    login(fakeData);
+                    message.success('Đăng nhập (dev mode) thành công!');
+                    navigate('/');
+                }
+            }
         } finally {
             setLoading(false);
         }
     };
 
     const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+        console.log('Lỗi:', errorInfo);
     };
 
     return (
@@ -47,9 +81,9 @@ function Login() {
                             transition={{ delay: 0.2 }}
                             className="text-3xl font-bold text-gray-800"
                         >
-                            Welcome Back
+                            Chào mừng trở lại
                         </motion.h1>
-                        <p className="text-gray-600 text-sm mt-1">Sign in to continue</p>
+                        
                     </div>
 
                     <Form
@@ -62,9 +96,9 @@ function Login() {
                         className="flex-1"
                     >
                         <Form.Item
-                            label={<span className="text-sm font-medium">Username</span>}
+                            label={<span className="text-sm font-medium">Tên người dùng</span>}
                             name="username"
-                            rules={[{ required: true, message: 'Please input your username!' }]}
+                            rules={[{ required: true, message: 'Vui lòng nhập tên người dùng!' }]}
                             className="mb-3"
                         >
                             <Input 
@@ -74,9 +108,9 @@ function Login() {
                         </Form.Item>
 
                         <Form.Item
-                            label={<span className="text-sm font-medium">Password</span>}
+                            label={<span className="text-sm font-medium">Mật khẩu</span>}
                             name="password"
-                            rules={[{ required: true, message: 'Please input your password!' }]}
+                            rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
                             className="mb-4"
                         >
                             <Input.Password 
@@ -97,22 +131,22 @@ function Login() {
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        Logging in...
+                                        Đang đăng nhập...
                                     </span>
-                                ) : 'Login'}
+                                ) : 'Đăng nhập'}
                             </button>
                         </motion.div>
                     </Form>
 
                     <div className="mt-5 text-center">
-                        <p className="text-gray-600 text-sm mb-2">Don't have an account?</p>
+                        <p className="text-gray-600 text-sm mb-2">Chưa có tài khoản?</p>
                         <motion.button 
                             onClick={() => navigate('/dang-ky')}
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.97 }}
                             className="text-blue-600 hover:text-blue-800 font-medium text-sm transition duration-200"
                         >
-                            Create account
+                            Tạo tài khoản mới
                         </motion.button>
                     </div>
                 </div>

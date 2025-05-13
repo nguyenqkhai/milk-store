@@ -1,96 +1,187 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import apiConfig from '../config/apiConfig';
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
-
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    
     useEffect(() => {
-        // Kiểm tra xem người dùng đã đăng nhập chưa (từ localStorage)
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
+        const accessToken = localStorage.getItem('accessToken');
+        
+        if (accessToken) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+            fetchUserInfo();
+        } else {
+            setLoading(false);
         }
-        setLoading(false);
     }, []);
 
-    const login = async (username, password) => {
+    const fetchUserInfo = async () => {
         try {
-            // Ở đây bạn thường sẽ gọi API đến backend
-            // Tạm thời giả lập đăng nhập thành công
-            // Trong thực tế, bạn sẽ xác thực với server
-
-            // Giả sử thông tin đăng nhập đúng là admin/admin123
-            if (username === 'admin' && password === 'admin123') {
-                const userData = {
-                    id: 1,
-                    username,
-                    name: 'Người quản trị',
-                    email: 'admin@example.com'
-                };
-                
-                setUser(userData);
-                localStorage.setItem('user', JSON.stringify(userData));
-                return { success: true };
-            } else {
-                return { success: false, error: 'Thông tin đăng nhập không chính xác' };
+            const response = await axios.get(`${apiConfig.API_BASE_URL}${apiConfig.CUSTOMER.INFO}`);
+            if (response.status === 200) {
+                setCurrentUser(response.data);
+                setIsAuthenticated(true);
             }
         } catch (error) {
-            console.error('Lỗi đăng nhập:', error);
-            return { success: false, error: 'Có lỗi xảy ra khi đăng nhập' };
+            console.error('Lỗi khi lấy thông tin người dùng:', error);
+            // Nếu lỗi 401 (Unauthorized), xóa token và yêu cầu đăng nhập lại
+            if (error.response && error.response.status === 401) {
+                logout();
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
-    const register = async (username, email, password, fullName, phone) => {
-        try {
-            // Ở đây bạn sẽ gọi API để đăng ký người dùng
-            // Giả lập đăng ký thành công
-            console.log('Đăng ký người dùng:', { username, email, password, fullName, phone });
+    const login = (userData) => {
+        // Lưu token vào localStorage
+        if (userData.accessToken) {
+            localStorage.setItem('accessToken', userData.accessToken);
+            localStorage.setItem('refreshToken', userData.refreshToken);
             
-            // Trong thực tế, bạn sẽ gửi dữ liệu này đến server và nhận phản hồi
-            // Giả sử đăng ký thành công
+            // Thiết lập token mặc định cho axios
+            axios.defaults.headers.common['Authorization'] = `Bearer ${userData.accessToken}`;
+            
+            // Lấy thông tin người dùng từ API
+            fetchUserInfo();
+            
             return { success: true };
+        }
+        
+        return { success: false, error: 'Token không hợp lệ' };
+    };
+
+    const logout = async () => {
+        try {
+            // Gọi API đăng xuất nếu cần
+            const accessToken = localStorage.getItem('accessToken');
+            if (accessToken) {
+                await axios.post(`${apiConfig.API_BASE_URL}${apiConfig.AUTH.LOGOUT}`);
+            }
         } catch (error) {
-            console.error('Lỗi đăng ký:', error);
-            return { success: false, error: 'Đăng ký thất bại' };
+            console.error('Lỗi khi đăng xuất:', error);
+        } finally {
+            // Xóa token và thông tin người dùng
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            delete axios.defaults.headers.common['Authorization'];
+            setCurrentUser(null);
+            setIsAuthenticated(false);
         }
     };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem('user');
-        navigate('/dang-nhap');
-    };
-
-    // Kiểm tra người dùng đã đăng nhập chưa
-    const isAuthenticated = () => {
-        return !!user;
-    };
-
-    if (loading) {
-        return <div>Loading...</div>; // Hoặc spinner hoặc loading component khác
+    const register = async (username, email, password, fullname, phone) => {
+        try {
+            const result = await authService.register(username, email, password, fullname, phone);
+            return result;
+        } catch (error) {
+            console.error('Đăng ký thất bại:', error);
+            return {success: false, error: error.response.data.message || 'Có lỗi xảy ra khi đăng ký'};
+        }
     }
 
+    const sendOtp = async (email) => {
+        try {
+            const result = await authService.sendOtp(email);
+            return result;
+        } catch (error) {
+            console.error('Lỗi gửi OTP:', error);
+            return { success: false, error: 'Có lỗi xảy ra khi gửi mã OTP' };
+        }
+    };
+
+    const verifyOtp = async (email, otp) => {
+        try {
+            const result = await authService.verifyOtp(email, otp);
+            return result;
+        } catch (error) {
+            console.error('Lỗi xác thực OTP:', error);
+            return { success: false, error: 'Có lỗi xảy ra khi xác thực mã OTP' };
+        }
+    }
+    // Hàm để làm mới token khi token cũ hết hạn
+    const refreshToken = async () => {
+        try {
+            const refreshTokenValue = localStorage.getItem('refreshToken');
+            if (!refreshTokenValue) {
+                throw new Error('Không có refresh token');
+            }
+
+            const response = await axios.post(`${apiConfig.API_BASE_URL}${apiConfig.AUTH.REFRESH_TOKEN}`, {
+                refreshToken: refreshTokenValue
+            });
+
+            if (response.status === 200 && response.data) {
+                // Cập nhật token mới
+                localStorage.setItem('accessToken', response.data.accessToken);
+                localStorage.setItem('refreshToken', response.data.refreshToken);
+                
+                // Cập nhật header cho axios
+                axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
+                
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Lỗi khi làm mới token:', error);
+            logout(); // Đăng xuất nếu không thể làm mới token
+            return false;
+        }
+    };
+
+    // Tạo interceptor để tự động làm mới token khi nhận lỗi 401
+    useEffect(() => {
+        const interceptor = axios.interceptors.response.use(
+            response => response,
+            async error => {
+                const originalRequest = error.config;
+                
+                // Nếu lỗi 401 và chưa thử làm mới token
+                if (error.response && error.response.status === 401 && !originalRequest._retry) {
+                    originalRequest._retry = true;
+                    
+                    // Thử làm mới token
+                    const success = await refreshToken();
+                    if (success) {
+                        // Thử lại request ban đầu với token mới
+                        return axios(originalRequest);
+                    }
+                }
+                
+                return Promise.reject(error);
+            }
+        );
+        
+        // Cleanup interceptor khi component unmount
+        return () => {
+            axios.interceptors.response.eject(interceptor);
+        };
+    }, []);
+
+    const value = {
+        currentUser,
+        isAuthenticated,
+        loading,
+        login,
+        logout,
+        refreshToken,
+        register,
+        sendOtp,
+        verifyOtp
+    };
+
     return (
-        <AuthContext.Provider value={{ 
-            user, 
-            login, 
-            logout, 
-            register, 
-            isAuthenticated 
-        }}>
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );
 };
 
 export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth phải được sử dụng trong AuthProvider');
-    }
-    return context;
+    return useContext(AuthContext);
 };

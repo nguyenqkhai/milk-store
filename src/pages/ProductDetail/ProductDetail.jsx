@@ -5,7 +5,9 @@ import ProductInfo from './Components/ProductInfo'
 import RelatedProducts from './Components/RelatedProducts'
 import LoadingState from '../Products/Components/LoadingState'
 import ErrorState from '../Products/Components/ErrorState'
-import { toSlug } from '../../utils/stringUtils'
+import { toSlug } from '../../utils/stringUtils'    
+import NotFound from './Components/ProductNotFound'
+import { useScrollToTop } from '../../hooks/useScrollToTop'
 
 const mockProducts = [
   {
@@ -16,7 +18,8 @@ const mockProducts = [
     price: 30.000,
     rating: 4.7,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0
+    discountPercentage: 0,
+    brand: 'Vinamilk'
   },
   {
     id: 2,
@@ -26,7 +29,8 @@ const mockProducts = [
     price: 30.000,
     rating: 4.6,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 5
+    discountPercentage: 5,
+    brand: 'Vinamilk'
   },
   {
     id: 3,
@@ -36,7 +40,8 @@ const mockProducts = [
     price: 32.000,
     rating: 4.8,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 10
+    discountPercentage: 10,
+    brand: 'Vinamilk'
   },
   {
     id: 4,
@@ -46,7 +51,8 @@ const mockProducts = [
     price: 27.000,
     rating: 4.5,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0
+    discountPercentage: 0,
+    brand: 'Vinamilk'
   },
   {
     id: 5,
@@ -56,7 +62,8 @@ const mockProducts = [
     price: 31.000,
     rating: 4.6,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0
+    discountPercentage: 0,
+    brand: 'TH True Milk'
   },
   {
     id: 6,
@@ -66,7 +73,8 @@ const mockProducts = [
     price: 31.000,
     rating: 4.7,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 3
+    discountPercentage: 3,
+    brand: 'TH True Milk'
   },
   {
     id: 7,
@@ -76,7 +84,8 @@ const mockProducts = [
     price: 34.000,
     rating: 4.6,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 5
+    discountPercentage: 5,
+    brand: 'TH True Milk'
   },
   {
     id: 8,
@@ -86,7 +95,8 @@ const mockProducts = [
     price: 35.000,
     rating: 4.4,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0
+    discountPercentage: 0,
+    brand: 'TH True Milk'
   },
   {
     id: 9,
@@ -96,7 +106,8 @@ const mockProducts = [
     price: 29.000,
     rating: 4.5,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0
+    discountPercentage: 0,
+    brand: 'Dutch Lady'
   },
   {
     id: 10,
@@ -106,7 +117,8 @@ const mockProducts = [
     price: 29.000,
     rating: 4.3,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0
+    discountPercentage: 0,
+    brand: 'Dutch Lady'
   },
   {
     id: 11,
@@ -116,7 +128,8 @@ const mockProducts = [
     price: 28.000,
     rating: 4.4,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0
+    discountPercentage: 0,
+    brand: 'Nutifood'
   },
   {
     id: 12,
@@ -126,7 +139,8 @@ const mockProducts = [
     price: 250.000,
     rating: 4.9,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 15
+    discountPercentage: 15,
+    brand: 'Nutifood'
   },
   {
     id: 13,
@@ -136,7 +150,8 @@ const mockProducts = [
     price: 220.000,
     rating: 4.7,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 10
+    discountPercentage: 10,
+    brand: 'Vinamilk'
   },
   {
     id: 14,
@@ -146,7 +161,8 @@ const mockProducts = [
     price: 33.000,
     rating: 4.6,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 7
+    discountPercentage: 7,
+    brand: 'Nutifood'
   },
   {
     id: 15,
@@ -156,7 +172,8 @@ const mockProducts = [
     price: 230.000,
     rating: 4.7,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 5
+    discountPercentage: 5,
+    brand: 'Nutifood'
   },
   {
     id: 16,
@@ -166,7 +183,8 @@ const mockProducts = [
     price: 255.000,
     rating: 4.8,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 10
+    discountPercentage: 10,
+    brand: 'Vinamilk'
   },
   {
     id: 17,
@@ -176,7 +194,8 @@ const mockProducts = [
     price: 25.000,
     rating: 4.9,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0
+    discountPercentage: 0,
+    brand: 'Vinamilk'
   },
   {
     id: 18,
@@ -186,7 +205,8 @@ const mockProducts = [
     price: 26.000,
     rating: 4.6,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0
+    discountPercentage: 0,
+    brand: 'Vinamilk'
   },
   {
     id: 19,
@@ -196,7 +216,8 @@ const mockProducts = [
     price: 35.000,
     rating: 4.5,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 8
+    discountPercentage: 8,
+    brand: 'Meadow Fresh'
   },
   {
     id: 20,
@@ -206,24 +227,71 @@ const mockProducts = [
     price: 36.000,
     rating: 4.7,
     thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 6
+    discountPercentage: 6,
+    brand: 'TH True Milk'
   }
 ];
 
+// Hàm lọc sản phẩm liên quan
+const getRelatedProducts = (currentProduct, allProducts) => {
+  if (!currentProduct) return [];
+  
+  // Lấy ra các thông tin cần thiết
+  const { id, category, brand } = currentProduct;
+  
+  // Ưu tiên 1: Sản phẩm cùng danh mục và cùng thương hiệu
+  const sameCategoryAndBrand = allProducts.filter(p => 
+    p.id !== id && 
+    p.category === category && 
+    p.brand === brand
+  );
+  
+  // Ưu tiên 2: Sản phẩm cùng danh mục nhưng khác thương hiệu
+  const sameCategoryDifferentBrand = allProducts.filter(p => 
+    p.id !== id && 
+    p.category === category && 
+    p.brand !== brand
+  );
+  
+  // Ưu tiên 3: Sản phẩm cùng thương hiệu nhưng khác danh mục
+  const sameBrandDifferentCategory = allProducts.filter(p => 
+    p.id !== id && 
+    p.category !== category && 
+    p.brand === brand
+  );
+  
+  // Kết hợp các danh sách với thứ tự ưu tiên và lấy tối đa 8 sản phẩm
+  const relatedProducts = [
+    ...sameCategoryAndBrand,
+    ...sameCategoryDifferentBrand,
+    ...sameBrandDifferentCategory
+  ].slice(0, 8);
+  
+  return relatedProducts;
+};
+
 const ProductDetail = () => {
+  useScrollToTop()
   const { category, productName } = useParams()
   const navigate = useNavigate()
   const [product, setProduct] = useState(null)
+  const [relatedProducts, setRelatedProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  // Thêm useEffect để cuộn lên đầu trang khi component mount
   useEffect(() => {
-    // Check if this is an old URL format (using ID)
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }, [])
+
+  useEffect(() => {
     const id = parseInt(productName)
     if (!isNaN(id)) {
       const productById = mockProducts.find(p => p.id === id)
       if (productById) {
-        // Redirect to new URL format immediately
         navigate(`/${toSlug(productById.category)}/${toSlug(productById.title)}`, { replace: true })
         return
       }
@@ -231,7 +299,6 @@ const ProductDetail = () => {
 
     const fetchProduct = () => {
       try {
-        // Simulate API call
         setTimeout(() => {
           const foundProduct = mockProducts.find(
             p => toSlug(p.category) === category && toSlug(p.title) === productName
@@ -239,11 +306,14 @@ const ProductDetail = () => {
           
           if (foundProduct) {
             setProduct(foundProduct)
+            // Tìm sản phẩm liên quan
+            const related = getRelatedProducts(foundProduct, mockProducts)
+            setRelatedProducts(related)
           } else {
             setError('Không tìm thấy sản phẩm')
           }
           setLoading(false)
-        }, 1000)
+        }, 800) // Giảm thời gian loading
       } catch (err) {
         setError('Có lỗi xảy ra khi tải sản phẩm')
         setLoading(false)
@@ -255,36 +325,67 @@ const ProductDetail = () => {
 
   if (loading) return <LoadingState />
   if (error) return <ErrorState message={error} />
-  if (!product) return <ProductNotFound />
+  if (!product) return <NotFound />
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <ProductImages product={product} />
-        <ProductInfo product={product} />
+      {/* Breadcrumbs */}
+      <nav className="flex items-center text-sm mb-6">
+        <Link to="/" className="text-gray-500 hover:text-blue-600">Trang chủ</Link>
+        <span className="mx-2 text-gray-400">/</span>
+        <Link 
+          to={`/${toSlug(product.category)}`} 
+          className="text-gray-500 hover:text-blue-600"
+        >
+          {product.category}
+        </Link>
+        <span className="mx-2 text-gray-400">/</span>
+        <span className="font-medium text-gray-800 truncate">{product.title}</span>
+      </nav>
+
+      {/* Chi tiết sản phẩm */}
+      <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <ProductImages product={product} />
+          <ProductInfo product={product} />
+        </div>
       </div>
-      <RelatedProducts 
-        currentProductId={product.id} 
-        category={product.category}
-        products={mockProducts} 
-      />
+      
+      {/* Mô tả chi tiết */}
+      <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <h2 className="text-xl font-semibold mb-4">Thông tin chi tiết</h2>
+        <div className="prose max-w-none">
+          <p className="text-gray-700">{product.description}</p>
+          
+          {/* Thông số sản phẩm */}
+          <div className="mt-6 border-t pt-4">
+            <h3 className="text-lg font-medium mb-3">Thông số sản phẩm</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex border-b border-gray-100 py-2">
+                <span className="font-medium w-32">Thương hiệu:</span>
+                <span className="text-gray-600">{product.brand}</span>
+              </div>
+              <div className="flex border-b border-gray-100 py-2">
+                <span className="font-medium w-32">Loại sản phẩm:</span>
+                <span className="text-gray-600">{product.category}</span>
+              </div>
+              <div className="flex border-b border-gray-100 py-2">
+                <span className="font-medium w-32">Xuất xứ:</span>
+                <span className="text-gray-600">Việt Nam</span>
+              </div>
+              <div className="flex border-b border-gray-100 py-2">
+                <span className="font-medium w-32">Đánh giá:</span>
+                <span className="text-gray-600">{product.rating}/5 ⭐</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Sản phẩm liên quan */}
+      <RelatedProducts products={relatedProducts} />
     </div>
   )
 }
-
-const ProductNotFound = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="text-center">
-      <h1 className="text-4xl font-bold text-gray-800 mb-4">Không tìm thấy sản phẩm</h1>
-      <p className="text-gray-600 mb-6">Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
-      <Link
-        to="/product"
-        className="inline-block bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors"
-      >
-        Quay về trang sản phẩm
-      </Link>
-    </div>
-  </div>
-)
 
 export default ProductDetail
