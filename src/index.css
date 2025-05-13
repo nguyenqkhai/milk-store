@@ -1,4 +1,7 @@
 @import 'tailwindcss';
+body {
+  font-family: 'Roboto', sans-serif;
+}
 @keyframes moveRight {
     0% {
       transform: translateX(-100%);
