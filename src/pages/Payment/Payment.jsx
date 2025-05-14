@@ -30,21 +30,25 @@ const Payment = () => {
         <div className="min-h-screen bg-gray-50 pb-10">
             {/* Header */}
             <div className="m-auto bg-gradient-to-b from-blue-200 via-blue-300 to-blue-200 h-44 w-full  px-4 py-3 mb-5 shadow-md">
-                <p className="text-center mt-4 text-4xl font-bold tracking-wide text-blue-800 drop-shadow-sm uppercase">
-                    Payment
-                </p>
+                <div className="flex mt-4 justify-center items-center gap-3">
+                    <FaCreditCard className="text-4xl text-blue-800" />
+                    <h1 className="text-4xl font-bold tracking-wide text-blue-800 drop-shadow-sm uppercase">
+                        Payment
+                    </h1>
+                </div>
+
                 <div className="w-fit mx-auto">
                     <div className="mt-5 px-4 py-2 bg-white rounded-full shadow text-sm text-gray-600 flex items-center gap-1 text-sm">
-                    <span className="hover:text-blue-200 cursor-pointer transition">Home</span>
+                        <span className="hover:text-blue-200 cursor-pointer transition" onClick={() => navigate('/trang-chu')}>Home</span>
                         <span>→</span>
-                        <span className="hover:text-blue-200 cursor-pointer transition">Cart</span>
+                        <span className="hover:text-blue-200 cursor-pointer transition" onClick={() => navigate('/gio-hang')}>Cart</span>
                         <span>→</span>
-                        <span className="hover:text-blue-200 cursor-pointer transition" onClick={() => navigate('/checkout')}>Checkout</span>
+                        <span className="hover:text-blue-200 cursor-pointer transition" onClick={() => navigate('/thanh-toan')}>Checkout</span>
                         <span>→</span>
                         <span className="font-medium">Payment</span>
                     </div>
                 </div>
-              
+
             </div>
 
             {/* Main Content */}

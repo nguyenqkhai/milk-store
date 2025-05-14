@@ -16,7 +16,7 @@ import ProductDetail from './pages/ProductDetail/ProductDetail';
 import About from './pages/About/About';
 import Footer from './components/Footer/Footer';
 import Payment from './pages/Payment/Payment';
-import Checkout from './pages/Order/Checkout';
+import Checkout from './pages/Order/CheckOut';
 import Cart from './pages/Cart/Cart';
 import TransferPolicy from './components/footer/TransferPolicy';
 import ReturnPolicy from './components/footer/ReturnPolicy';
@@ -78,17 +78,23 @@ const AppRoutes = () => {
             <Checkout/>
           </ProtectedRoute>
         }/>
+
+        {/* <Route path='/thanh-toan' element={<Checkout/>}/> */}
         <Route path='/gio-hang' element={
           <ProtectedRoute>
             <Cart />
           </ProtectedRoute>
         } />
+        <Route path='/gio-hang' element={<Cart />} />
+        
         <Route path='/xac-nhan-thanh-toan' element={
           <ProtectedRoute>
             <Payment/>
           </ProtectedRoute>
         }/>
         
+
+        {/* <Route path='/xac-nhan-thanh-toan' element={<Payment/>}/> */}
         <Route path='/chinh-sach-van-chuyen' element={<TransferPolicy/>}/>
         <Route path='/huong-dan-mua-hang' element={<PurchaseGuide />} />
         <Route path='/chinh-sach-doi-tra' element={<ReturnPolicy />} />

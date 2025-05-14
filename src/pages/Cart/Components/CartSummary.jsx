@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const CartSummary = ({ subTotal, shipping, grandTotal }) => {
   const formatPrice = (price) => {
@@ -7,7 +8,7 @@ const CartSummary = ({ subTotal, shipping, grandTotal }) => {
       currency: 'VND'
     }).format(price);
   };
-
+  const navigate = useNavigate();
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-xl font-semibold mb-6">Tóm tắt đơn hàng</h2>
@@ -33,7 +34,8 @@ const CartSummary = ({ subTotal, shipping, grandTotal }) => {
           </div>
         </div>
         
-        <button className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white px-4 py-2.5 rounded-lg font-medium shadow-md hover:shadow-lg transition duration-300 hover:from-blue-600 hover:to-blue-800 flex cursor-pointer items-center gap-2">
+        <button  onClick={() => navigate('/thanh-toan')}
+          className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white px-4 py-2.5 rounded-lg font-medium shadow-md hover:shadow-lg transition duration-300 hover:from-blue-600 hover:to-blue-800 flex cursor-pointer items-center gap-2">
           Tiến hành thanh toán <span>→</span>
         </button>
         
