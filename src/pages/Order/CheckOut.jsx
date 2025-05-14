@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import creditImage from '/src/assets/creditImage.png'
 import { FaArrowRight } from "react-icons/fa6";
-import { FaCreditCard, FaMoneyBillWave } from "react-icons/fa";
+import { FaCreditCard, FaMoneyBillWave, FaCashRegister } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
-
 const Checkout = () => {
     const navigate = useNavigate();
     const [onCreditCard, setOnCreditCard] = useState(false);
@@ -19,8 +18,8 @@ const Checkout = () => {
         expiryDate: '',
         cvv: ''
     });
-    const handleCheckout = () =>{
-        navigate('/payment',{
+    const handleCheckout = () => {
+        navigate('/xac-nhan-thanh-toan', {
             state: {
                 formData,
                 paymentMethod: onCreditCard ? 'credit' : 'cash'
@@ -36,7 +35,7 @@ const Checkout = () => {
     };
 
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
@@ -44,24 +43,27 @@ const Checkout = () => {
         >
             {/* Header Banner */}
             <div className="m-auto bg-gradient-to-b from-blue-200 via-blue-300 to-blue-200 h-44 w-full  px-4 py-3 mb-6  shadow-md">
-                <p className="text-center mt-4 text-4xl font-bold tracking-wide text-blue-800 drop-shadow-sm uppercase">
-                    Checkout
-                </p>
+                <div className="mt-4 flex items-center justify-center gap-3">
+                    <FaCashRegister className="text-4xl text-blue-800" />
+                    <h1 className="text-4xl font-bold tracking-wide text-blue-800 drop-shadow-sm uppercase">
+                        Checkout
+                    </h1>
+                </div>
                 <div className="w-fit mx-auto">
                     <div className="mt-5 px-4 py-2 bg-white rounded-full shadow text-sm text-gray-600 flex items-center gap-1 text-sm">
-                    <span className="hover:text-blue-200 cursor-pointer transition">Home</span>
+                        <span className="hover:text-blue-200 cursor-pointer transition" onClick={() => navigate('/trang-chu')}>Home</span>
                         <span>→</span>
-                        <span className="hover:text-blue-200 cursor-pointer transition">Cart</span>
+                        <span className="hover:text-blue-200 cursor-pointer transition" onClick={() => navigate('/gio-hang')}>Cart</span>
                         <span>→</span>
                         <span className="font-medium">Checkout</span>
                     </div>
                 </div>
-              
+
             </div>
 
             {/* Main Content */}
             <div className="max-w-4xl mx-auto w-full px-4 ">
-                <motion.div 
+                <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
@@ -140,11 +142,10 @@ const Checkout = () => {
                     <div className="mt-6">
                         <h2 className="text-2xl font-semibold mb-4 text-gray-800">Payment Method</h2>
                         <div className="space-y-4">
-                            <motion.div 
+                            <motion.div
                                 whileHover={{ scale: 1.02 }}
-                                className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
-                                    onCreditCard ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
-                                }`}
+                                className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${onCreditCard ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
+                                    }`}
                                 onClick={() => setOnCreditCard(true)}
                             >
                                 <div className="flex items-center justify-between">
@@ -156,11 +157,10 @@ const Checkout = () => {
                                 </div>
                             </motion.div>
 
-                            <motion.div 
+                            <motion.div
                                 whileHover={{ scale: 1.02 }}
-                                className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${
-                                    !onCreditCard ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
-                                }`}
+                                className={`p-4 rounded-lg border-2 cursor-pointer transition-colors ${!onCreditCard ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
+                                    }`}
                                 onClick={() => setOnCreditCard(false)}
                             >
                                 <div className="flex items-center space-x-3">
@@ -172,7 +172,7 @@ const Checkout = () => {
 
                         {/* Credit Card Form */}
                         {onCreditCard && (
-                            <motion.div 
+                            <motion.div
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: 'auto', opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
@@ -222,7 +222,7 @@ const Checkout = () => {
                     <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick = {handleCheckout}
+                        onClick={handleCheckout}
                         className="mt-4 w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white py-3 rounded-lg font-semibold shadow-lg hover:from-blue-700 hover:to-blue-500 transition-all duration-300 flex items-center justify-center space-x-2"
                     >
                         <span>Complete Checkout</span>
@@ -231,7 +231,7 @@ const Checkout = () => {
                 </motion.div>
             </div>
         </motion.div>
-        
+
     );
 }
 
