@@ -2,10 +2,24 @@ import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { headerClass } from './data'
 import { FiShoppingCart, FiUser } from 'react-icons/fi'
+import { fetchCartItems } from '../../api/cartApi'
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const location = useLocation()
+  const [countItems, setCountItems] = useState(0)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchCartItems()
+        setCountItems(data.length)
+      } catch (error) {
+        console.error('Error fetching cart items:', error)
+      }
+    }
+    fetchData()
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,11 +85,13 @@ const Header = () => {
             <button
               className={`${headerClass.button} flex cursor-pointer items-center gap-2`}
             >
-              <FiShoppingCart className='h-5 w-5' />
-              <span className='hidden sm:inline'>Giỏ hàng</span>
-              <span className='inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs text-blue-700'>
-                3
-              </span>
+              <Link to='/gio-hang'>
+                <FiShoppingCart className='h-5 w-5' />
+                <span className='hidden sm:inline'>Giỏ hàng</span>
+                <span className='inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs text-blue-700'>
+                  {countItems}
+                </span>
+              </Link>
             </button>
           </div>
         </div>
