@@ -72,7 +72,6 @@ const AppRoutes = () => {
         <Route path='/san-pham' element={<Products />} />
         <Route path='/lien-he' element={<Contact />} />
         <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path="/:category/:productName" element={<ProductDetail />} />
         <Route path='/thanh-toan' element={
           <ProtectedRoute>
             <Checkout />
