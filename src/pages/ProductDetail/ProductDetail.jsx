@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, Link, useNavigate, useLocation  } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import ProductImages from './Components/ProductImages'
 import ProductInfo from './Components/ProductInfo'
 import RelatedProducts from './Components/RelatedProducts'
 import LoadingState from '../Products/Components/LoadingState'
 import ErrorState from '../Products/Components/ErrorState'
-import { toSlug } from '../../utils/stringUtils'    
 import NotFound from './Components/ProductNotFound'
 import { useScrollToTop } from '../../hooks/useScrollToTop'
 import ProductService from '../../services/Product/ProductServices';
 
 const ProductDetail = () => {
   useScrollToTop()
-  const { category, productName, id } = useParams()
+  const { id } = useParams()
   const navigate = useNavigate()
-  const location = useLocation();
   const [product, setProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -45,178 +43,31 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        let productData = null;
-
-        if (location.state?.product) {
-          productData = location.state.product;
-          setProduct(productData);
+        
+        // Use passed product from navigation state if available
+        if (navigate.location?.state?.product) {
+          setProduct(navigate.location.state.product);
           setLoading(false);
           return;
         }
-
-        const searchParams = new URLSearchParams(location.search);
-        const productIdFromQuery = searchParams.get('pid');
         
-        if (productIdFromQuery) {
-          try {
-            console.log(`Fetching product by ID from query parameter: ${productIdFromQuery}`);
-            const response = await ProductService.getProductById(productIdFromQuery);
-            
-            if (response?.data) {
-              productData = response.data;
-              setProduct(productData);
-              setLoading(false);
-              return;
-            }
-          } catch (queryIdError) {
-            console.error('Error fetching product by ID from query parameter:', queryIdError);
-          }
-        }
-
+        // Fetch product by ID
         if (id) {
           try {
             console.log(`Fetching product by ID: ${id}`);
             const response = await ProductService.getProductById(id);
             
             if (response?.data) {
-              productData = response.data;
-              const seoUrl = `/${toSlug(productData.category || 'san-pham')}/${toSlug(productData.name || productData.title)}?pid=${encodeURIComponent(productData.id)}`;
-              
-              if (location.pathname !== seoUrl.split('?')[0]) {
-                navigate(seoUrl, { 
-                  replace: true, 
-                  state: { product: productData } 
-                });
-                return;
-              }
+              setProduct(response.data);
+            } else {
+              setError('Không tìm thấy sản phẩm');
             }
-          } catch (idError) {
-            console.error('Error fetching product by ID:', idError);
+          } catch (error) {
+            console.error('Error fetching product by ID:', error);
+            setError('Có lỗi xảy ra khi tải sản phẩm');
           }
-        }
-        
-        if (!productData && productName && !id) {
-          const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-          if (uuidRegex.test(productName)) {
-            try {
-              console.log(`Detected UUID in productName: ${productName}`);
-              const response = await ProductService.getProductById(productName);
-              
-              if (response?.data) {
-                productData = response.data;
-      
-                navigate(`/${toSlug(productData.category || 'san-pham')}/${toSlug(productData.name || productData.title)}`, 
-                  { replace: true, state: { product: productData } }
-                );
-                return;
-              }
-            } catch (uuidError) {
-              console.error('Error fetching by UUID in productName:', uuidError);
-            }
-          }
-        }
-        
-        if (!productData && productName && !id) {
-          const simpleIdRegex = /^[A-Za-z0-9]{1,10}$/;
-          
-          if (simpleIdRegex.test(productName)) {
-            try {
-              console.log(`Trying productName as simple ID: ${productName}`);
-              const response = await ProductService.getProductById(productName);
-              
-              if (response?.data) {
-                productData = response.data;
-                navigate(`/${toSlug(productData.category || 'san-pham')}/${toSlug(productData.name || productData.title)}`, 
-                  { replace: true, state: { product: productData } }
-                );
-                return;
-              }
-            } catch (simpleIdError) {
-              console.error('Error fetching by simple ID:', simpleIdError);
-            }
-          }
-        }
-        
-        if (!productData && category && productName) {
-          try {
-            console.log(`Searching for product with term: ${productName.replace(/-/g, ' ')}`);
-            const queryParams = {
-              pageNumber: 1,
-              pageSize: 100,
-              searchTerm: productName.replace(/-/g, ' ')
-            };
-            
-            const result = await ProductService.getProducts(queryParams);
-            
-            if (result.products && result.products.length > 0) {
-              const exactMatches = result.products.filter(p => 
-                toSlug(p.category || '') === category && 
-                toSlug(p.title || p.name || '') === productName
-              );
-              
-              if (exactMatches.length > 0) {
-                exactMatches.sort((a, b) => {
-                  const aIsSimpleId = /^[A-Za-z0-9]{1,10}$/.test(a.id);
-                  const bIsSimpleId = /^[A-Za-z0-9]{1,10}$/.test(b.id);
-                  
-                  if (aIsSimpleId && !bIsSimpleId) return -1;
-                  if (!aIsSimpleId && bIsSimpleId) return 1;
-                  
-                  const aDate = new Date(a.updatedAt || a.createdAt || 0);
-                  const bDate = new Date(b.updatedAt || b.createdAt || 0);
-                  return bDate - aDate;
-                });
-                const bestMatch = exactMatches[0];
-                try {
-                  // Get detailed product information
-                  console.log(`Found best match from ${exactMatches.length} matches: ${bestMatch.id}`);
-                  const detailedResult = await ProductService.getProductById(bestMatch.id);
-                  productData = detailedResult.data;
-                } catch (detailError) {
-                  // Fallback to basic product info
-                  console.log('Using basic product info due to detail fetch error');
-                  productData = bestMatch;
-                }
-              } else {
-                const partialMatches = result.products.filter(p => {
-                  const productSlug = toSlug(p.title || p.name || '');
-                  return productSlug.includes(productName) || productName.includes(productSlug);
-                });
-                
-                if (partialMatches.length > 0) {
-                  partialMatches.sort((a, b) => {
-                    const aIsSimpleId = /^[A-Za-z0-9]{1,10}$/.test(a.id);
-                    const bIsSimpleId = /^[A-Za-z0-9]{1,10}$/.test(b.id);
-                    
-                    if (aIsSimpleId && !bIsSimpleId) return -1;
-                    if (!aIsSimpleId && bIsSimpleId) return 1;
-                    
-                    // Then sort by updated date
-                    const aDate = new Date(a.updatedAt || a.createdAt || 0);
-                    const bDate = new Date(b.updatedAt || b.createdAt || 0);
-                    return bDate - aDate; // Most recent first
-                  });
-                  
-                  const bestPartialMatch = partialMatches[0];
-                  try {
-                    console.log(`Found best partial match from ${partialMatches.length} matches: ${bestPartialMatch.id}`);
-                    const detailedResult = await ProductService.getProductById(bestPartialMatch.id);
-                    productData = detailedResult.data;
-                  } catch (detailError) {
-                    productData = bestPartialMatch;
-                  }
-                }
-              }
-            }
-          } catch (searchError) {
-            console.error('Error searching for product:', searchError);
-          }
-        }
-
-        if (productData) {
-          setProduct(productData);
         } else {
-          setError('Không tìm thấy sản phẩm');
+          setError('Không tìm thấy ID sản phẩm');
         }
       } catch (err) {
         console.error('Error in product fetch process:', err);
@@ -227,7 +78,7 @@ const ProductDetail = () => {
     };
 
     fetchProduct();
-  }, [category, productName, id, navigate, location]);
+  }, [id, navigate]);
 
   if (loading) return <LoadingState />
   if (error) return <ErrorState message={error} />
@@ -240,10 +91,10 @@ const ProductDetail = () => {
         <Link to="/" className="text-gray-500 hover:text-blue-600">Trang chủ</Link>
         <span className="mx-2 text-gray-400">/</span>
         <Link 
-          to={`/${toSlug(product.category || 'san-pham')}`} 
+          to="/products" 
           className="text-gray-500 hover:text-blue-600"
         >
-          {product.category || 'Sản phẩm'}
+          Sản phẩm
         </Link>
         <span className="mx-2 text-gray-400">/</span>
         <span className="font-medium text-gray-800 truncate">{product.title || product.name}</span>

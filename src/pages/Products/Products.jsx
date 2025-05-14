@@ -141,24 +141,10 @@ const Products = () => {
   const handleProductClick = (product) => {
     sessionStorage.setItem('scrollPosition', window.scrollY);
 
-    const isComplexId = /[0-9a-f]{8}-[0-9a-f]{4}/i.test(product.id);
-    const productSlug = toSlug(product.title || product.name || '');
-
-    if (isComplexId) {
-      navigate(
-        `/${toSlug(product.category || 'san-pham')}/${productSlug}?pid=${encodeURIComponent(product.id)}`,
-        {
-          state: { product }
-        }
-      );
-    } else {
-      navigate(
-        `/${toSlug(product.category || 'san-pham')}/${productSlug}?pid=${encodeURIComponent(product.id)}`,
-        {
-          state: { product }
-        }
-      );
-    }
+    // Simplify navigation to just use the product ID as requested
+    navigate(`/product/${product.id}`, {
+      state: { product }
+    });
   };
 
   const removeFilter = (filter) => {
