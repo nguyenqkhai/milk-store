@@ -17,7 +17,6 @@ import {
 import ProductService from '../../services/Product/ProductServices';
 
 const Products = () => {
-  // State management
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,7 +31,6 @@ const Products = () => {
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
-  // Pagination metadata from API
   const [paginationMeta, setPaginationMeta] = useState({
     totalCount: 0,
     totalPages: 0,
@@ -142,7 +140,25 @@ const Products = () => {
 
   const handleProductClick = (product) => {
     sessionStorage.setItem('scrollPosition', window.scrollY);
-    console.log('Product clicked:', product.id);
+
+    const isComplexId = /[0-9a-f]{8}-[0-9a-f]{4}/i.test(product.id);
+    const productSlug = toSlug(product.title || product.name || '');
+
+    if (isComplexId) {
+      navigate(
+        `/${toSlug(product.category || 'san-pham')}/${productSlug}?pid=${encodeURIComponent(product.id)}`,
+        {
+          state: { product }
+        }
+      );
+    } else {
+      navigate(
+        `/${toSlug(product.category || 'san-pham')}/${productSlug}?pid=${encodeURIComponent(product.id)}`,
+        {
+          state: { product }
+        }
+      );
+    }
   };
 
   const removeFilter = (filter) => {
@@ -150,7 +166,7 @@ const Products = () => {
       setSelectedCategory('Tất cả');
     } else if (filter.type === 'search') {
       setSearchText('');
-      setSearchQuery(''); 
+      setSearchQuery('');
     } else if (filter.type === 'sort') {
       setSortBy('default');
     }
@@ -160,7 +176,7 @@ const Products = () => {
 
   const resetAllFilters = () => {
     setSearchText('');
-    setSearchQuery(''); 
+    setSearchQuery('');
     setSelectedCategory('Tất cả');
     setSortBy('default');
     setCurrentPage(1);

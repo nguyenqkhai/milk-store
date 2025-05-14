@@ -1,13 +1,65 @@
 import React, { useRef, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import ProductCard from '../../Products/Components/ProductCard'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import ProductService from '../../../services/Product/ProductServices';
 
-const RelatedProducts = ({ products, title = 'Sản phẩm liên quan' }) => {
+import LoadingState from '../../Products/Components/LoadingState'
+
+const RelatedProducts = ({ product, title = 'Sản phẩm liên quan' }) => {
   const scrollContainerRef = useRef(null)
   const [showLeftArrow, setShowLeftArrow] = useState(false)
   const [showRightArrow, setShowRightArrow] = useState(true)
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
+  const [relatedProducts, setRelatedProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  
+  // Fetch related products from API
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      if (!product) return
+      
+      try {
+        setLoading(true)
+        
+        // Use the product's category or brand to find related products
+        // You might need to adjust these query parameters based on your API
+        const queryParams = {
+          pageNumber: 1,
+          pageSize: 10,
+          // Uncomment and modify these based on your actual API structure
+          // categoryId: product.categoryId || '',
+          // sortBy: 'ProductName',
+          // sortAscending: true
+        }
+        
+        // If we have a brand, try to fetch products from same brand
+        if (product.brand) {
+          // Assuming brand is either a string or an object with a name property
+          const brandName = typeof product.brand === 'object' ? product.brand.name : product.brand
+          queryParams.searchTerm = brandName
+        }
+        
+        const result = await ProductService.getProducts(queryParams)
+        
+        // Filter out the current product from related products
+        const filtered = result.products.filter(p => 
+          p.id !== product.id && p.id !== product.productid
+        ).slice(0, 8)
+        
+        setRelatedProducts(filtered)
+      } catch (error) {
+        console.error('Error fetching related products:', error)
+        // Fallback to empty array in case of error
+        setRelatedProducts([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    fetchRelatedProducts()
+  }, [product])
   
   // Kiểm tra xem có thể cuộn không
   useEffect(() => {
@@ -38,7 +90,7 @@ const RelatedProducts = ({ products, title = 'Sản phẩm liên quan' }) => {
         resizeObserver.disconnect()
       }
     }
-  }, [products])
+  }, [relatedProducts])
   
   // Hàm xử lý cuộn
   const scroll = (direction) => {
@@ -76,7 +128,24 @@ const RelatedProducts = ({ products, title = 'Sản phẩm liên quan' }) => {
     }
   }
   
-  if (!products || products.length === 0) return null
+  if (loading) {
+    return (
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">{title}</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(item => (
+            <div key={item} className="animate-pulse">
+              <div className="bg-gray-200 h-48 rounded-lg mb-2"></div>
+              <div className="bg-gray-200 h-4 rounded w-3/4 mb-2"></div>
+              <div className="bg-gray-200 h-4 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+  
+  if (!relatedProducts || relatedProducts.length === 0) return null
   
   return (
     <div className="mb-8 relative overflow-hidden">
@@ -86,7 +155,7 @@ const RelatedProducts = ({ products, title = 'Sản phẩm liên quan' }) => {
       
       <div className="relative">
         {/* Nút cuộn trái */}
-        {showLeftArrow && products.length > 4 && (
+        {showLeftArrow && relatedProducts.length > 4 && (
           <button
             onClick={() => scroll('left')}
             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md text-gray-700 border border-gray-200 hover:bg-gray-50 transition-opacity"
@@ -113,7 +182,7 @@ const RelatedProducts = ({ products, title = 'Sản phẩm liên quan' }) => {
           {/* Padding đầu tiên */}
           <div className="flex-shrink-0 w-1 md:w-3"></div>
           
-          {products.map((product, index) => (
+          {relatedProducts.map((product, index) => (
             <div 
               key={product.id} 
               className="flex-shrink-0 w-[45%] sm:w-[33%] md:w-[25%] lg:w-[20%] px-2 snap-start"
@@ -133,7 +202,7 @@ const RelatedProducts = ({ products, title = 'Sản phẩm liên quan' }) => {
         </div>
         
         {/* Nút cuộn phải */}
-        {showRightArrow && products.length > 4 && (
+        {showRightArrow && relatedProducts.length > 4 && (
           <button
             onClick={() => scroll('right')}
             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md text-gray-700 border border-gray-200 hover:bg-gray-50 transition-opacity"
