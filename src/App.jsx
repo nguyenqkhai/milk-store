@@ -71,13 +71,13 @@ const AppRoutes = () => {
         <Route path='/ve-chung-toi' element={<About />} />
         <Route path='/san-pham' element={<Products />} />
         <Route path='/lien-he' element={<Contact />} />
-        <Route path='/:category/:productName' element={<ProductDetail />} />
-        
+        <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/:category/:productName" element={<ProductDetail />} />
         <Route path='/thanh-toan' element={
           <ProtectedRoute>
-            <Checkout/>
+            <Checkout />
           </ProtectedRoute>
-        }/>
+        } />
 
         {/* <Route path='/thanh-toan' element={<Checkout/>}/> */}
         <Route path='/gio-hang' element={
@@ -86,24 +86,24 @@ const AppRoutes = () => {
           </ProtectedRoute>
         } />
         <Route path='/gio-hang' element={<Cart />} />
-        
+
         <Route path='/xac-nhan-thanh-toan' element={
           <ProtectedRoute>
-            <Payment/>
+            <Payment />
           </ProtectedRoute>
-        }/>
-        
+        } />
+
 
         {/* <Route path='/xac-nhan-thanh-toan' element={<Payment/>}/> */}
-        <Route path='/chinh-sach-van-chuyen' element={<TransferPolicy/>}/>
+        <Route path='/chinh-sach-van-chuyen' element={<TransferPolicy />} />
         <Route path='/huong-dan-mua-hang' element={<PurchaseGuide />} />
         <Route path='/chinh-sach-doi-tra' element={<ReturnPolicy />} />
         <Route path='/trang-ca-nhan' element={
           <ProtectedRoute>
             <Profile />
           </ProtectedRoute>
-        }/>
-        <Route path='*' element={<NotFound/>}/>
+        } />
+        <Route path='*' element={<NotFound />} />
       </Routes>
     </Layout>
   );

@@ -101,7 +101,6 @@ const ProductFilters = ({
                 <option value='default'>Mặc định</option>
                 <option value='price-low-high'>Giá: Thấp - Cao</option>
                 <option value='price-high-low'>Giá: Cao - Thấp</option>
-                <option value='rating'>Đánh giá cao nhất</option>
               </select>
             </div>
           </div>
@@ -123,7 +122,6 @@ const ProductFilters = ({
             <option value='default'>Mặc định</option>
             <option value='price-low-high'>Giá: Thấp - Cao</option>
             <option value='price-high-low'>Giá: Cao - Thấp</option>
-            <option value='rating'>Đánh giá cao nhất</option>
           </select>
         </div>
       </div>

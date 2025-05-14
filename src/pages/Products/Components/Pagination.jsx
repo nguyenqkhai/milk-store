@@ -1,116 +1,133 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const Pagination = ({ currentPage, totalPages, onPageChange, totalItems, itemsPerPage }) => {
-  const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-  
-  // Tạo mảng các số trang để hiển thị
-  const getPageNumbers = () => {
+const Pagination = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+  itemsPerPage,
+  totalItems,
+  hasPrevious,
+  hasNext
+}) => {
+  // If there's only one page, don't show pagination
+  if (totalPages <= 1) return null;
+
+  // Calculate the range of pages to show
+  const getVisiblePages = () => {
+    const delta = 2; // Number of pages to show on either side of current page
     const pages = [];
-    const maxPagesToShow = 5; // Số lượng nút số trang tối đa hiển thị
     
-    if (totalPages <= maxPagesToShow) {
-      // Hiển thị tất cả các trang nếu tổng số trang ít hơn maxPagesToShow
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
+    let startPage = Math.max(1, currentPage - delta);
+    let endPage = Math.min(totalPages, currentPage + delta);
+    
+    // Ensure we always show at least 5 pages if available
+    if (endPage - startPage + 1 < 5) {
+      if (startPage === 1) {
+        endPage = Math.min(5, totalPages);
+      } else if (endPage === totalPages) {
+        startPage = Math.max(1, totalPages - 4);
       }
-    } else {
-      // Trường hợp có nhiều trang, hiển thị một số trang đầu, cuối và gần trang hiện tại
-      let startPage = Math.max(currentPage - Math.floor(maxPagesToShow / 2), 1);
-      let endPage = startPage + maxPagesToShow - 1;
-      
-      if (endPage > totalPages) {
-        endPage = totalPages;
-        startPage = Math.max(endPage - maxPagesToShow + 1, 1);
-      }
-      
-      // Thêm trang đầu tiên
-      if (startPage > 1) {
-        pages.push(1);
-        if (startPage > 2) {
-          pages.push('...');
-        }
-      }
-      
-      // Thêm các trang ở giữa
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-      }
-      
-      // Thêm trang cuối cùng
-      if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-          pages.push('...');
-        }
-        pages.push(totalPages);
-      }
+    }
+    
+    // Generate page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
     }
     
     return pages;
   };
-  
-  const pageNumbers = getPageNumbers();
+
+  const visiblePages = getVisiblePages();
+
+  // Pagination stats
+  const start = Math.min((currentPage - 1) * itemsPerPage + 1, totalItems);
+  const end = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4">
-      <div className="flex flex-col sm:flex-row items-center justify-between">
-        {/* Thông tin về số lượng sản phẩm hiển thị */}
-        <div className="text-sm text-gray-600 mb-4 sm:mb-0">
-          Hiển thị <span className="font-medium">{startItem}-{endItem}</span> trên <span className="font-medium">{totalItems}</span> sản phẩm
-        </div>
-        
-        {/* Nút phân trang */}
-        <div className="flex items-center space-x-1">
-          {/* Nút Previous */}
+    <div className="flex flex-col-reverse md:flex-row md:justify-between md:items-center">
+      <div className="text-sm text-gray-600 mt-4 md:mt-0">
+        Hiển thị <span className="font-medium">{start}-{end}</span> trên{' '}
+        <span className="font-medium">{totalItems}</span> sản phẩm
+      </div>
+      
+      <div className="flex items-center justify-center gap-1">
+        {/* Previous page button */}
+        <button
+          onClick={() => hasPrevious && onPageChange(currentPage - 1)}
+          disabled={!hasPrevious}
+          className={`px-3 py-1 rounded-md ${
+            hasPrevious
+              ? 'text-gray-700 hover:bg-gray-200'
+              : 'text-gray-400 cursor-not-allowed'
+          }`}
+          aria-label="Trang trước"
+        >
+          <ChevronLeft size={18} />
+        </button>
+
+        {/* First page and ellipsis if needed */}
+        {visiblePages[0] > 1 && (
+          <>
+            <button
+              onClick={() => onPageChange(1)}
+              className="px-3 py-1 rounded-md hover:bg-gray-200 text-gray-700"
+              aria-label="Trang đầu tiên"
+            >
+              1
+            </button>
+            {visiblePages[0] > 2 && (
+              <span className="px-2 py-1 text-gray-400">...</span>
+            )}
+          </>
+        )}
+
+        {/* Visible page buttons */}
+        {visiblePages.map(page => (
           <button
-            onClick={() => onPageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={`flex items-center justify-center w-9 h-9 rounded-md ${
-              currentPage === 1
-                ? 'text-gray-400 cursor-not-allowed bg-gray-50'
-                : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
+            key={page}
+            onClick={() => onPageChange(page)}
+            className={`px-3 py-1 rounded-md ${
+              currentPage === page
+                ? 'bg-blue-600 text-white font-medium'
+                : 'text-gray-700 hover:bg-gray-200'
             }`}
-            aria-label="Previous page"
+            aria-label={`Trang ${page}`}
+            aria-current={currentPage === page ? 'page' : undefined}
           >
-            <ChevronLeft size={18} />
+            {page}
           </button>
-          
-          {/* Các nút số trang */}
-          {pageNumbers.map((pageNumber, index) => (
-            pageNumber === '...' ? (
-              <span key={`ellipsis-${index}`} className="flex items-center justify-center w-9 h-9 text-gray-600">
-                ...
-              </span>
-            ) : (
-              <button
-                key={`page-${pageNumber}`}
-                onClick={() => onPageChange(pageNumber)}
-                className={`w-9 h-9 rounded-md text-sm font-medium ${
-                  currentPage === pageNumber
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
-                } transition-colors`}
-              >
-                {pageNumber}
-              </button>
-            )
-          ))}
-          
-          {/* Nút Next */}
-          <button
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={`flex items-center justify-center w-9 h-9 rounded-md ${
-              currentPage === totalPages
-                ? 'text-gray-400 cursor-not-allowed bg-gray-50'
-                : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
-            }`}
-            aria-label="Next page"
-          >
-            <ChevronRight size={18} />
-          </button>
-        </div>
+        ))}
+
+        {/* Last page and ellipsis if needed */}
+        {visiblePages[visiblePages.length - 1] < totalPages && (
+          <>
+            {visiblePages[visiblePages.length - 1] < totalPages - 1 && (
+              <span className="px-2 py-1 text-gray-400">...</span>
+            )}
+            <button
+              onClick={() => onPageChange(totalPages)}
+              className="px-3 py-1 rounded-md hover:bg-gray-200 text-gray-700"
+              aria-label="Trang cuối cùng"
+            >
+              {totalPages}
+            </button>
+          </>
+        )}
+
+        {/* Next page button */}
+        <button
+          onClick={() => hasNext && onPageChange(currentPage + 1)}
+          disabled={!hasNext}
+          className={`px-3 py-1 rounded-md ${
+            hasNext
+              ? 'text-gray-700 hover:bg-gray-200'
+              : 'text-gray-400 cursor-not-allowed'
+          }`}
+          aria-label="Trang kế tiếp"
+        >
+          <ChevronRight size={18} />
+        </button>
       </div>
     </div>
   );

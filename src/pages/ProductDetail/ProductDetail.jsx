@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useLocation, Link, useNavigate } from 'react-router-dom'
+import { useParams, Link, useNavigate, useLocation  } from 'react-router-dom'
 import ProductImages from './Components/ProductImages'
 import ProductInfo from './Components/ProductInfo'
 import RelatedProducts from './Components/RelatedProducts'
@@ -8,278 +8,17 @@ import ErrorState from '../Products/Components/ErrorState'
 import { toSlug } from '../../utils/stringUtils'    
 import NotFound from './Components/ProductNotFound'
 import { useScrollToTop } from '../../hooks/useScrollToTop'
-
-const mockProducts = [
-  {
-    id: 1,
-    title: 'Sữa Tươi Có Đường Vinamilk 1L',
-    category: 'Sữa tươi',
-    description: 'Sữa tươi tiệt trùng có đường Vinamilk giàu dinh dưỡng',
-    price: 30.000,
-    rating: 4.7,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0,
-    brand: 'Vinamilk'
-  },
-  {
-    id: 2,
-    title: 'Sữa Tươi Không Đường Vinamilk 1L',
-    category: 'Sữa tươi',
-    description: 'Sữa tươi tiệt trùng không đường Vinamilk, tốt cho sức khỏe',
-    price: 30.000,
-    rating: 4.6,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 5,
-    brand: 'Vinamilk'
-  },
-  {
-    id: 3,
-    title: 'Sữa Hạt Óc Chó Vinamilk',
-    category: 'Sữa hạt',
-    description: 'Sữa óc chó thơm ngon, bổ dưỡng từ Vinamilk',
-    price: 32.000,
-    rating: 4.8,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 10,
-    brand: 'Vinamilk'
-  },
-  {
-    id: 4,
-    title: 'Sữa Đậu Nành Vinamilk 1L',
-    category: 'Sữa hạt',
-    description: 'Sữa đậu nành nguyên chất, ít đường',
-    price: 27.000,
-    rating: 4.5,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0,
-    brand: 'Vinamilk'
-  },
-  {
-    id: 5,
-    title: 'Sữa Tươi TH True Milk 1L',
-    category: 'Sữa tươi',
-    description: 'Sữa tươi sạch từ trang trại TH',
-    price: 31.000,
-    rating: 4.6,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0,
-    brand: 'TH True Milk'
-  },
-  {
-    id: 6,
-    title: 'Sữa Tươi Ít Đường TH True Milk 1L',
-    category: 'Sữa tươi',
-    description: 'Sữa ít đường từ thương hiệu TH True Milk',
-    price: 31.000,
-    rating: 4.7,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 3,
-    brand: 'TH True Milk'
-  },
-  {
-    id: 7,
-    title: 'Sữa Hạt TH True Nut Óc Chó',
-    category: 'Sữa hạt',
-    description: 'Sữa hạt óc chó thơm ngon từ TH True Nut',
-    price: 34.000,
-    rating: 4.6,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 5,
-    brand: 'TH True Milk'
-  },
-  {
-    id: 8,
-    title: 'Sữa Đậu Đen TH True Nut',
-    category: 'Sữa hạt',
-    description: 'Sữa đậu đen nguyên chất, thơm ngon và lành mạnh',
-    price: 35.000,
-    rating: 4.4,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0,
-    brand: 'TH True Milk'
-  },
-  {
-    id: 9,
-    title: 'Sữa Tươi Có Đường Dutch Lady 1L',
-    category: 'Sữa tươi',
-    description: 'Sữa tươi thơm ngon từ Hà Lan',
-    price: 29.000,
-    rating: 4.5,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0,
-    brand: 'Dutch Lady'
-  },
-  {
-    id: 10,
-    title: 'Sữa Tươi Không Đường Dutch Lady 1L',
-    category: 'Sữa tươi',
-    description: 'Sữa không đường phù hợp người ăn kiêng',
-    price: 29.000,
-    rating: 4.3,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0,
-    brand: 'Dutch Lady'
-  },
-  {
-    id: 11,
-    title: 'Sữa Bắp Nutifood 1L',
-    category: 'Sữa hạt',
-    description: 'Sữa bắp Nutifood thơm ngon tự nhiên',
-    price: 28.000,
-    rating: 4.4,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0,
-    brand: 'Nutifood'
-  },
-  {
-    id: 12,
-    title: 'Sữa Dinh Dưỡng Nuti IQ Gold',
-    category: 'Sữa bột',
-    description: 'Sữa dành cho trẻ em phát triển trí tuệ và chiều cao',
-    price: 250.000,
-    rating: 4.9,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 15,
-    brand: 'Nutifood'
-  },
-  {
-    id: 13,
-    title: 'Sữa Dielac Alpha Vinamilk 900g',
-    category: 'Sữa bột',
-    description: 'Sữa bột cho trẻ từ 1-6 tuổi hỗ trợ phát triển trí não',
-    price: 220.000,
-    rating: 4.7,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 10,
-    brand: 'Vinamilk'
-  },
-  {
-    id: 14,
-    title: 'Sữa Dinh Dưỡng GrowPLUS+ 1L',
-    category: 'Sữa dinh dưỡng',
-    description: 'Hỗ trợ tăng cân và chiều cao cho trẻ em suy dinh dưỡng',
-    price: 33.000,
-    rating: 4.6,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 7,
-    brand: 'Nutifood'
-  },
-  {
-    id: 15,
-    title: 'Sữa Nuti EnPlus Diamond',
-    category: 'Sữa dinh dưỡng',
-    description: 'Sữa dành cho người lớn tuổi và người bệnh',
-    price: 230.000,
-    rating: 4.7,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 5,
-    brand: 'Nutifood'
-  },
-  {
-    id: 16,
-    title: 'Sữa Sure Prevent Gold Vinamilk',
-    category: 'Sữa dinh dưỡng',
-    description: 'Hỗ trợ tim mạch, bổ sung canxi cho người cao tuổi',
-    price: 255.000,
-    rating: 4.8,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 10,
-    brand: 'Vinamilk'
-  },
-  {
-    id: 17,
-    title: 'Sữa Đặc Ông Thọ Trắng 380g',
-    category: 'Sữa đặc',
-    description: 'Sữa đặc có đường ông Thọ dùng pha cà phê hoặc làm bánh',
-    price: 25.000,
-    rating: 4.9,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0,
-    brand: 'Vinamilk'
-  },
-  {
-    id: 18,
-    title: 'Sữa Đặc Ông Thọ Xanh 380g',
-    category: 'Sữa đặc',
-    description: 'Sữa đặc ít đường thích hợp với người ăn kiêng',
-    price: 26.000,
-    rating: 4.6,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 0,
-    brand: 'Vinamilk'
-  },
-  {
-    id: 19,
-    title: 'Sữa Tươi Nguyên Kem Meadow Fresh 1L',
-    category: 'Sữa tươi',
-    description: 'Sữa nguyên kem nhập khẩu từ New Zealand',
-    price: 35.000,
-    rating: 4.5,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 8,
-    brand: 'Meadow Fresh'
-  },
-  {
-    id: 20,
-    title: 'Sữa Hạt Ngũ Cốc TH True Nut',
-    category: 'Sữa hạt',
-    description: 'Kết hợp dinh dưỡng từ 5 loại hạt tốt cho sức khỏe',
-    price: 36.000,
-    rating: 4.7,
-    thumbnail: 'https://product.hstatic.net/1000141988/product/sua_tuoi_tiet_trung_co_duong_vinamilk_viet_nam__1l__2f553e41e7f54abba37116456aa94db3_grande.png',
-    discountPercentage: 6,
-    brand: 'TH True Milk'
-  }
-];
-
-// Hàm lọc sản phẩm liên quan
-const getRelatedProducts = (currentProduct, allProducts) => {
-  if (!currentProduct) return [];
-  
-  // Lấy ra các thông tin cần thiết
-  const { id, category, brand } = currentProduct;
-  
-  // Ưu tiên 1: Sản phẩm cùng danh mục và cùng thương hiệu
-  const sameCategoryAndBrand = allProducts.filter(p => 
-    p.id !== id && 
-    p.category === category && 
-    p.brand === brand
-  );
-  
-  // Ưu tiên 2: Sản phẩm cùng danh mục nhưng khác thương hiệu
-  const sameCategoryDifferentBrand = allProducts.filter(p => 
-    p.id !== id && 
-    p.category === category && 
-    p.brand !== brand
-  );
-  
-  // Ưu tiên 3: Sản phẩm cùng thương hiệu nhưng khác danh mục
-  const sameBrandDifferentCategory = allProducts.filter(p => 
-    p.id !== id && 
-    p.category !== category && 
-    p.brand === brand
-  );
-  
-  // Kết hợp các danh sách với thứ tự ưu tiên và lấy tối đa 8 sản phẩm
-  const relatedProducts = [
-    ...sameCategoryAndBrand,
-    ...sameCategoryDifferentBrand,
-    ...sameBrandDifferentCategory
-  ].slice(0, 8);
-  
-  return relatedProducts;
-};
+import ProductService from '../../services/Product/ProductServices';
 
 const ProductDetail = () => {
   useScrollToTop()
-  const { category, productName } = useParams()
+  const { category, productName, id } = useParams()
   const navigate = useNavigate()
+  const location = useLocation();
   const [product, setProduct] = useState(null)
-  const [relatedProducts, setRelatedProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // Thêm useEffect để cuộn lên đầu trang khi component mount
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -288,40 +27,207 @@ const ProductDetail = () => {
   }, [])
 
   useEffect(() => {
-    const id = parseInt(productName)
-    if (!isNaN(id)) {
-      const productById = mockProducts.find(p => p.id === id)
-      if (productById) {
-        navigate(`/${toSlug(productById.category)}/${toSlug(productById.title)}`, { replace: true })
-        return
+    const restoreScrollPosition = () => {
+      const savedPosition = sessionStorage.getItem('scrollPosition');
+      if (savedPosition !== null) {
+        window.scrollTo({ top: parseInt(savedPosition), behavior: 'auto' });
+        sessionStorage.removeItem('scrollPosition'); // Clear after use
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
-    }
+    };
 
-    const fetchProduct = () => {
+    const timer = setTimeout(restoreScrollPosition, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
       try {
-        setTimeout(() => {
-          const foundProduct = mockProducts.find(
-            p => toSlug(p.category) === category && toSlug(p.title) === productName
-          )
-          
-          if (foundProduct) {
-            setProduct(foundProduct)
-            // Tìm sản phẩm liên quan
-            const related = getRelatedProducts(foundProduct, mockProducts)
-            setRelatedProducts(related)
-          } else {
-            setError('Không tìm thấy sản phẩm')
-          }
-          setLoading(false)
-        }, 800) // Giảm thời gian loading
-      } catch (err) {
-        setError('Có lỗi xảy ra khi tải sản phẩm')
-        setLoading(false)
-      }
-    }
+        setLoading(true);
+        let productData = null;
 
-    fetchProduct()
-  }, [category, productName, navigate])
+        if (location.state?.product) {
+          productData = location.state.product;
+          setProduct(productData);
+          setLoading(false);
+          return;
+        }
+
+        const searchParams = new URLSearchParams(location.search);
+        const productIdFromQuery = searchParams.get('pid');
+        
+        if (productIdFromQuery) {
+          try {
+            console.log(`Fetching product by ID from query parameter: ${productIdFromQuery}`);
+            const response = await ProductService.getProductById(productIdFromQuery);
+            
+            if (response?.data) {
+              productData = response.data;
+              setProduct(productData);
+              setLoading(false);
+              return;
+            }
+          } catch (queryIdError) {
+            console.error('Error fetching product by ID from query parameter:', queryIdError);
+          }
+        }
+
+        if (id) {
+          try {
+            console.log(`Fetching product by ID: ${id}`);
+            const response = await ProductService.getProductById(id);
+            
+            if (response?.data) {
+              productData = response.data;
+              const seoUrl = `/${toSlug(productData.category || 'san-pham')}/${toSlug(productData.name || productData.title)}?pid=${encodeURIComponent(productData.id)}`;
+              
+              if (location.pathname !== seoUrl.split('?')[0]) {
+                navigate(seoUrl, { 
+                  replace: true, 
+                  state: { product: productData } 
+                });
+                return;
+              }
+            }
+          } catch (idError) {
+            console.error('Error fetching product by ID:', idError);
+          }
+        }
+        
+        if (!productData && productName && !id) {
+          const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+          if (uuidRegex.test(productName)) {
+            try {
+              console.log(`Detected UUID in productName: ${productName}`);
+              const response = await ProductService.getProductById(productName);
+              
+              if (response?.data) {
+                productData = response.data;
+      
+                navigate(`/${toSlug(productData.category || 'san-pham')}/${toSlug(productData.name || productData.title)}`, 
+                  { replace: true, state: { product: productData } }
+                );
+                return;
+              }
+            } catch (uuidError) {
+              console.error('Error fetching by UUID in productName:', uuidError);
+            }
+          }
+        }
+        
+        if (!productData && productName && !id) {
+          const simpleIdRegex = /^[A-Za-z0-9]{1,10}$/;
+          
+          if (simpleIdRegex.test(productName)) {
+            try {
+              console.log(`Trying productName as simple ID: ${productName}`);
+              const response = await ProductService.getProductById(productName);
+              
+              if (response?.data) {
+                productData = response.data;
+                navigate(`/${toSlug(productData.category || 'san-pham')}/${toSlug(productData.name || productData.title)}`, 
+                  { replace: true, state: { product: productData } }
+                );
+                return;
+              }
+            } catch (simpleIdError) {
+              console.error('Error fetching by simple ID:', simpleIdError);
+            }
+          }
+        }
+        
+        if (!productData && category && productName) {
+          try {
+            console.log(`Searching for product with term: ${productName.replace(/-/g, ' ')}`);
+            const queryParams = {
+              pageNumber: 1,
+              pageSize: 100,
+              searchTerm: productName.replace(/-/g, ' ')
+            };
+            
+            const result = await ProductService.getProducts(queryParams);
+            
+            if (result.products && result.products.length > 0) {
+              const exactMatches = result.products.filter(p => 
+                toSlug(p.category || '') === category && 
+                toSlug(p.title || p.name || '') === productName
+              );
+              
+              if (exactMatches.length > 0) {
+                exactMatches.sort((a, b) => {
+                  const aIsSimpleId = /^[A-Za-z0-9]{1,10}$/.test(a.id);
+                  const bIsSimpleId = /^[A-Za-z0-9]{1,10}$/.test(b.id);
+                  
+                  if (aIsSimpleId && !bIsSimpleId) return -1;
+                  if (!aIsSimpleId && bIsSimpleId) return 1;
+                  
+                  const aDate = new Date(a.updatedAt || a.createdAt || 0);
+                  const bDate = new Date(b.updatedAt || b.createdAt || 0);
+                  return bDate - aDate;
+                });
+                const bestMatch = exactMatches[0];
+                try {
+                  // Get detailed product information
+                  console.log(`Found best match from ${exactMatches.length} matches: ${bestMatch.id}`);
+                  const detailedResult = await ProductService.getProductById(bestMatch.id);
+                  productData = detailedResult.data;
+                } catch (detailError) {
+                  // Fallback to basic product info
+                  console.log('Using basic product info due to detail fetch error');
+                  productData = bestMatch;
+                }
+              } else {
+                const partialMatches = result.products.filter(p => {
+                  const productSlug = toSlug(p.title || p.name || '');
+                  return productSlug.includes(productName) || productName.includes(productSlug);
+                });
+                
+                if (partialMatches.length > 0) {
+                  partialMatches.sort((a, b) => {
+                    const aIsSimpleId = /^[A-Za-z0-9]{1,10}$/.test(a.id);
+                    const bIsSimpleId = /^[A-Za-z0-9]{1,10}$/.test(b.id);
+                    
+                    if (aIsSimpleId && !bIsSimpleId) return -1;
+                    if (!aIsSimpleId && bIsSimpleId) return 1;
+                    
+                    // Then sort by updated date
+                    const aDate = new Date(a.updatedAt || a.createdAt || 0);
+                    const bDate = new Date(b.updatedAt || b.createdAt || 0);
+                    return bDate - aDate; // Most recent first
+                  });
+                  
+                  const bestPartialMatch = partialMatches[0];
+                  try {
+                    console.log(`Found best partial match from ${partialMatches.length} matches: ${bestPartialMatch.id}`);
+                    const detailedResult = await ProductService.getProductById(bestPartialMatch.id);
+                    productData = detailedResult.data;
+                  } catch (detailError) {
+                    productData = bestPartialMatch;
+                  }
+                }
+              }
+            }
+          } catch (searchError) {
+            console.error('Error searching for product:', searchError);
+          }
+        }
+
+        if (productData) {
+          setProduct(productData);
+        } else {
+          setError('Không tìm thấy sản phẩm');
+        }
+      } catch (err) {
+        console.error('Error in product fetch process:', err);
+        setError('Có lỗi xảy ra khi tải sản phẩm');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [category, productName, id, navigate, location]);
 
   if (loading) return <LoadingState />
   if (error) return <ErrorState message={error} />
@@ -334,13 +240,13 @@ const ProductDetail = () => {
         <Link to="/" className="text-gray-500 hover:text-blue-600">Trang chủ</Link>
         <span className="mx-2 text-gray-400">/</span>
         <Link 
-          to={`/${toSlug(product.category)}`} 
+          to={`/${toSlug(product.category || 'san-pham')}`} 
           className="text-gray-500 hover:text-blue-600"
         >
-          {product.category}
+          {product.category || 'Sản phẩm'}
         </Link>
         <span className="mx-2 text-gray-400">/</span>
-        <span className="font-medium text-gray-800 truncate">{product.title}</span>
+        <span className="font-medium text-gray-800 truncate">{product.title || product.name}</span>
       </nav>
 
       {/* Chi tiết sản phẩm */}
@@ -363,11 +269,17 @@ const ProductDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex border-b border-gray-100 py-2">
                 <span className="font-medium w-32">Thương hiệu:</span>
-                <span className="text-gray-600">{product.brand}</span>
+                <span className="text-gray-600">
+                  {typeof product.brand === 'object' ? product.brand.name : product.brand || 'Không có thông tin'}
+                </span>
               </div>
               <div className="flex border-b border-gray-100 py-2">
                 <span className="font-medium w-32">Loại sản phẩm:</span>
-                <span className="text-gray-600">{product.category}</span>
+                <span className="text-gray-600">{product.category || 'Không có thông tin'}</span>
+              </div>
+              <div className="flex border-b border-gray-100 py-2">
+                <span className="font-medium w-32">Mã SKU:</span>
+                <span className="text-gray-600">{product.sku || 'Không có thông tin'}</span>
               </div>
               <div className="flex border-b border-gray-100 py-2">
                 <span className="font-medium w-32">Xuất xứ:</span>
@@ -375,15 +287,19 @@ const ProductDetail = () => {
               </div>
               <div className="flex border-b border-gray-100 py-2">
                 <span className="font-medium w-32">Đánh giá:</span>
-                <span className="text-gray-600">{product.rating}/5 ⭐</span>
+                <span className="text-gray-600">{product.rating || 0}/5 ⭐</span>
+              </div>
+              <div className="flex border-b border-gray-100 py-2">
+                <span className="font-medium w-32">Số lượng kho:</span>
+                <span className="text-gray-600">{product.stockQuantity || product.stockquantity || 0}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
       
-      {/* Sản phẩm liên quan */}
-      <RelatedProducts products={relatedProducts} />
+      {/* Sản phẩm liên quan từ API */}
+      <RelatedProducts product={product} />
     </div>
   )
 }
