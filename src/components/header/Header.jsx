@@ -11,12 +11,8 @@ const Header = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const data = await fetchCartItems()
-        setCountItems(data.length)
-      } catch (error) {
-        console.error('Error fetching cart items:', error)
-      }
+      const data = await fetchCartItems()
+      setCountItems(data.length || 0)
     }
     fetchData()
   }, [])
