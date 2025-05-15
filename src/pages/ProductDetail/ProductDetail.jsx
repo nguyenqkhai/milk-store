@@ -91,7 +91,7 @@ const ProductDetail = () => {
         <Link to="/" className="text-gray-500 hover:text-blue-600">Trang chủ</Link>
         <span className="mx-2 text-gray-400">/</span>
         <Link 
-          to="/products" 
+          to="/san-pham" 
           className="text-gray-500 hover:text-blue-600"
         >
           Sản phẩm
