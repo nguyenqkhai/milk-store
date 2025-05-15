@@ -33,7 +33,7 @@ const CartItemsList = ({ items, itemCount, handleUpdateQuantity, handleRemoveIte
               </div>
               <div>
                 <h3 className="font-medium text-gray-800">{item.name}</h3>
-                <p className="text-sm text-gray-500 mt-1">Kích thước: {item.size}</p>
+                {/* <p className="text-sm text-gray-500 mt-1">Kích thước: {item.size}</p> */}
               </div>
             </div>
           </div>

@@ -41,7 +41,27 @@ export const fetchCartItems = async (PageNumber = 1, PageSize = 10, SearchTern =
   }
 }
 
-export const addToCart = async (productId, quantity) => {}
+export const addToCart = async (productId, quantity) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/CartItem/add-to-cart`,
+      {
+        productId,
+        quantity
+      },
+      {
+        headers: {
+          'Authorization': `${localStorage.getItem('accessToken')}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    return {statusCode : response.data.statusCode, message : response.data.message};
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+    throw error;
+  }
+}
 
 export const updateCartItem = async (cartItemId, quantity) => {
   try {
