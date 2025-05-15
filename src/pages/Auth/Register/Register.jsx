@@ -1,14 +1,13 @@
-// src/pages/Register.jsx
-
 import React, { useState } from 'react';
 import { Form, message, Steps } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import RegisterForm from './components/RegisterForm';
 import OtpModal from './components/OtpModal';
-import { sendOtp, verifyOtpAndRegister } from '../../../services/authServices';
+import { useAuth } from '../../../context/AuthContext';
+import { motion } from 'framer-motion';
 
 function Register() {
+  const { register, sendOtp } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
@@ -22,7 +21,7 @@ function Register() {
 
   const handleSendOtp = async (emailToSend = null) => {
     const emailAddress = emailToSend || email;
-    
+
     if (!emailAddress) {
       message.error('Vui lòng nhập email!');
       return false;
@@ -30,19 +29,17 @@ function Register() {
 
     setLoading(true);
     try {
-      console.log("Sending OTP to:", emailAddress);
-      
       const response = await sendOtp(emailAddress);
-      
+
       if (response.status === 200) {
         message.success('Mã OTP đã được gửi đến email của bạn!');
         setEmail(emailAddress);
         setOtpModalVisible(true);
         setCurrentStep(1);
-        
+
         setCanResendOtp(false);
         setResendCountdown(60);
-        
+
         const timer = setInterval(() => {
           setResendCountdown((prev) => {
             if (prev <= 1) {
@@ -61,7 +58,7 @@ function Register() {
       console.error('Lỗi gửi OTP:', error);
       if (error.response) {
         console.log('Error response data:', error.response.data);
-        
+
         if (error.response?.data?.message) {
           message.error(error.response.data.message);
         } else {
@@ -106,7 +103,7 @@ function Register() {
 
       console.log("Verifying OTP with data:", requestData);
 
-      const response = await verifyOtpAndRegister(requestData);
+      const response = await register(requestData);
 
       if (response.status === 200) {
         message.success('Đăng ký thành công!');
@@ -118,7 +115,7 @@ function Register() {
       // Log thêm chi tiết lỗi
       if (error.response) {
         console.log('Error response data:', error.response.data);
-        
+
         if (error.response?.data?.message) {
           message.error(error.response.data.message);
         } else if (error.response?.data?.errors) {
@@ -164,7 +161,7 @@ function Register() {
       address: values.address || "",
       gender: values.gender || "Nam"
     };
-    
+
     setFormData(userData);
 
     // Gửi OTP đến email
@@ -179,7 +176,7 @@ function Register() {
   // Hiệu ứng animation
   const milkVariants = {
     initial: { opacity: 0 },
-    animate: { 
+    animate: {
       opacity: [0, 0.3, 0],
       transition: {
         duration: 8,
@@ -220,7 +217,7 @@ function Register() {
       </div>
 
       {/* Main content */}
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -254,7 +251,7 @@ function Register() {
           {/* Login link */}
           <div className="mt-4 text-center">
             <span className="text-gray-600 text-sm mr-2">Đã có tài khoản?</span>
-            <motion.button 
+            <motion.button
               onClick={() => navigate('/dang-nhap')}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
@@ -268,13 +265,13 @@ function Register() {
         {/* Right Side - Image */}
         <div className="hidden md:block w-1/2 relative">
           <div className="absolute inset-0 bg-gradient-to-b from-[#8ecae6]/30 to-[#219ebc]/30"></div>
-          <img 
+          <img
             src="https://images.unsplash.com/photo-1550583724-b2692b85b150?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
             alt="Milk bottles"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 flex items-center justify-center">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
