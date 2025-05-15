@@ -41,11 +41,11 @@ class ProductService {
                 id: item.productid,
                 title: item.productName,
                 description: item.description || '',
+                rating: item.rate || 0,
                 price: item.priceActive || item.priceDefault || 0,
                 thumbnail: item.imageDTOs && item.imageDTOs.length > 0
                     ? item.imageDTOs[0].imageData
                     : 'https://via.placeholder.com/150',
-                rating: 4.5, // Default rating since it's not in the API
                 discountPercentage: item.priceDefault && item.priceActive && item.priceDefault > item.priceActive
                     ? Math.round(((item.priceDefault - item.priceActive) / item.priceDefault) * 100)
                     : 0,
