@@ -37,7 +37,7 @@ const NotFound = () => {
           </Link>
           
           <Link 
-            to="/product" 
+            to="/san-pham" 
             className='rounded-lg border border-blue-600 bg-white px-6 py-3 text-base font-medium text-blue-600 transition-colors hover:bg-blue-50 hover:-translate-y-1'
           >
             Xem sản phẩm

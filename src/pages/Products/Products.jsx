@@ -13,7 +13,6 @@ import {
   Star,
   X
 } from 'lucide-react';
-import CategoryService from '../../services/Category/CategoryServices';
 import { useProductStore } from './ProductStore';
 
 const Products = () => {

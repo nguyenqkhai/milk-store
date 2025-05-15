@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
-import apiConfig from '../config/apiConfig';
+import CookieService from '../services/Cookie/CookieService';
+import AuthService from '../services/Auth/AuthServices';
 
 const AuthContext = createContext();
 
@@ -10,10 +10,9 @@ export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     
     useEffect(() => {
-        const accessToken = localStorage.getItem('accessToken');
+        const accessToken = CookieService.getAccessToken();
         
         if (accessToken) {
-            axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
             fetchUserInfo();
         } else {
             setLoading(false);
@@ -22,14 +21,13 @@ export const AuthProvider = ({ children }) => {
 
     const fetchUserInfo = async () => {
         try {
-            const response = await axios.get(`${apiConfig.API_BASE_URL}${apiConfig.CUSTOMER.INFO}`);
+            const response = await AuthService.info();
             if (response.status === 200) {
                 setCurrentUser(response.data);
+                console.log('User info:', response.data);
                 setIsAuthenticated(true);
             }
         } catch (error) {
-            console.error('Lỗi khi lấy thông tin người dùng:', error);
-            // Nếu lỗi 401 (Unauthorized), xóa token và yêu cầu đăng nhập lại
             if (error.response && error.response.status === 401) {
                 logout();
             }
@@ -38,128 +36,99 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const login = (userData) => {
-        // Lưu token vào localStorage
-        if (userData.accessToken) {
-            localStorage.setItem('accessToken', userData.accessToken);
-            localStorage.setItem('refreshToken', userData.refreshToken);
-            
-            // Thiết lập token mặc định cho axios
-            axios.defaults.headers.common['Authorization'] = `Bearer ${userData.accessToken}`;
-            
-            // Lấy thông tin người dùng từ API
-            fetchUserInfo();
-            
-            return { success: true };
-        }
-        
-        return { success: false, error: 'Token không hợp lệ' };
-    };
-
-    const logout = async () => {
+    const login = async (username, password) => {
         try {
-            // Gọi API đăng xuất nếu cần
-            const accessToken = localStorage.getItem('accessToken');
-            if (accessToken) {
-                await axios.post(`${apiConfig.API_BASE_URL}${apiConfig.AUTH.LOGOUT}`);
+            const response = await AuthService.login(username, password);
+            if (response) {
+                CookieService.setAuthTokens(
+                    response.data.accessToken, 
+                    response.data.refreshToken
+                );
+                
+                await fetchUserInfo();
+                
+                return { success: true };
             }
+            
+            return { 
+                success: false, 
+                error: response.data?.message || 'Đăng nhập thất bại' 
+            };
         } catch (error) {
-            console.error('Lỗi khi đăng xuất:', error);
-        } finally {
-            // Xóa token và thông tin người dùng
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            delete axios.defaults.headers.common['Authorization'];
-            setCurrentUser(null);
-            setIsAuthenticated(false);
+            console.error('Lỗi khi đăng nhập:', error);
+            return { 
+                success: false, 
+                error: error.response?.data?.message || 'Đăng nhập thất bại' 
+            };
         }
     };
 
-    const register = async (username, email, password, fullname, phone) => {
+    const logout = () => {
+        AuthService.logout();
+        setCurrentUser(null);
+        setIsAuthenticated(false);
+    };
+
+    const register = async (registrationData) => {
         try {
-            const result = await authService.register(username, email, password, fullname, phone);
-            return result;
+            const response = await AuthService.verifyOtpAndRegister(registrationData);
+            return {
+                success: true,
+                data: response.data
+            };
         } catch (error) {
             console.error('Đăng ký thất bại:', error);
-            return {success: false, error: error.response.data.message || 'Có lỗi xảy ra khi đăng ký'};
+            return {
+                success: false, 
+                error: error.response?.data?.message || 'Có lỗi xảy ra khi đăng ký'
+            };
         }
-    }
+    };
 
     const sendOtp = async (email) => {
         try {
-            const result = await authService.sendOtp(email);
-            return result;
+            const response = await AuthService.sendOtp(email);
+            return {
+                success: true,
+                data: response.data
+            };
         } catch (error) {
             console.error('Lỗi gửi OTP:', error);
-            return { success: false, error: 'Có lỗi xảy ra khi gửi mã OTP' };
+            return { 
+                success: false, 
+                error: error.response?.data?.message || 'Có lỗi xảy ra khi gửi mã OTP' 
+            };
         }
     };
 
-    const verifyOtp = async (email, otp) => {
+    const verifyOtpAndRegister = async (registrationData) => {
         try {
-            const result = await authService.verifyOtp(email, otp);
-            return result;
+            const response = await AuthService.verifyOtpAndRegister(registrationData);
+            return {
+                success: true,
+                data: response.data
+            };
         } catch (error) {
-            console.error('Lỗi xác thực OTP:', error);
-            return { success: false, error: 'Có lỗi xảy ra khi xác thực mã OTP' };
-        }
-    }
-    // Hàm để làm mới token khi token cũ hết hạn
-    const refreshToken = async () => {
-        try {
-            const refreshTokenValue = localStorage.getItem('refreshToken');
-            if (!refreshTokenValue) {
-                throw new Error('Không có refresh token');
-            }
-
-            const response = await axios.post(`${apiConfig.API_BASE_URL}${apiConfig.AUTH.REFRESH_TOKEN}`, {
-                refreshToken: refreshTokenValue
-            });
-
-            if (response.status === 200 && response.data) {
-                // Cập nhật token mới
-                localStorage.setItem('accessToken', response.data.accessToken);
-                localStorage.setItem('refreshToken', response.data.refreshToken);
-                
-                // Cập nhật header cho axios
-                axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
-                
-                return true;
-            }
-            return false;
-        } catch (error) {
-            console.error('Lỗi khi làm mới token:', error);
-            logout(); // Đăng xuất nếu không thể làm mới token
-            return false;
+            console.error('Lỗi xác thực OTP và đăng ký:', error);
+            return { 
+                success: false, 
+                error: error.response?.data?.message || 'Có lỗi xảy ra khi xác thực mã OTP' 
+            };
         }
     };
 
-    // Tạo interceptor để tự động làm mới token khi nhận lỗi 401
+    // Lắng nghe sự kiện logout từ AuthService
     useEffect(() => {
-        const interceptor = axios.interceptors.response.use(
-            response => response,
-            async error => {
-                const originalRequest = error.config;
-                
-                // Nếu lỗi 401 và chưa thử làm mới token
-                if (error.response && error.response.status === 401 && !originalRequest._retry) {
-                    originalRequest._retry = true;
-                    
-                    // Thử làm mới token
-                    const success = await refreshToken();
-                    if (success) {
-                        // Thử lại request ban đầu với token mới
-                        return axios(originalRequest);
-                    }
-                }
-                
-                return Promise.reject(error);
-            }
-        );
+        const handleAuthLogout = () => {
+            setCurrentUser(null);
+            setIsAuthenticated(false);
+        };
         
-        // Cleanup interceptor khi component unmount
+        window.addEventListener('auth:logout', handleAuthLogout);
+        
+        // Cleanup listener khi component unmount
         return () => {
-            axios.interceptors.response.eject(interceptor);
+            window.removeEventListener('auth:logout', handleAuthLogout);
         };
     }, []);
 
@@ -169,10 +138,9 @@ export const AuthProvider = ({ children }) => {
         loading,
         login,
         logout,
-        refreshToken,
         register,
         sendOtp,
-        verifyOtp
+        verifyOtpAndRegister
     };
 
     return (

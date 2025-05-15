@@ -36,16 +36,15 @@ const ProductCard = ({ product }) => {
         </div>
       )}
       
-      {/* Ảnh sản phẩm */}
-      <div className="relative overflow-hidden h-40 md:h-48">
-        <img 
-          src={product.thumbnail} 
-          alt={product.title}
-          className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-          loading="lazy"
-        />
-        
-        {/* Overlay khi hover */}
+        <div className="relative overflow-hidden h-32 md:h-48 lg:h-60">
+          <img 
+            src={product.thumbnail} 
+            alt={product.title}
+            className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
+          
+          {/* Overlay khi hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         
         {/* Quick actions */}

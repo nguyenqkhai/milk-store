@@ -1,21 +1,51 @@
-import React, { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { headerClass } from './data'
-import { FiShoppingCart, FiUser } from 'react-icons/fi'
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { headerClass } from './data';
+import { FiShoppingCart, FiUser, FiLogOut, FiInfo } from 'react-icons/fi';
+import { useAuth } from '../../context/AuthContext';
+import { message } from 'antd';
 
 const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const location = useLocation()
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const location = useLocation();
+  const { currentUser, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-  const isActive = path => location.pathname === path
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showUserMenu && !event.target.closest('.user-menu-container')) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserMenu]);
+
+  const isActive = path => location.pathname === path;
+
+  const getUserDisplayName = () => {
+    if (!currentUser || !currentUser.data) return '';
+
+    const { firstName, middleName, surname } = currentUser.data;
+    return `${surname} ${middleName} ${firstName}`;
+  };
+
+  const handleLogout = () => {
+    logout();
+    setShowUserMenu(false);
+    message.success('Đăng xuất thành công!');
+  };
 
   return (
     <>
@@ -63,11 +93,64 @@ const Header = () => {
 
           {/* buttons */}
           <div className='flex items-center space-x-4'>
-            <button className='flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-gray-700 transition-all hover:bg-gray-100'>
-              <Link to='/dang-nhap'>
-                <FiUser className='h-5 w-5' />
-              </Link>
-            </button>
+            {/* User profile button */}
+            <div className="user-menu-container relative">
+              {isAuthenticated ? (
+                <button
+                  className='flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors'
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                >
+                  <div className='h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center'>
+                    {currentUser?.data?.avatar ? (
+                      <img
+                        src={currentUser.data.avatar}
+                        alt="User avatar"
+                        className="h-full w-full rounded-full object-cover"
+                      />
+                    ) : (
+                      <FiUser className='h-5 w-5 text-blue-600' />
+                    )}
+                  </div>
+                  <span className='hidden md:block font-medium'>
+                    {getUserDisplayName()}
+                  </span>
+                </button>
+              ) : (
+                <Link
+                  to='/dang-nhap'
+                  className='flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-gray-700 transition-all hover:bg-gray-100'
+                >
+                  <FiUser className='h-5 w-5' />
+                </Link>
+              )}
+
+              {/* User dropdown menu */}
+              {showUserMenu && isAuthenticated && (
+                <div className="absolute right-0 mt-2 w-60 bg-white rounded-md shadow-lg py-2 z-30">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-medium text-gray-700">{getUserDisplayName()}</p>
+                    <p className="text-xs text-gray-500 truncate">{currentUser?.data?.email}</p>
+                  </div>
+                  <Link
+                    to="/thong-tin-ca-nhan"
+                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
+                    onClick={() => setShowUserMenu(false)}
+                  >
+                    <FiInfo className="mr-2 h-4 w-4" />
+                    Thông tin cá nhân
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                  >
+                    <FiLogOut className="mr-2 h-4 w-4" />
+                    Đăng xuất
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Shopping cart button */}
             <button
               className={`${headerClass.button} flex cursor-pointer items-center gap-2`}
             >
@@ -81,7 +164,7 @@ const Header = () => {
         </div>
       </header>
     </>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
