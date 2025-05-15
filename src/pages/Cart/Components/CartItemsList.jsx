@@ -37,12 +37,19 @@ const CartItemsList = ({ items, itemCount, handleUpdateQuantity, handleRemoveIte
               </div>
             </div>
           </div>
-          <div className="col-span-2 text-center text-gray-800">{formatPrice(item.price)}</div>
+          {/* <div className="col-span-2 text-center text-gray-800">{formatPrice(item.price)}</div> */}
+          <div className="col-span-2 text-center text-gray-800">
+            <div>{formatPrice(item.price)}</div>
+            {item.price !== item.priceDefault && (
+              <div className="text-sm text-red-500 line-through">{formatPrice(item.priceDefault)}</div>
+            )}
+          </div>
           <div className="col-span-2">
             <div className="flex items-center justify-center">
               <button
-                className="w-8 h-8 border border-gray-300 rounded-l flex items-center justify-center hover:bg-gray-100 transition-colors"
+                className={`w-8 h-8 border border-gray-300 rounded-l flex items-center justify-center hover:bg-gray-100 transition-colors ${item.quantity <= 1 ? 'cursor-not-allowed' : ''}`}
                 onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
+                disabled={item.quantity <= 1}
               >
                 -
               </button>
@@ -53,15 +60,19 @@ const CartItemsList = ({ items, itemCount, handleUpdateQuantity, handleRemoveIte
                 readOnly
               />
               <button
-                className="w-8 h-8 border border-gray-300 rounded-r flex items-center justify-center hover:bg-gray-100 transition-colors"
+                className={`w-8 h-8 border border-gray-300 rounded-r flex items-center justify-center hover:bg-gray-100 transition-colors ${item.quantity >= item.available ? 'cursor-not-allowed' : ''}`}
                 onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
+                disabled={item.quantity >= item.available}
               >
                 +
               </button>
             </div>
           </div>
-          <div className="col-span-2 text-center font-medium text-blue-600">
-            {formatPrice(item.price * item.quantity)}
+          <div className="col-span-2 text-center text-gray-800">
+            <div>{formatPrice(item.price * item.quantity)}</div>
+            {item.price !== item.priceDefault && (
+              <div className="text-sm text-red-500 line-through">{formatPrice(item.priceDefault * item.quantity)}</div>
+            )}
           </div>
           <button 
             onClick={() => handleRemoveItem(item.id)}

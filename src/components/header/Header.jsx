@@ -11,8 +11,8 @@ const Header = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchCartItems()
-      setCountItems(data.length || 0)
+      const {metadata} = await fetchCartItems()
+      setCountItems(metadata.totalCount || 0)
     }
     fetchData()
   }, [])
