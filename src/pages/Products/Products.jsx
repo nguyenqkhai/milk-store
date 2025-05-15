@@ -4,7 +4,6 @@ import ProductCard from './Components/ProductCard';
 import LoadingState from './Components/LoadingState';
 import ErrorState from './Components/ErrorState';
 import Pagination from './Components/Pagination';
-import { toSlug } from '../../utils/stringUtils';
 import {
   Search,
   Check,
@@ -14,119 +13,71 @@ import {
   Star,
   X
 } from 'lucide-react';
-import ProductService from '../../services/Product/ProductServices';
+import CategoryService from '../../services/Category/CategoryServices';
+import { useProductStore } from './ProductStore';
 
 const Products = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
   const [searchText, setSearchText] = useState('');
-  const [searchQuery, setSearchQuery] = useState(''); // Thêm state mới để lưu giá trị tìm kiếm đã xác nhận
-  const [selectedCategory, setSelectedCategory] = useState('Tất cả');
-  const [categories, setCategories] = useState(['Tất cả']);
-  const [sortBy, setSortBy] = useState('default');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [activeFilters, setActiveFilters] = useState([]);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
-
-  const [paginationMeta, setPaginationMeta] = useState({
-    totalCount: 0,
-    totalPages: 0,
-    pageSize: 12,
-    hasPrevious: false,
-    hasNext: false
-  });
+  const [selectedCategory, setSelectedCategory] = useState({ id: null, value: 'Tất cả' });
+  const {
+    products,
+    loading,
+    error,
+    pagination,
+    filters,
+    fetchProducts,
+    updateFilters,
+    changePage,
+    fetchCategories,
+    categories
+  } = useProductStore();
 
   const navigate = useNavigate();
-  const productsPerPage = 12;
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
+   fetchCategories()
+  }, []);
 
-        const apiParams = {
-          pageNumber: currentPage,
-          pageSize: productsPerPage,
-          searchTerm: searchQuery,
-          sortBy: sortBy === 'default' ? 'ProductName' : sortBy,
-          sortAscending: sortBy !== 'price-high-low' && sortBy !== 'discount' && sortBy !== 'rating'
-        };
-
-        if (selectedCategory !== 'Tất cả') {
-          apiParams.categoryId = selectedCategory;
-        }
-
-        const result = await ProductService.getProducts(apiParams);
-        if (result && result.products && Array.isArray(result.products)) {
-          setProducts(result.products);
-
-          if (result.metadata) {
-            setPaginationMeta({
-              totalCount: result.metadata.totalCount || 0,
-              totalPages: result.metadata.totalPages || 0,
-              pageSize: result.metadata.pageSize || productsPerPage,
-              hasPrevious: result.metadata.hasPrevious || false,
-              hasNext: result.metadata.hasNext || false
-            });
-          }
-
-          const uniqueCategories = [
-            'Tất cả',
-            ...new Set(result.products.map(product => product.category))
-          ];
-          setCategories(uniqueCategories);
-        } else {
-          throw new Error('Invalid data format received from API');
-        }
-
-      } catch (err) {
-        setError('Có lỗi xảy ra khi tải dữ liệu');
-        console.error('Error fetching products:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const timer = setTimeout(() => fetchProducts(), 500);
-    return () => clearTimeout(timer);
-  }, [currentPage, productsPerPage, searchQuery, sortBy, selectedCategory]);
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   useEffect(() => {
     let currentFilters = [];
 
-    if (selectedCategory !== 'Tất cả') {
-      currentFilters.push({ type: 'category', value: selectedCategory });
+    if (selectedCategory.id !== null) {
+      currentFilters.push({ type: 'category', value: selectedCategory.value });
     }
 
-    if (searchQuery.trim() !== '') {
-      currentFilters.push({ type: 'search', value: searchQuery });
+    if (filters.searchTerm) {
+      currentFilters.push({ type: 'search', value: filters.searchTerm });
     }
 
     let sortLabel = '';
-    switch (sortBy) {
-      case 'price-low-high':
-        sortLabel = 'Giá thấp đến cao';
+    switch (filters.sortBy) {
+      case 'priceActive':
+        sortLabel = filters.sortAscending ? 'Giá thấp đến cao' : 'Giá cao đến thấp';
         break;
-      case 'price-high-low':
-        sortLabel = 'Giá cao đến thấp';
+      case 'ProductName':
+        sortLabel = 'Tên sản phẩm';
         break;
       default:
         break;
     }
 
-    if (sortBy !== 'default' && sortLabel) {
+    if (filters.sortBy !== 'ProductName' || !filters.sortAscending) {
       currentFilters.push({ type: 'sort', value: sortLabel });
     }
 
     setActiveFilters(currentFilters);
-  }, [selectedCategory, searchQuery, sortBy]);
+  }, [filters, selectedCategory]);
 
-  // Helper functions
   const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+    changePage(pageNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -134,14 +85,11 @@ const Products = () => {
     if (e) {
       e.preventDefault();
     }
-    setSearchQuery(searchText);
-    setCurrentPage(1);
+    updateFilters({ searchTerm: searchText });
   };
 
   const handleProductClick = (product) => {
     sessionStorage.setItem('scrollPosition', window.scrollY);
-
-    // Simplify navigation to just use the product ID as requested
     navigate(`/product/${product.id}`, {
       state: { product }
     });
@@ -149,38 +97,72 @@ const Products = () => {
 
   const removeFilter = (filter) => {
     if (filter.type === 'category') {
-      setSelectedCategory('Tất cả');
+      setSelectedCategory({ id: null, value: 'Tất cả' });
+      updateFilters({ categoryId: null });
     } else if (filter.type === 'search') {
       setSearchText('');
-      setSearchQuery('');
+      updateFilters({ searchTerm: '' });
     } else if (filter.type === 'sort') {
-      setSortBy('default');
+      updateFilters({ 
+        sortBy: 'ProductName', 
+        sortAscending: true 
+      });
     }
-
-    setCurrentPage(1);
   };
 
   const resetAllFilters = () => {
     setSearchText('');
-    setSearchQuery('');
-    setSelectedCategory('Tất cả');
-    setSortBy('default');
-    setCurrentPage(1);
+    setSelectedCategory({ id: null, value: 'Tất cả' });
     setShowMobileFilters(false);
     setShowCategoryDropdown(false);
     setShowSortDropdown(false);
+    
+    updateFilters({
+      categoryId: null,
+      trendId: null,
+      searchTerm: '',
+      sortBy: 'ProductName',
+      sortAscending: true
+    });
   };
 
   const handleClearSearch = () => {
     setSearchText('');
-    if (searchQuery) {
-      setSearchQuery('');
-      setCurrentPage(1);
-    }
+    updateFilters({ searchTerm: '' });
   };
 
-  if (loading) return <LoadingState />;
-  if (error) return <ErrorState error={error} onRetry={() => window.location.reload()} />;
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+    updateFilters({ 
+      categoryId: category.id
+    });
+    setShowCategoryDropdown(false);
+  };
+
+  const handleSortChange = (sortOption) => {
+    let sortBy = 'ProductName';
+    let sortAscending = true;
+
+    switch (sortOption) {
+      case 'price-low-high':
+        sortBy = 'priceActive';
+        sortAscending = true;
+        break;
+      case 'price-high-low':
+        sortBy = 'priceActive';
+        sortAscending = false;
+        break;
+      default:
+        sortBy = 'ProductName';
+        sortAscending = true;
+    }
+
+    updateFilters({ sortBy, sortAscending });
+    setShowSortDropdown(false);
+  };
+
+  if (loading && !products.length) return <LoadingState />;
+  if (error) return <ErrorState error={error} onRetry={fetchProducts} />;
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -289,7 +271,7 @@ const Products = () => {
                     className="w-full flex justify-between items-center px-4 py-2 border border-gray-300 rounded-md bg-white text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
                   >
-                    <span>Danh mục: {selectedCategory}</span>
+                    <span>Danh mục: {selectedCategory.value}</span>
                     <ChevronDown
                       size={16}
                       className={`transition-transform ${showCategoryDropdown ? 'transform rotate-180' : ''}`}
@@ -300,19 +282,16 @@ const Products = () => {
                     <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md py-1 border border-gray-200 max-h-60 overflow-auto">
                       {categories.map(category => (
                         <button
-                          key={category}
-                          onClick={() => {
-                            setSelectedCategory(category);
-                            setCurrentPage(1); // Reset to first page on category change
-                            setShowCategoryDropdown(false);
-                          }}
-                          className={`w-full flex items-center justify-between px-4 py-2 text-left text-sm ${selectedCategory === category
-                            ? 'bg-blue-50 text-blue-700 font-medium'
-                            : 'text-gray-700 hover:bg-gray-50'
+                          key={category.id || 'all'}
+                          onClick={() => handleCategoryChange(category)}
+                          className={`w-full flex items-center justify-between px-4 py-2 text-left text-sm ${
+                            selectedCategory.id === category.id
+                              ? 'bg-blue-50 text-blue-700 font-medium'
+                              : 'text-gray-700 hover:bg-gray-50'
                             }`}
                         >
-                          <span>{category}</span>
-                          {selectedCategory === category && <Check size={16} />}
+                          <span>{category.value}</span>
+                          {selectedCategory.id === category.id && <Check size={16} />}
                         </button>
                       ))}
                     </div>
@@ -329,8 +308,10 @@ const Products = () => {
                   >
                     <span>
                       {
-                        sortBy === 'price-low-high' ? 'Sắp xếp: Giá thấp đến cao' :
-                          sortBy === 'price-high-low' ? 'Sắp xếp: Giá cao đến thấp' : 'Sắp xếp: Mặc định'}
+                        filters.sortBy === 'priceActive' && filters.sortAscending ? 'Sắp xếp: Giá thấp đến cao' :
+                        filters.sortBy === 'priceActive' && !filters.sortAscending ? 'Sắp xếp: Giá cao đến thấp' : 
+                        'Sắp xếp: Mặc định'
+                      }
                     </span>
                     <ChevronDown
                       size={16}
@@ -347,18 +328,21 @@ const Products = () => {
                       ].map(option => (
                         <button
                           key={option.value}
-                          onClick={() => {
-                            setSortBy(option.value);
-                            setCurrentPage(1); // Reset to first page on sort change
-                            setShowSortDropdown(false);
-                          }}
-                          className={`w-full flex items-center justify-between px-4 py-2 text-left text-sm ${sortBy === option.value
-                            ? 'bg-blue-50 text-blue-700 font-medium'
-                            : 'text-gray-700 hover:bg-gray-50'
-                            }`}
+                          onClick={() => handleSortChange(option.value)}
+                          className={`w-full flex items-center justify-between px-4 py-2 text-left text-sm ${
+                            (option.value === 'price-low-high' && filters.sortBy === 'priceActive' && filters.sortAscending) ||
+                            (option.value === 'price-high-low' && filters.sortBy === 'priceActive' && !filters.sortAscending) ||
+                            (option.value === 'default' && filters.sortBy === 'ProductName')
+                              ? 'bg-blue-50 text-blue-700 font-medium'
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
                         >
                           <span>{option.label}</span>
-                          {sortBy === option.value && <Check size={16} />}
+                          {
+                            (option.value === 'price-low-high' && filters.sortBy === 'priceActive' && filters.sortAscending) ||
+                            (option.value === 'price-high-low' && filters.sortBy === 'priceActive' && !filters.sortAscending) ||
+                            (option.value === 'default' && filters.sortBy === 'ProductName') && <Check size={16} />
+                          }
                         </button>
                       ))}
                     </div>
@@ -401,20 +385,20 @@ const Products = () => {
               <div className="text-sm text-gray-600">
                 <span>Hiển thị </span>
                 <span className="font-medium">
-                  {paginationMeta.totalCount === 0 ? 0 : ((currentPage - 1) * paginationMeta.pageSize) + 1}-
-                  {Math.min(currentPage * paginationMeta.pageSize, paginationMeta.totalCount)}
+                  {pagination.totalItems === 0 ? 0 : ((pagination.currentPage - 1) * pagination.pageSize) + 1}-
+                  {Math.min(pagination.currentPage * pagination.pageSize, pagination.totalItems)}
                 </span>
                 <span> trên </span>
-                <span className="font-medium">{paginationMeta.totalCount}</span>
+                <span className="font-medium">{pagination.totalItems}</span>
                 <span> sản phẩm</span>
               </div>
-              <div className="relative w-48">
+              {/* <div className="relative w-48">
                 <select
-                  value={sortBy}
-                  onChange={(e) => {
-                    setSortBy(e.target.value);
-                    setCurrentPage(1); // Reset to first page on sort change
-                  }}
+                  value={
+                    filters.sortBy === 'ProductName' ? 'default' : 
+                    filters.sortBy === 'priceActive' && filters.sortAscending ? 'price-low-high' : 'price-high-low'
+                  }
+                  onChange={(e) => handleSortChange(e.target.value)}
                   className="w-full appearance-none px-4 py-2 pr-8 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 >
                   <option value="default">Sắp xếp: Mặc định</option>
@@ -425,7 +409,7 @@ const Products = () => {
                   size={16}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"
                 />
-              </div>
+              </div> */}
             </div>
 
             {products.length === 0 ? (
@@ -437,7 +421,7 @@ const Products = () => {
                 />
                 <h3 className="mt-4 text-lg font-medium text-gray-900">Không tìm thấy sản phẩm</h3>
                 <p className="mt-2 text-gray-500">
-                  {searchQuery ? `Không có sản phẩm nào phù hợp với "${searchQuery}"` : 'Không có sản phẩm nào trong danh mục này'}
+                  {filters.searchTerm ? `Không có sản phẩm nào phù hợp với "${filters.searchTerm}"` : 'Không có sản phẩm nào trong danh mục này'}
                 </p>
                 <button
                   onClick={resetAllFilters}
@@ -459,13 +443,13 @@ const Products = () => {
                 {/* Pagination */}
                 <div className="mt-8">
                   <Pagination
-                    currentPage={currentPage}
-                    totalPages={paginationMeta.totalPages}
+                    currentPage={pagination.currentPage}
+                    totalPages={pagination.totalPages}
                     onPageChange={handlePageChange}
-                    itemsPerPage={paginationMeta.pageSize}
-                    totalItems={paginationMeta.totalCount}
-                    hasPrevious={paginationMeta.hasPrevious}
-                    hasNext={paginationMeta.hasNext}
+                    itemsPerPage={pagination.pageSize}
+                    totalItems={pagination.totalItems}
+                    hasPrevious={pagination.currentPage > 1}
+                    hasNext={pagination.currentPage < pagination.totalPages}
                   />
                 </div>
               </>
