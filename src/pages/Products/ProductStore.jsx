@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import ProductService from '../../services/Product/ProductServices';
 import CategoryService from '../../services/Category/CategoryServices';
-// import { addToCart } from '../../services/Cart/CartServices';
 import CartService from '@services/Cart/cartServices';
 /**
  * ProductStore - Quản lý trạng thái toàn cục cho các sản phẩm

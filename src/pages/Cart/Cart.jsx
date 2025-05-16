@@ -72,7 +72,6 @@ const Cart = () => {
   useEffect(() => {
     const newTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     setSubTotal(newTotal);
-    // Khong hop li
   }, [items]);
   
   const handleUpdateQuantity = async (itemId, newQuantity) => {

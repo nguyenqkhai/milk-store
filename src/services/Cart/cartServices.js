@@ -16,16 +16,6 @@ class CartService {
         PageSize,
       }
       const response = await api.get('/CartItem/get-list-cart-item', params, headers);
-      // const response = await axios.get(`${API_BASE_URL}/CartItem/get-list-cart-item`, {
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `${CookieService.getAccessToken()}`
-      //   },
-      //   params: {
-      //     PageNumber,
-      //     PageSize,
-      //   }
-      // });
       const cartItems = response.data.data.items.map(item => ({
         id: item.id,
         name: item.getProductToCart.productName,
@@ -80,23 +70,7 @@ class CartService {
         path: '/quantity',
         value: quantity
       }
-      const response = await api.patch(`/CartItem/update-cart-item/${cartItemId}`, data, headers);
-      // const response = await axios.patch(
-      //   `${API_BASE_URL}/CartItem/update-cart-item/${cartItemId}`,
-      //   [
-      //     {
-      //       op: 'replace',
-      //       path: '/quantity',
-      //       value: quantity
-      //     }
-      //   ],
-      //   {
-      //     headers: {
-      //       'Authorization': `${CookieService.getAccessToken()}`,
-      //       'Content-Type': 'application/json-patch+json'
-      //     }
-      //   }
-      // );
+      const response = await api.patch(`/CartItem/update-cart-item/${cartItemId}`, [data], headers);
       return { statusCode: response.data.statusCode, message: response.data.message };
     } catch (error) {
       console.error('Error updating cart item:', error);
@@ -110,15 +84,6 @@ class CartService {
         'Content-Type': 'application/json',
       }
       const response = await api.delete(`/CartItem/delete-cart-item/${cartItemId}`, headers);
-      // const response = await axios.delete(
-      //   `${API_BASE_URL}/CartItem/delete-cart-item/${cartItemId}`,
-      //   {
-      //     headers: {
-      //       'Authorization': `${CookieService.getAccessToken()}`,
-      //       'Content-Type': 'application/json',
-      //     }
-      //   }
-      // );
       return { statusCode: response.data.statusCode, message: response.data.message };
     } catch (error) {
       console.error('Error deleting cart item:', error);

@@ -4,7 +4,6 @@ import { headerClass } from './data';
 import { FiShoppingCart, FiUser, FiLogOut, FiInfo } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { message } from 'antd';
-// import { fetchCartItems } from '../../services/Cart/CartServices'
 import CartService from '@services/Cart/cartServices';
 
 const Header = () => {
