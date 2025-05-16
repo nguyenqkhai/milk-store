@@ -24,7 +24,7 @@ import PurchaseGuide from './pages/Guide/PurchaseGuide';
 import NotFound from './pages/NotFound/NotFound';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProfilePage from './pages/Profile/ProfilePage';
-
+import OrderHistory from './pages/Order/History';
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
@@ -98,11 +98,15 @@ const AppRoutes = () => {
         <Route path='/ve-chung-toi' element={<About />} />
         <Route path='/san-pham' element={<Products />} />
         <Route path='/lien-he' element={<Contact />} />
-        <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/san-pham/:id" element={<ProductDetail />} />
         <Route path='/chinh-sach-van-chuyen' element={<TransferPolicy />} />
         <Route path='/huong-dan-mua-hang' element={<PurchaseGuide />} />
         <Route path='/chinh-sach-doi-tra' element={<ReturnPolicy />} />
-        
+        <Route path='/lich-su-don-hang' element={
+          <ProtectedRoute>
+            <OrderHistory />
+          </ProtectedRoute>
+        } />
         {/* Protected routes - require authentication */}
         <Route path='/thanh-toan' element={
           <ProtectedRoute>

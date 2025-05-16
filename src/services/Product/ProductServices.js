@@ -47,6 +47,7 @@ class ProductService {
                 isActive: item.isActive
             }));
 
+
             return {
                 metadata: response.data.data.metadata,
                 products: mappedProducts
