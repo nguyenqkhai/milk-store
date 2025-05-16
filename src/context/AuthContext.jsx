@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
             const response = await AuthService.info();
             if (response.status === 200) {
                 setCurrentUser(response.data);
-                console.log('User info:', response.data);
+                console.log('User info:', currentUser);
                 setIsAuthenticated(true);
             }
         } catch (error) {
