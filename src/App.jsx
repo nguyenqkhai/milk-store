@@ -23,14 +23,12 @@ import ReturnPolicy from './components/footer/ReturnPolicy';
 import PurchaseGuide from './pages/Guide/PurchaseGuide';
 import NotFound from './pages/NotFound/NotFound';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import Profile from './pages/Profile/Profile';
+import ProfilePage from './pages/Profile/ProfilePage';
 
-// Thêm component bảo vệ route - đã sửa để sử dụng state isAuthenticated từ AuthContext
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
-  // Hiển thị loading state khi đang kiểm tra xác thực
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -39,11 +37,29 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  // Kiểm tra nếu người dùng đã xác thực
   if (!isAuthenticated) {
     return <Navigate to="/dang-nhap" state={{ from: location }} replace />;
   }
 
+  return children;
+};
+
+const AuthRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+  
+  if (isAuthenticated) {
+    return <Navigate to={location.state?.from?.pathname || "/"} replace />;
+  }
+  
   return children;
 };
 
@@ -64,44 +80,52 @@ const AppRoutes = () => {
   return (
     <Layout>
       <Routes>
-        <Route path='/dang-nhap' element={<Login />} />
-        <Route path='/dang-ky' element={<Register />} />
+        {/* Auth routes - redirect to home if already logged in */}
+        <Route path='/dang-nhap' element={
+          <AuthRoute>
+            <Login />
+          </AuthRoute>
+        } />
+        <Route path='/dang-ky' element={
+          <AuthRoute>
+            <Register />
+          </AuthRoute>
+        } />
+        
+        {/* Public routes */}
         <Route path='/' element={<Home />} />
         <Route path='/trang-chu' element={<Home />} />
         <Route path='/ve-chung-toi' element={<About />} />
         <Route path='/san-pham' element={<Products />} />
         <Route path='/lien-he' element={<Contact />} />
         <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path='/chinh-sach-van-chuyen' element={<TransferPolicy />} />
+        <Route path='/huong-dan-mua-hang' element={<PurchaseGuide />} />
+        <Route path='/chinh-sach-doi-tra' element={<ReturnPolicy />} />
+        
+        {/* Protected routes - require authentication */}
         <Route path='/thanh-toan' element={
           <ProtectedRoute>
             <Checkout />
           </ProtectedRoute>
         } />
-
-        {/* <Route path='/thanh-toan' element={<Checkout/>}/> */}
         <Route path='/gio-hang' element={
           <ProtectedRoute>
             <Cart />
           </ProtectedRoute>
         } />
-        <Route path='/gio-hang' element={<Cart />} />
-
         <Route path='/xac-nhan-thanh-toan' element={
           <ProtectedRoute>
             <Payment />
           </ProtectedRoute>
         } />
-
-
-        {/* <Route path='/xac-nhan-thanh-toan' element={<Payment/>}/> */}
-        <Route path='/chinh-sach-van-chuyen' element={<TransferPolicy />} />
-        <Route path='/huong-dan-mua-hang' element={<PurchaseGuide />} />
-        <Route path='/chinh-sach-doi-tra' element={<ReturnPolicy />} />
-        <Route path='/trang-ca-nhan' element={
+        <Route path='/thong-tin-ca-nhan' element={
           <ProtectedRoute>
-            <Profile />
+            <ProfilePage />
           </ProtectedRoute>
         } />
+        
+        {/* 404 route */}
         <Route path='*' element={<NotFound />} />
       </Routes>
     </Layout>
