@@ -39,6 +39,7 @@ const ProductCard = ({ product }) => {
     try {
       if (isAuthenticated) {
         addCart(product.id, 1);
+        navigate('/gio-hang');
       }
       else {
         message.error("Vui lòng đăng nhập để mua sản phẩm");
