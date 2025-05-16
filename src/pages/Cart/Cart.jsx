@@ -3,8 +3,8 @@ import CartHeader from './Components/CartHeader';
 import CartItemsList from './Components/CartItemsList';
 import CartSummary from './Components/CartSummary';
 import EmptyCart from './Components/EmptyCart';
-import { fetchCartItems, updateCartItem, deleteCartItem } from '../../services/Cart/cartServices';
-import Pagination from '../Products/Components/Pagination';
+import CartService from '@services/Cart/CartServices';
+import Pagination from '@/pages/Products/Components/Pagination';
 import { message } from 'antd';
 
 const Cart = () => {
@@ -55,7 +55,7 @@ const Cart = () => {
 
   useEffect(() => {
     const fetchItems = async () => {
-      const { items, metadata} = await fetchCartItems(currentPage, paginationMeta.pageSize);
+      const { items, metadata} = await CartService.fetchCartItems(currentPage, paginationMeta.pageSize);
       setItems(items);
       setPaginationMeta({
         totalPages: metadata.totalPages,
@@ -81,7 +81,7 @@ const Cart = () => {
         item.id === itemId ? {...item, quantity: newQuantity} : item
       );
       setItems(updatedItems);
-      const { statusCode, message: apiMessage } = await updateCartItem(itemId, newQuantity);
+      const { statusCode, message: apiMessage } = await CartService.updateCartItem(itemId, newQuantity);
       if (statusCode === 200) {
         // message.success(apiMessage);
       } else {
@@ -91,12 +91,12 @@ const Cart = () => {
   };
 
   const handleRemoveItem = async (itemId) => {
-    const { statusCode, message: apiMessage } = await deleteCartItem(itemId);
+    const { statusCode, message: apiMessage } = await CartService.deleteCartItem(itemId);
     if (statusCode === 200) {
       message.success(apiMessage);
       // const updatedItems = items.filter(item => item.id !== itemId);
       // setItems(updatedItems);
-      const newItems = await fetchCartItems(currentPage, paginationMeta.pageSize);
+      const newItems = await CartService.fetchCartItems(currentPage, paginationMeta.pageSize);
       setItems(newItems.items);
       setPaginationMeta({
         totalPages: newItems.metadata.totalPages,

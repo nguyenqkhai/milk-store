@@ -12,5 +12,15 @@ export default {
         secure: false
       }
     }
+  },
+    resolve: {
+    alias: {
+      '@': '/src',
+      '@components': '/src/components',
+      '@pages': '/src/pages',
+      '@services': '/src/services',
+      '@assets': '/src/assets',
+      '@utils': '/src/utils'
+    }
   }
 }

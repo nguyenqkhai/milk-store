@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import ProductService from '../../services/Product/ProductServices';
 import CategoryService from '../../services/Category/CategoryServices';
-import { addToCart } from '../../services/Cart/cartServices';
+// import { addToCart } from '../../services/Cart/CartServices';
+import CartService from '@services/Cart/cartServices';
 /**
  * ProductStore - Quản lý trạng thái toàn cục cho các sản phẩm
  * Sử dụng Zustand để tạo store đơn giản và hiệu quả
@@ -135,7 +136,7 @@ export const useProductStore = create((set, get) => ({
     try {
       set({ cartLoading: true, cartError: null, cartMessage: null });
       
-      const response = await addToCart(productId, quantity);
+      const response = await CartService.addToCart(productId, quantity);
       
       set({
         cartLoading: false,

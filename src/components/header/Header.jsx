@@ -4,7 +4,8 @@ import { headerClass } from './data';
 import { FiShoppingCart, FiUser, FiLogOut, FiInfo } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { message } from 'antd';
-import { fetchCartItems } from '../../services/Cart/cartServices'
+// import { fetchCartItems } from '../../services/Cart/CartServices'
+import CartService from '@services/Cart/cartServices';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,7 +16,7 @@ const Header = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { metadata } = await fetchCartItems()
+      const { metadata } = await CartService.fetchCartItems()
       setCountItems(metadata.totalCount || 0)
     }
     fetchData()
