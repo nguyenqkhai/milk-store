@@ -4,12 +4,22 @@ import { headerClass } from './data';
 import { FiShoppingCart, FiUser, FiLogOut, FiInfo } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { message } from 'antd';
+import { fetchCartItems } from '../../api/cartApi'
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const location = useLocation();
   const { currentUser, isAuthenticated, logout } = useAuth();
+  const [countItems, setCountItems] = useState(0)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const {metadata} = await fetchCartItems()
+      setCountItems(metadata.totalCount || 0)
+    }
+    fetchData()
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -154,11 +164,13 @@ const Header = () => {
             <button
               className={`${headerClass.button} flex cursor-pointer items-center gap-2`}
             >
-              <FiShoppingCart className='h-5 w-5' />
-              <span className='hidden sm:inline'>Giỏ hàng</span>
-              <span className='inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs text-blue-700'>
-                3
-              </span>
+              <Link to='/gio-hang'>
+                <FiShoppingCart className='h-5 w-5' />
+                <span className='hidden sm:inline'>Giỏ hàng</span>
+                <span className='inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs text-blue-700'>
+                  {countItems}
+                </span>
+              </Link>
             </button>
           </div>
         </div>

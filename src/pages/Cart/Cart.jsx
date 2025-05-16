@@ -3,6 +3,9 @@ import CartHeader from './Components/CartHeader';
 import CartItemsList from './Components/CartItemsList';
 import CartSummary from './Components/CartSummary';
 import EmptyCart from './Components/EmptyCart';
+import { fetchCartItems, updateCartItem, deleteCartItem } from '../../api/cartApi';
+import Pagination from '../Products/Components/Pagination';
+import { message } from 'antd';
 
 const Cart = () => {
   const [items, setItems] = useState([
@@ -41,25 +44,75 @@ const Cart = () => {
   ]);
   const [shipping] = useState(20000);
   const [subTotal, setSubTotal] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [paginationMeta, setPaginationMeta] = useState({
+    totalPages: 1,
+    pageSize: 2,
+    totalCount: 0,
+    hasPrevious: false,
+    hasNext: false
+  });
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      const { items, metadata} = await fetchCartItems(currentPage, paginationMeta.pageSize);
+      setItems(items);
+      setPaginationMeta({
+        totalPages: metadata.totalPages,
+        pageSize: metadata.pageSize,
+        totalCount: metadata.totalCount,
+        hasPrevious: metadata.hasPrevious,
+        hasNext: metadata.hasNext
+      });
+    };
+
+    fetchItems();
+  } , [currentPage, paginationMeta.pageSize]);
 
   useEffect(() => {
     const newTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     setSubTotal(newTotal);
+    // Khong hop li
   }, [items]);
-
-  const handleUpdateQuantity = (itemId, newQuantity) => {
+  
+  const handleUpdateQuantity = async (itemId, newQuantity) => {
     if (newQuantity > 0) {
       const updatedItems = items.map(item => 
         item.id === itemId ? {...item, quantity: newQuantity} : item
       );
       setItems(updatedItems);
+      const { statusCode, message: apiMessage } = await updateCartItem(itemId, newQuantity);
+      if (statusCode === 200) {
+        message.success(apiMessage);
+      } else {
+        message.error(apiMessage);
+      }
     }
   };
 
-  const handleRemoveItem = (itemId) => {
-    const updatedItems = items.filter(item => item.id !== itemId);
-    setItems(updatedItems);
+  const handleRemoveItem = async (itemId) => {
+    const { statusCode, message: apiMessage } = await deleteCartItem(itemId);
+    if (statusCode === 200) {
+      message.success(apiMessage);
+      // const updatedItems = items.filter(item => item.id !== itemId);
+      // setItems(updatedItems);
+      const newItems = await fetchCartItems(currentPage, paginationMeta.pageSize);
+      setItems(newItems.items);
+      setPaginationMeta({
+        totalPages: newItems.metadata.totalPages,
+        pageSize: newItems.metadata.pageSize,
+        totalCount: newItems.metadata.totalCount,
+        hasPrevious: newItems.metadata.hasPrevious,
+        hasNext: newItems.metadata.hasNext
+      });
+    } else {
+      message.error(apiMessage);
+    }
   };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  }
 
   const grandTotal = subTotal + shipping;
   const itemCount = items.length;
@@ -72,23 +125,36 @@ const Cart = () => {
         {items.length === 0 ? (
           <EmptyCart />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              <CartItemsList
-                items={items} 
-                itemCount={itemCount}
-                handleUpdateQuantity={handleUpdateQuantity}
-                handleRemoveItem={handleRemoveItem}
-              />
+          <div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                <CartItemsList
+                  items={items} 
+                  itemCount={itemCount}
+                  handleUpdateQuantity={handleUpdateQuantity}
+                  handleRemoveItem={handleRemoveItem}
+                  />
+              </div>
+              
+              <div className="lg:col-span-1">
+                <CartSummary 
+                  subTotal={subTotal} 
+                  shipping={shipping} 
+                  grandTotal={grandTotal} 
+                  />
+              </div>
             </div>
-            
-            <div className="lg:col-span-1">
-              <CartSummary 
-                subTotal={subTotal} 
-                shipping={shipping} 
-                grandTotal={grandTotal} 
-              />
-            </div>
+            <div className="mt-8">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={paginationMeta.totalPages}
+                onPageChange={handlePageChange}
+                itemsPerPage={paginationMeta.pageSize}
+                totalItems={paginationMeta.totalCount}
+                hasPrevious={paginationMeta.hasPrevious}
+                hasNext={paginationMeta.hasNext}
+                />
+              </div>
           </div>
         )}
       </div>
