@@ -8,10 +8,10 @@ export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    
+
     useEffect(() => {
         const accessToken = CookieService.getAccessToken();
-        
+
         if (accessToken) {
             fetchUserInfo();
         } else {
@@ -41,32 +41,47 @@ export const AuthProvider = ({ children }) => {
             const response = await AuthService.login(username, password);
             if (response) {
                 CookieService.setAuthTokens(
-                    response.data.accessToken, 
+                    response.data.accessToken,
                     response.data.refreshToken
                 );
-                
+
                 await fetchUserInfo();
-                
+
                 return { success: true };
             }
-            
-            return { 
-                success: false, 
-                error: response.data?.message || 'Đăng nhập thất bại' 
+
+            return {
+                success: false,
+                error: response.data?.message || 'Đăng nhập thất bại'
             };
         } catch (error) {
             console.error('Lỗi khi đăng nhập:', error);
-            return { 
-                success: false, 
-                error: error.response?.data?.message || 'Đăng nhập thất bại' 
+            return {
+                success: false,
+                error: error.response?.data?.message || 'Đăng nhập thất bại'
             };
         }
     };
 
-    const logout = () => {
-        AuthService.logout();
-        setCurrentUser(null);
-        setIsAuthenticated(false);
+    const logout = async () => {
+        try {
+            setCurrentUser(null);
+            setIsAuthenticated(false);
+            const response = await AuthService.logout();
+            if (response.status === 200) {
+                return { success: true };
+            }
+            return {
+                success: false,
+                error: response.data?.message || 'Đăng xuất thất bại'
+            };
+        } catch (error) {
+            console.error('Lỗi khi đăng xuất:', error);
+            return {
+                success: false,
+                error: error.response?.data?.message || 'Đăng xuất thất bại'
+            };
+        }
     };
 
     const register = async (registrationData) => {
@@ -79,7 +94,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
             console.error('Đăng ký thất bại:', error);
             return {
-                success: false, 
+                success: false,
                 error: error.response?.data?.message || 'Có lỗi xảy ra khi đăng ký'
             };
         }
@@ -94,9 +109,9 @@ export const AuthProvider = ({ children }) => {
             };
         } catch (error) {
             console.error('Lỗi gửi OTP:', error);
-            return { 
-                success: false, 
-                error: error.response?.data?.message || 'Có lỗi xảy ra khi gửi mã OTP' 
+            return {
+                success: false,
+                error: error.response?.data?.message || 'Có lỗi xảy ra khi gửi mã OTP'
             };
         }
     };
@@ -110,23 +125,25 @@ export const AuthProvider = ({ children }) => {
             };
         } catch (error) {
             console.error('Lỗi xác thực OTP và đăng ký:', error);
-            return { 
-                success: false, 
-                error: error.response?.data?.message || 'Có lỗi xảy ra khi xác thực mã OTP' 
+            return {
+                success: false,
+                error: error.response?.data?.message || 'Có lỗi xảy ra khi xác thực mã OTP'
             };
         }
     };
 
     // Lắng nghe sự kiện logout từ AuthService
     useEffect(() => {
+        if (!CookieService.hasAuthTokens()) return;
+
         const handleAuthLogout = () => {
             setCurrentUser(null);
             setIsAuthenticated(false);
+            AuthService.logout();
         };
-        
+
         window.addEventListener('auth:logout', handleAuthLogout);
-        
-        // Cleanup listener khi component unmount
+
         return () => {
             window.removeEventListener('auth:logout', handleAuthLogout);
         };

@@ -1,7 +1,4 @@
-import axios from 'axios';
-import apiConfig from '../../config/apiConfig';
-
-const API_BASE_URL = apiConfig.API_BASE_URL;
+import api from '../apiClient';
 
 class ProductService {
     /**
@@ -18,23 +15,16 @@ class ProductService {
      */
     async getProducts(queryParams) {
         try {
-            // Convert the query parameters object to URL params
-            const params = new URLSearchParams();
-
-            // Add required parameters
-            params.append('pageNumber', queryParams.pageNumber || 1);
-            params.append('pageSize', queryParams.pageSize || 10);
-
-            // Add optional parameters if they exist
-            if (queryParams.categoryId) params.append('categoryId', queryParams.categoryId);
-            if (queryParams.trendId) params.append('trendId', queryParams.trendId);
-            if (queryParams.searchTerm) params.append('searchTerm', queryParams.searchTerm);
-
-            // Add sorting parameters (with defaults if not provided)
-            params.append('sortBy', queryParams.sortBy || 'ProductName');
-            params.append('sortAscending', queryParams.sortAscending !== undefined ? queryParams.sortAscending : true);
-
-            const response = await axios.get(`${API_BASE_URL}/Product/get-products`, { params });
+            // Sử dụng api.public không cần token
+            const response = await api.public.get('/Product/get-products', {
+                pageNumber: queryParams.pageNumber || 1,
+                pageSize: queryParams.pageSize || 10,
+                categoryId: queryParams.categoryId || undefined,
+                trendId: queryParams.trendId || undefined,
+                searchTerm: queryParams.searchTerm || undefined,
+                sortBy: queryParams.sortBy || 'ProductName',
+                sortAscending: queryParams.sortAscending !== undefined ? queryParams.sortAscending : true
+            });
 
             // Map the API response to the format needed by the UI
             const mappedProducts = response.data.data.items.map(item => ({
@@ -49,7 +39,6 @@ class ProductService {
                 discountPercentage: item.priceDefault && item.priceActive && item.priceDefault > item.priceActive
                     ? Math.round(((item.priceDefault - item.priceActive) / item.priceDefault) * 100)
                     : 0,
-                category: "Sữa", // Default category since it's not in the API response
                 brand: item.brand || '',
                 stockquantity: item.stockquantity || 0,
                 bar: item.bar || '',
@@ -75,7 +64,8 @@ class ProductService {
      */
     async getProductById(id) {
         try {
-            const response = await axios.get(`${API_BASE_URL}/Product/${id}`);
+            // Sử dụng api.public không cần token
+            const response = await api.public.get(`/Product/${id}`);
 
             // If the request was successful but the data structure doesn't match expectations
             if (!response.data.data) {
@@ -136,6 +126,7 @@ class ProductService {
             throw error;
         }
     }
+    
     
     
 }

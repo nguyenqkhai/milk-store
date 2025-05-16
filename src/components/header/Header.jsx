@@ -4,7 +4,7 @@ import { headerClass } from './data';
 import { FiShoppingCart, FiUser, FiLogOut, FiInfo } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { message } from 'antd';
-import { fetchCartItems } from '../../api/cartApi'
+import { fetchCartItems } from '../../services/Cart/cartServices'
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,7 +15,7 @@ const Header = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const {metadata} = await fetchCartItems()
+      const { metadata } = await fetchCartItems()
       setCountItems(metadata.totalCount || 0)
     }
     fetchData()
@@ -51,10 +51,20 @@ const Header = () => {
     return `${surname} ${middleName} ${firstName}`;
   };
 
-  const handleLogout = () => {
-    logout();
-    setShowUserMenu(false);
-    message.success('Đăng xuất thành công!');
+  const handleLogout = async () => {
+    try {
+      const result = await logout();
+      if (result.success) {
+        message.success('Đăng xuất thành công!');
+      }
+    } catch (error) {
+      console.error('Lỗi đăng nhập:', error);
+      message.error('Không thể kết nối đến máy chủ, vui lòng thử lại sau');
+    }
+    finally {
+      setShowUserMenu(false);
+    }
+
   };
 
   return (
@@ -160,18 +170,20 @@ const Header = () => {
               )}
             </div>
 
-            {/* Shopping cart button */}
-            <button
-              className={`${headerClass.button} flex cursor-pointer items-center gap-2`}
-            >
-              <Link to='/gio-hang'>
-                <FiShoppingCart className='h-5 w-5' />
-                <span className='hidden sm:inline'>Giỏ hàng</span>
-                <span className='inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs text-blue-700'>
-                  {countItems}
-                </span>
-              </Link>
-            </button>
+            {/* Shopping cart button - only display when authenticated */}
+            {isAuthenticated && (
+              <button
+                className={`${headerClass.button} flex cursor-pointer items-center gap-2`}
+              >
+                <Link to='/gio-hang'>
+                  <FiShoppingCart className='h-5 w-5' />
+                  <span className='hidden sm:inline'>Giỏ hàng</span>
+                  <span className='inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs text-blue-700'>
+                    {countItems}
+                  </span>
+                </Link>
+              </button>
+            )}
           </div>
         </div>
       </header>

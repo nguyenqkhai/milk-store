@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import ProductService from '../../services/Product/ProductServices';
 import CategoryService from '../../services/Category/CategoryServices';
+import { addToCart } from '../../services/Cart/cartServices';
 /**
  * ProductStore - Quản lý trạng thái toàn cục cho các sản phẩm
  * Sử dụng Zustand để tạo store đơn giản và hiệu quả
@@ -11,6 +12,9 @@ export const useProductStore = create((set, get) => ({
   productDetails: null,
   loading: false,
   error: null,
+  cartLoading: false,
+  cartError: null,
+  cartMessage: null,
   pagination: {
     currentPage: 1,
     pageSize: 12,
@@ -123,6 +127,33 @@ export const useProductStore = create((set, get) => ({
   },
 
   /**
+   * Thêm sản phẩm vào giỏ hàng
+   * @param {string} productId - ID của sản phẩm
+   * @param {number} quantity - Số lượng sản phẩm
+   */
+  addCart: async (productId, quantity) => {
+    try {
+      set({ cartLoading: true, cartError: null, cartMessage: null });
+      
+      const response = await addToCart(productId, quantity);
+      
+      set({
+        cartLoading: false,
+        cartMessage: response.message
+      });
+      
+      return response;
+    } catch (error) {
+      console.error(`Error in ProductStore.addCart for product ID ${productId}:`, error);
+      set({ 
+        cartError: error.message || 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng', 
+        cartLoading: false 
+      });
+      throw error;
+    }
+  },
+
+  /**
    * Cập nhật các bộ lọc và tải lại sản phẩm
    * @param {Object} newFilters - Các bộ lọc mới
    */
@@ -181,6 +212,9 @@ export const useProductStore = create((set, get) => ({
       productDetails: null,
       loading: false,
       error: null,
+      cartLoading: false,
+      cartError: null,
+      cartMessage: null,
       pagination: {
         currentPage: 1,
         pageSize: 10,

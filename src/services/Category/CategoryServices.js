@@ -1,13 +1,10 @@
-import axios from 'axios';
-import apiConfig from '../../config/apiConfig';
-
-const API_BASE_URL = apiConfig.API_BASE_URL;
+import api from '../apiClient';
 
 class CategoryService {
     
     async getAllCategories() {
         try {
-            const response = await axios.get(`${API_BASE_URL}/Category`);
+            const response = await api.public.get('/Category');
             return response.data;
         } catch (error) {
             console.error('Error fetching categories:', error);

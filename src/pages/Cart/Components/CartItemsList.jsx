@@ -84,7 +84,7 @@ const CartItemsList = ({ items, itemCount, handleUpdateQuantity, handleRemoveIte
       ))}
       
       <div className="mt-6">
-        <Link to="/product" className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-2">
+        <Link to="/san-pham" className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-2">
           <span>←</span> Tiếp tục mua sắm
         </Link>
       </div>

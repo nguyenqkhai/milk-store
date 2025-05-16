@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import ProductCard from './Components/ProductCard';
 import LoadingState from './Components/LoadingState';
 import ErrorState from './Components/ErrorState';
@@ -35,10 +34,8 @@ const Products = () => {
     categories
   } = useProductStore();
 
-  const navigate = useNavigate();
-
   useEffect(() => {
-   fetchCategories()
+    fetchCategories()
   }, []);
 
   useEffect(() => {
@@ -87,13 +84,6 @@ const Products = () => {
     updateFilters({ searchTerm: searchText });
   };
 
-  const handleProductClick = (product) => {
-    sessionStorage.setItem('scrollPosition', window.scrollY);
-    navigate(`/product/${product.id}`, {
-      state: { product }
-    });
-  };
-
   const removeFilter = (filter) => {
     if (filter.type === 'category') {
       setSelectedCategory({ id: null, value: 'Tất cả' });
@@ -102,9 +92,9 @@ const Products = () => {
       setSearchText('');
       updateFilters({ searchTerm: '' });
     } else if (filter.type === 'sort') {
-      updateFilters({ 
-        sortBy: 'ProductName', 
-        sortAscending: true 
+      updateFilters({
+        sortBy: 'ProductName',
+        sortAscending: true
       });
     }
   };
@@ -115,7 +105,7 @@ const Products = () => {
     setShowMobileFilters(false);
     setShowCategoryDropdown(false);
     setShowSortDropdown(false);
-    
+
     updateFilters({
       categoryId: null,
       trendId: null,
@@ -132,7 +122,7 @@ const Products = () => {
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
-    updateFilters({ 
+    updateFilters({
       categoryId: category.id
     });
     setShowCategoryDropdown(false);
@@ -144,11 +134,11 @@ const Products = () => {
 
     switch (sortOption) {
       case 'price-low-high':
-        sortBy = 'priceActive';
+        sortBy = 'price-low-high';
         sortAscending = true;
         break;
       case 'price-high-low':
-        sortBy = 'priceActive';
+        sortBy = 'price-high-low';
         sortAscending = false;
         break;
       default:
@@ -283,8 +273,7 @@ const Products = () => {
                         <button
                           key={category.id || 'all'}
                           onClick={() => handleCategoryChange(category)}
-                          className={`w-full flex items-center justify-between px-4 py-2 text-left text-sm ${
-                            selectedCategory.id === category.id
+                          className={`w-full flex items-center justify-between px-4 py-2 text-left text-sm ${selectedCategory.id === category.id
                               ? 'bg-blue-50 text-blue-700 font-medium'
                               : 'text-gray-700 hover:bg-gray-50'
                             }`}
@@ -308,8 +297,8 @@ const Products = () => {
                     <span>
                       {
                         filters.sortBy === 'priceActive' && filters.sortAscending ? 'Sắp xếp: Giá thấp đến cao' :
-                        filters.sortBy === 'priceActive' && !filters.sortAscending ? 'Sắp xếp: Giá cao đến thấp' : 
-                        'Sắp xếp: Mặc định'
+                          filters.sortBy === 'priceActive' && !filters.sortAscending ? 'Sắp xếp: Giá cao đến thấp' :
+                            'Sắp xếp: Mặc định'
                       }
                     </span>
                     <ChevronDown
@@ -328,13 +317,12 @@ const Products = () => {
                         <button
                           key={option.value}
                           onClick={() => handleSortChange(option.value)}
-                          className={`w-full flex items-center justify-between px-4 py-2 text-left text-sm ${
-                            (option.value === 'price-low-high' && filters.sortBy === 'priceActive' && filters.sortAscending) ||
-                            (option.value === 'price-high-low' && filters.sortBy === 'priceActive' && !filters.sortAscending) ||
-                            (option.value === 'default' && filters.sortBy === 'ProductName')
+                          className={`w-full flex items-center justify-between px-4 py-2 text-left text-sm ${(option.value === 'price-low-high' && filters.sortBy === 'priceActive' && filters.sortAscending) ||
+                              (option.value === 'price-high-low' && filters.sortBy === 'priceActive' && !filters.sortAscending) ||
+                              (option.value === 'default' && filters.sortBy === 'ProductName')
                               ? 'bg-blue-50 text-blue-700 font-medium'
                               : 'text-gray-700 hover:bg-gray-50'
-                          }`}
+                            }`}
                         >
                           <span>{option.label}</span>
                           {
@@ -433,9 +421,7 @@ const Products = () => {
               <>
                 <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
                   {products.map((product) => (
-                    <div key={product.id} onClick={() => handleProductClick(product)}>
-                      <ProductCard product={product} />
-                    </div>
+                    <ProductCard product={product} />
                   ))}
                 </div>
 

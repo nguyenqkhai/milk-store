@@ -3,7 +3,7 @@ import CartHeader from './Components/CartHeader';
 import CartItemsList from './Components/CartItemsList';
 import CartSummary from './Components/CartSummary';
 import EmptyCart from './Components/EmptyCart';
-import { fetchCartItems, updateCartItem, deleteCartItem } from '../../api/cartApi';
+import { fetchCartItems, updateCartItem, deleteCartItem } from '../../services/Cart/cartServices';
 import Pagination from '../Products/Components/Pagination';
 import { message } from 'antd';
 
@@ -83,7 +83,7 @@ const Cart = () => {
       setItems(updatedItems);
       const { statusCode, message: apiMessage } = await updateCartItem(itemId, newQuantity);
       if (statusCode === 200) {
-        message.success(apiMessage);
+        // message.success(apiMessage);
       } else {
         message.error(apiMessage);
       }
