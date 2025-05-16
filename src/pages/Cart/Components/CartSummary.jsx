@@ -1,13 +1,21 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const CartSummary = ({ subTotal, shipping, grandTotal }) => {
+const CartSummary = ({ subTotal, shipping, grandTotal, checkedItems }) => {
   const formatPrice = (price) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND'
     }).format(price);
   };
+
+  const order = {
+      items: checkedItems,
+      subtotal: subTotal,
+      total: grandTotal,
+      shipping: shipping
+    };
+
   const navigate = useNavigate();
   return (
     <div className="bg-white rounded-lg shadow p-6">
@@ -34,7 +42,7 @@ const CartSummary = ({ subTotal, shipping, grandTotal }) => {
           </div>
         </div>
         
-        <button  onClick={() => navigate('/thanh-toan')}
+        <button  onClick={() => navigate('/thanh-toan', { state: { order } })}
           className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white px-4 py-2.5 rounded-lg font-medium shadow-md hover:shadow-lg transition duration-300 hover:from-blue-600 hover:to-blue-800 flex cursor-pointer items-center gap-2">
           Tiến hành thanh toán <span>→</span>
         </button>

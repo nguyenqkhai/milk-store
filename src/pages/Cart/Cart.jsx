@@ -87,6 +87,10 @@ const Cart = () => {
         item.id === itemId ? {...item, quantity: newQuantity} : item
       );
       setItems(updatedItems);
+
+      const updatedCheckedItems = checkedItems.map(item => item.id === itemId ? {...item, quantity: newQuantity} : item);
+      setCheckedItems(updatedCheckedItems);
+
       const { statusCode, message: apiMessage } = await CartService.updateCartItem(itemId, newQuantity);
       if (statusCode === 200) {
         // message.success(apiMessage);
@@ -152,7 +156,8 @@ const Cart = () => {
                 <CartSummary 
                   subTotal={subTotal} 
                   shipping={shipping} 
-                  grandTotal={grandTotal} 
+                  grandTotal={grandTotal}
+                  checkedItems={checkedItems}
                   />
               </div>
             </div>
