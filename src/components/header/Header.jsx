@@ -160,12 +160,12 @@ const Header = () => {
                     Thông tin cá nhân
                   </Link>
                   <Link
-                    to="/lich-su-don-hang"
+                    to="/don-hang"
                     className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
                     onClick={() => setShowUserMenu(false)}
                   >
                     <FiClock className="mr-2 h-4 w-4" />
-                    Lịch sử đơn hàng
+                    Đơn hàng
                   </Link>
                   <button
                     onClick={handleLogout}

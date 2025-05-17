@@ -2,9 +2,99 @@ import api from '@services/apiClient';
 
 class OrderService {
 
-    async getOrders() {
+    async getPendingOrders(queryParams) {
         try {
-            const response = await api.get('/Order/get-orders');
+            const response = await api.get('/Order/user/status/PENDING',{
+                PageNumber: queryParams.pageNumber || 1,
+                PageSize: queryParams.pageSize || 10,
+                searchTerm: queryParams.searchTerm || undefined,
+                SortBy: queryParams.sortBy || 'orderdate',
+                SortAscending: queryParams.sortAscending !== undefined ? queryParams.sortAscending : false,
+                startDate: queryParams.startDate || undefined,
+                endDate: queryParams.endDate || undefined
+            });
+
+            const mappedOrders = response.data.data.items.map(item => ({
+                id: item.orderId,
+                orderNumber: item.orderNumber,
+                customerId: item.customerId,
+                orderDate: item.orderDate,
+                shippingAddress: item.shippingAddress,
+                shippingFee: item.shippingFee,
+                shippingCode: item.shippingCode,
+                totalPrice: item.totalPrice,
+                paymentMethod: item.paymentMethod,
+                paymentMethodName: item.paymentMethodName,
+                notes: item.notes,
+                createdAt: item.createdAt,
+                statusId: item.statusId,
+                isSuccess: item.isSuccess,
+                orderDetails: item.orderDetails,
+                appliedVouchers: item.appliedVouchers || []
+            }));
+
+            return {
+                metadata: response.data.data.metadata,
+                orders: mappedOrders
+            };
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            throw error;
+        }
+    }
+
+    async getConfirmedOrders(queryParams) {
+        try {
+            const response = await api.get('/Order/user/status/CONFIRMED',{
+                PageNumber: queryParams.pageNumber || 1,
+                PageSize: queryParams.pageSize || 10,
+                searchTerm: queryParams.searchTerm || undefined,
+                SortBy: queryParams.sortBy || 'orderdate',
+                SortAscending: queryParams.sortAscending !== undefined ? queryParams.sortAscending : false,
+                startDate: queryParams.startDate || undefined,
+                endDate: queryParams.endDate || undefined
+            });
+
+            const mappedOrders = response.data.data.items.map(item => ({
+                id: item.orderId,
+                orderNumber: item.orderNumber,
+                customerId: item.customerId,
+                orderDate: item.orderDate,
+                shippingAddress: item.shippingAddress,
+                shippingFee: item.shippingFee,
+                shippingCode: item.shippingCode,
+                totalPrice: item.totalPrice,
+                paymentMethod: item.paymentMethod,
+                paymentMethodName: item.paymentMethodName,
+                notes: item.notes,
+                createdAt: item.createdAt,
+                statusId: item.statusId,
+                isSuccess: item.isSuccess,
+                orderDetails: item.orderDetails,
+                appliedVouchers: item.appliedVouchers || []
+            }));
+
+            return {
+                metadata: response.data.data.metadata,
+                orders: mappedOrders
+            };
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            throw error;
+        }
+    }
+
+    async getShippingOrders(queryParams) {
+        try {
+            const response = await api.get('/Order/user/status/SHIPPING',{
+                PageNumber: queryParams.pageNumber || 1,
+                PageSize: queryParams.pageSize || 10,
+                searchTerm: queryParams.searchTerm || undefined,
+                SortBy: queryParams.sortBy || 'orderdate',
+                SortAscending: queryParams.sortAscending !== undefined ? queryParams.sortAscending : false,
+                startDate: queryParams.startDate || undefined,
+                endDate: queryParams.endDate || undefined
+            });
 
             const mappedOrders = response.data.data.items.map(item => ({
                 id: item.orderId,
