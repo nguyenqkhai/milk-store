@@ -4,22 +4,14 @@ import { headerClass } from './data';
 import { FiShoppingCart, FiUser, FiLogOut, FiInfo, FiClock, FiTag } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { message } from 'antd';
-import CartService from '@services/Cart/cartService';
+import { useCartCount } from '@/hooks/useCart';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const location = useLocation();
   const { currentUser, isAuthenticated, logout } = useAuth();
-  const [countItems, setCountItems] = useState(0)
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const { metadata } = await CartService.fetchCartItems()
-      setCountItems(metadata.totalCount || 0)
-    }
-    fetchData()
-  }, [])
+  const [countItems] = useCartCount();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,7 +56,6 @@ const Header = () => {
     finally {
       setShowUserMenu(false);
     }
-
   };
 
   return (
