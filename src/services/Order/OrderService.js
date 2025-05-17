@@ -194,7 +194,6 @@ class OrderService {
                 'Content-Type': 'application/json',
             };
             const response = await api.post('/Order', orderData, headers);
-            console.log('Order creation response:', response);
             if (response.data.statusCode === 200) {
                 return true;
             } else {

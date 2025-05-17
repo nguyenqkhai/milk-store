@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaCheckCircle, FaCreditCard, FaMoneyBillWave } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
 import OrderSummary from './components/OrderSummary';
 import VoucherBox from './components/VoucherBox';
 import OrderService from '@services/Order/OrderService';
+import { message } from 'antd';
 
 const Payment = () => {
     const location = useLocation();
@@ -12,13 +13,33 @@ const Payment = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [voucher, setVoucher] = useState(null);
+    const [discountValue, setDiscountValue] = useState(0);
 
     // Get form data from location state
     const formData = location.state?.formData || {};
     const paymentMethod = location.state?.paymentMethod || 'cash';
     const order = location.state?.order || {};
 
-    const discountValue = order?.total * (voucher?.discount || 0) / 100 || 0;
+    // const discountValue = order?.total * (voucher?.discount || 0) / 100 || 0;
+
+    useEffect(() => {
+        if (voucher) {
+            if (order?.total < voucher.minOrder) {
+                setVoucher(null);
+                message.error(`Đơn hàng tối thiểu để áp dụng mã giảm giá là ${formatPrice(voucher?.minOrder || 0)}`);
+                return;
+            }
+            const calculatedDiscount = order?.subtotal * (voucher.discount || 0) / 100;
+            if (voucher.maxDiscount && calculatedDiscount > voucher.maxDiscount) {
+                setDiscountValue(voucher.maxDiscount);
+            }
+            else {
+                setDiscountValue(calculatedDiscount);
+            }
+        }else{
+            setDiscountValue(0);
+        }
+    }, [voucher]);
 
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', {
@@ -29,7 +50,6 @@ const Payment = () => {
 
     const handleProcessPayment = () => {
         setIsProcessing(true);
-        console.log(order.items)
         const orderData = {
             shippingAddress: formData.state + ', ' + formData.city,
             shippingFee: order.shipping,
@@ -41,7 +61,6 @@ const Payment = () => {
                 quantity: item.quantity,
             })),
         }
-        console.log('Order Data:', orderData);
         // Call OrderService to create order
         OrderService.createOrder(orderData)
             .then((response) => {
@@ -63,16 +82,6 @@ const Payment = () => {
                 setIsSuccess(false);
                 alert('Payment failed. Please try again.');
             });
-            
-        // Simulate payment processing
-        // setTimeout(() => {
-            // setIsProcessing(false);
-            // setIsSuccess(true);
-            // Redirect to order confirmation after 2 seconds
-            // setTimeout(() => {
-            //     navigate('/order-confirmation');
-            // }, 2000);
-        // }, 3000);
     };
 
     const handleApplyVoucher = (voucherObj) => {

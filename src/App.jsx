@@ -26,6 +26,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ProfilePage from './pages/Profile/ProfilePage';
 import OrderHistory from './pages/Order/History';
 import Order from './pages/Order/Order';
+import Voucher from '@/pages/Voucher/Voucher';
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
@@ -127,6 +128,12 @@ const AppRoutes = () => {
         <Route path='/thong-tin-ca-nhan' element={
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        } />
+
+        <Route path='/ma-giam-gia' element={
+          <ProtectedRoute>
+            <Voucher />
           </ProtectedRoute>
         } />
         

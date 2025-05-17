@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { headerClass } from './data';
-import { FiShoppingCart, FiUser, FiLogOut, FiInfo, FiClock } from 'react-icons/fi';
+import { FiShoppingCart, FiUser, FiLogOut, FiInfo, FiClock, FiTag } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { message } from 'antd';
 import CartService from '@services/Cart/cartServices';
@@ -166,6 +166,14 @@ const Header = () => {
                   >
                     <FiClock className="mr-2 h-4 w-4" />
                     Đơn hàng
+                  </Link>
+                  <Link
+                    to="/ma-giam-gia"
+                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
+                    onClick={() => setShowUserMenu(false)}
+                  >
+                    <FiTag className="mr-2 h-4 w-4" />
+                      Mã giảm giá
                   </Link>
                   <button
                     onClick={handleLogout}

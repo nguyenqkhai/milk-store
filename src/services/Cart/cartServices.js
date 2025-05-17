@@ -1,7 +1,7 @@
 import api from "@services/apiClient";
 
 class CartService {
-  static async fetchCartItems(PageNumber = 1, PageSize = 10, SearchTern = "", SortBy = "", SortAscending = 0) {
+  static async fetchCartItems(PageNumber = 1, PageSize = 10) {
     try {
 
       const headers = {
