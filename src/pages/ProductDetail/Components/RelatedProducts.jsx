@@ -125,7 +125,7 @@ const RelatedProducts = ({ product, title = 'Sản phẩm liên quan' }) => {
     sessionStorage.setItem('scrollPosition', window.scrollY);
 
     // Simplify navigation to just use the product ID as requested
-    navigate(`/product/${product.id}`, {
+    navigate(`/san-pham/${product.id}`, {
       state: { product }
     });
   };

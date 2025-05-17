@@ -26,7 +26,6 @@ const Cart = () => {
   const fetchItems = async () => {
     const { items, metadata } = await CartService.fetchCartItems(currentPage, paginationMeta.pageSize);
     setItems(items);
-    console.log('items', items);
     setItemCount(metadata.totalCount);
     setPaginationMeta({
       totalPages: metadata.totalPages,
