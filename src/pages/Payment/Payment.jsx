@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import OrderSummary from './components/OrderSummary';
 import VoucherBox from './components/VoucherBox';
 import OrderService from '@services/Order/OrderService';
+import CartService from "@services/Cart/CartService";
 import { message } from 'antd';
 
 const Payment = () => {
@@ -19,6 +20,7 @@ const Payment = () => {
     const formData = location.state?.formData || {};
     const paymentMethod = location.state?.paymentMethod || 'cash';
     const order = location.state?.order || {};
+    const buyNow = location.state?.buyNow || {};
 
     // const discountValue = order?.total * (voucher?.discount || 0) / 100 || 0;
 
@@ -63,17 +65,26 @@ const Payment = () => {
         }
         // Call OrderService to create order
         OrderService.createOrder(orderData)
-            .then((response) => {
+            .then(async (response) => {
                 if (response) {
+                    if (!buyNow){
+                        for (const item of order.items) {
+                            try {
+                                await CartService.deleteCartItem(item.cartItemId || item.id);
+                            } catch (err) {
+                                console.error('Error deleting cart item:', err);
+                            }
+                        }
+                    }
                     setIsProcessing(false);
                     setIsSuccess(true);
-                    // setTimeout(() => {
-                    //     navigate('/order-confirmation');
-                    // }, 2000);
+                    setTimeout(() => {
+                        navigate('/san-pham');
+                    }, 2000);
                 } else {
                     setIsProcessing(false);
                     setIsSuccess(false);
-                    alert('Payment failed. Please try again.');
+                    message.error('Payment failed. Please try again.');
                 }
             })
             .catch((error) => {

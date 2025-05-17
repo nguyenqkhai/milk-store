@@ -192,10 +192,26 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+
+
     useEffect(() => {
         if (!CookieService.hasAuthTokens()) return;
 
-        const handleAuthLogout = () => {
+        const handleAuthTokenExpire = () => {
+            AuthService.refreshToken();
+        };
+
+        window.addEventListener('auth:tokenExpire', handleAuthTokenExpire);
+
+        return () => {
+            window.removeEventListener('auth:tokenExpire', handleAuthTokenExpire);
+        };
+    }, []);
+    
+    useEffect(() => {
+        if (!CookieService.hasAuthTokens()) return;
+
+         const handleAuthLogout = () => {
             setCurrentUser(null);
             setIsAuthenticated(false);
             AuthService.logout();

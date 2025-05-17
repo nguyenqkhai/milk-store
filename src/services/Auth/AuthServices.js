@@ -122,11 +122,9 @@ class AuthService {
                 const data = response.data;
 
                 if (data.success && data.accessToken) {
-                    // Cập nhật access token mới vào cookies
                     CookieService.setAccessToken(data.accessToken);
                     return data;
                 } else {
-                    // Nếu server không trả về token mới
                     this.logout();
                     throw new Error('Refresh token không hợp lệ');
                 }

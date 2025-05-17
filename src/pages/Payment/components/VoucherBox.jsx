@@ -19,7 +19,7 @@ const VoucherBox = ({ onApply }) => {
   const fetchVouchers = async (SearchTerm = null) => {
     setLoading(true);
     try {
-      const response = await VoucherService.getVouchersUser(SearchTerm);
+      const response = await VoucherService.getVouchersUser({SearchTerm});
       setListVoucher(response.items || []);
     } catch (error) {
       setListVoucher([]);
