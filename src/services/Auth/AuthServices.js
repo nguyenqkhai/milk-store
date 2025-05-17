@@ -20,6 +20,22 @@ class AuthService {
     }
 
     /**
+     * Thay đổi thông tin người dùng
+     * @param {Array} updateFields - Mảng các trường cần cập nhật
+     * @param {Array} updateValues - Mảng các giá trị tương ứng
+     * @returns {Promise} - Kết quả từ API
+     */
+    async updateInfo(updateFields) {
+        try {
+            const response = await api.patch('/Customer/update', updateFields);
+            return response;
+        } catch (error) {
+            console.error('Error updating user info:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Đăng nhập người dùng
      * @param {string} username - Tên đăng nhập
      * @param {string} password - Mật khẩu
