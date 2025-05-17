@@ -127,9 +127,112 @@ class ProductService {
             throw error;
         }
     }
-    
-    
-    
+
+    /**
+     * Get reviews for a specific product
+     * @param {string} productId - The ID of the product to get reviews for
+     * @returns {Promise} Promise containing the reviews data
+     */
+    async getReviews(productId) {
+        try {
+            if (!productId) {
+                throw new Error('Product ID is required');
+            }
+
+            const response = await api.public.get(`/Review/get-list-review`, {
+                productId: productId
+            });
+
+            if (!response.data.success) {
+                throw new Error(response.data.message || 'Failed to fetch reviews');
+            }
+
+            return {
+                success: response.data.success,
+                statusCode: response.data.statusCode,
+                message: response.data.message,
+                data: response.data.data
+            };
+        } catch (error) {
+            console.error(`Error fetching reviews for product ${productId}:`, error);
+            throw error;
+        }
+    }
+
+    async isAddReview(productId) {
+        try {
+            if (!productId) {
+                throw new Error('Product ID is required');
+            }
+
+            const response = await api.get(`/Review/check-completed-order/${productId}`);
+
+            if (!response.data.success) {
+                throw new Error(response.data.message || 'Failed to check review status');
+            }
+
+            return {
+                success: response.data.success,
+                statusCode: response.data.statusCode,
+                message: response.data.message,
+                data: response.data.data
+            };
+        } catch (error) {
+            console.error(`Error checking review status for product ${productId}:`, error);
+            throw error;
+        }
+    }
+
+    async createReview(productId, stars) {
+        try {
+            if (!productId || !stars) {
+                throw new Error('Product ID and stars are required');
+            }
+
+            const response = await api.post(`/Review/create-review`, {
+                productId: productId,
+                rate: stars
+            });
+
+            if (!response.data.success) {
+                throw new Error(response.data.message || 'Failed to create review');
+            }
+
+            return {
+                success: response.data.success,
+                statusCode: response.data.statusCode,
+                message: response.data.message,
+                data: response.data.data
+            };
+        } catch (error) {
+            console.error(`Error creating review for product ${productId}:`, error);
+            throw error;
+        }
+    }
+
+    async deleteReview(reviewId) {
+        try {
+            if (!reviewId) {
+                throw new Error('Review ID is required');
+            }
+
+            const response = await api.delete(`/Review/delete-review/${reviewId}`);
+
+            if (!response.data.success) {
+                throw new Error(response.data.message || 'Failed to delete review');
+            }
+
+            return {
+                success: response.data.success,
+                statusCode: response.data.statusCode,
+                message: response.data.message,
+                data: response.data.data
+            };
+        } catch (error) {
+            console.error(`Error deleting review with ID ${reviewId}:`, error);
+            throw error;
+        }
+    }
 }
 
 export default new ProductService();

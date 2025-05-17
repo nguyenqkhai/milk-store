@@ -192,7 +192,6 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Lắng nghe sự kiện logout từ AuthService
     useEffect(() => {
         if (!CookieService.hasAuthTokens()) return;
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import ProductImages from './Components/ProductImages'
 import ProductInfo from './Components/ProductInfo'
+import Reviews from './Components/ProductReview'
 import RelatedProducts from './Components/RelatedProducts'
 import LoadingState from '../Products/Components/LoadingState'
 import ErrorState from '../Products/Components/ErrorState'
@@ -150,10 +151,7 @@ const ProductDetail = () => {
                   {typeof product.status === 'object' ? product.status.name : product.status || 'Đang hoạt động'}
                 </span>
               </div>
-              <div className="flex border-b border-gray-100 py-2">
-                <span className="font-medium w-32">Đánh giá:</span>
-                <span className="text-gray-600">{product.rating || 0}/5 ⭐</span>
-              </div>
+    
               <div className="flex border-b border-gray-100 py-2">
                 <span className="font-medium w-32">Số lượng kho:</span>
                 <span className="text-gray-600">{product.stockQuantity || 0}</span>
@@ -202,6 +200,9 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
+      
+      {/* Đánh giá sản phẩm */}
+      <Reviews productId={id} />
       
       {/* Sản phẩm liên quan từ API */}
       <RelatedProducts product={product} />
