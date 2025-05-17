@@ -3,7 +3,7 @@ import creditImage from '/src/assets/creditImage.png'
 import { FaArrowRight } from "react-icons/fa6";
 import { FaCreditCard, FaMoneyBillWave, FaCashRegister } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 const Checkout = () => {
     const navigate = useNavigate();
     const [onCreditCard, setOnCreditCard] = useState(false);
@@ -18,9 +18,12 @@ const Checkout = () => {
         expiryDate: '',
         cvv: ''
     });
+    const location = useLocation();
+    const order = location.state?.order || {};
     const handleCheckout = () => {
         navigate('/xac-nhan-thanh-toan', {
             state: {
+                order: order,
                 formData,
                 paymentMethod: onCreditCard ? 'credit' : 'cash'
             }

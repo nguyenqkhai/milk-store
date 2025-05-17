@@ -1,10 +1,7 @@
-import apiConfig from "@/config/apiConfig";
 import api from "@services/apiClient";
 
-const API_BASE_URL = apiConfig.API_BASE_URL;
-
 class CartService {
-  static async fetchCartItems(PageNumber = 1, PageSize = 10, SearchTern = "", SortBy = "", SortAscending = 0) {
+  static async fetchCartItems(PageNumber = 1, PageSize = 10) {
     try {
 
       const headers = {
@@ -18,6 +15,7 @@ class CartService {
       const response = await api.get('/CartItem/get-list-cart-item', params, headers);
       const cartItems = response.data.data.items.map(item => ({
         id: item.id,
+        productId: item.productId,
         name: item.getProductToCart.productName,
         priceDefault: item.getProductToCart.productPriceIsDefault,
         price: item.getProductToCart.productPriceIsActive,

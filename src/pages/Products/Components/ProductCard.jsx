@@ -10,7 +10,7 @@ const formatPrice = (price) => {
     style: 'currency',
     currency: 'VND',
     minimumFractionDigits: 0
-  }).format(price * 1000);
+  }).format(price * 1);
 };
 
 const calculateDiscountedPrice = (price, discountPercentage) => {
@@ -29,7 +29,7 @@ const ProductCard = ({ product }) => {
   const hasHalfStar = product.rating % 1 >= 0.5;
 
   const handleProductClick = () => {
-    navigate(`/product/${product.id}`, {
+    navigate(`/san-pham/${product.id}`, {
       state: { product }
     });
   };

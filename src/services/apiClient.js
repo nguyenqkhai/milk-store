@@ -37,7 +37,7 @@ apiClient.interceptors.response.use(
         // Xử lý lỗi
         if (error.response) {
             console.error('Server Error:', error.response.status, error.response.data);
-            if (error.response.status === 401) {
+            if (error.response.status === 401 || error.response.status === 400) {
                 handleExpiredToken();
             }
         } else if (error.request) {

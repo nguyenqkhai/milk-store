@@ -52,6 +52,7 @@ const Cart = () => {
     hasPrevious: false,
     hasNext: false
   });
+  const [checkedItems, setCheckedItems] = useState([]);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -69,10 +70,16 @@ const Cart = () => {
     fetchItems();
   } , [currentPage, paginationMeta.pageSize]);
 
+  // useEffect(() => {
+  //   console.log('items', items);
+  //   const newTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  //   setSubTotal(newTotal);
+  // }, [items]);
+
   useEffect(() => {
-    const newTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const newTotal = checkedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     setSubTotal(newTotal);
-  }, [items]);
+  }, [checkedItems]);
   
   const handleUpdateQuantity = async (itemId, newQuantity) => {
     if (newQuantity > 0) {
@@ -80,6 +87,10 @@ const Cart = () => {
         item.id === itemId ? {...item, quantity: newQuantity} : item
       );
       setItems(updatedItems);
+
+      const updatedCheckedItems = checkedItems.map(item => item.id === itemId ? {...item, quantity: newQuantity} : item);
+      setCheckedItems(updatedCheckedItems);
+
       const { statusCode, message: apiMessage } = await CartService.updateCartItem(itemId, newQuantity);
       if (statusCode === 200) {
         // message.success(apiMessage);
@@ -113,6 +124,10 @@ const Cart = () => {
     setCurrentPage(page);
   }
 
+  const handleCheckedItemsChange = (newChecked) => {
+    setCheckedItems(newChecked);
+  };
+
   const grandTotal = subTotal + shipping;
   const itemCount = items.length;
 
@@ -132,6 +147,8 @@ const Cart = () => {
                   itemCount={itemCount}
                   handleUpdateQuantity={handleUpdateQuantity}
                   handleRemoveItem={handleRemoveItem}
+                  checkedItems={checkedItems}
+                  onCheckedItemsChange={handleCheckedItemsChange}
                   />
               </div>
               
@@ -139,7 +156,8 @@ const Cart = () => {
                 <CartSummary 
                   subTotal={subTotal} 
                   shipping={shipping} 
-                  grandTotal={grandTotal} 
+                  grandTotal={grandTotal}
+                  checkedItems={checkedItems}
                   />
               </div>
             </div>

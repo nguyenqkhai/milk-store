@@ -17,42 +17,36 @@ import { DatePicker, Space } from 'antd';
 
 const { RangePicker } = DatePicker;
 
-const OrderHistory = () => {
+const OrderPending = () => {
   const {
-    ordersHistory,
+    ordersPending,
     loading,
     error,
-    pagination,
-    filters,
-    HistoryStatuses,
-    updateFilters,
-    changePage,
-    changePageSize,
+    paginationPending,
+    filtersPending,
+    updatePendingFilters,
+    changePendingPage,
+    changePendingPageSize,
   } = useOrderStore();
 
   const [hoveredOrder, setHoveredOrder] = useState(null);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
-  
+
   const containerRef = useRef(null);
 
   const handleSearchChange = (e) => {
     const searchTerm = e.target.value;
-    updateFilters({ searchTerm });
-  };
-
-  const handleStatusChange = (e) => {
-    const statusId = e.target.value === "null" ? null : e.target.value;
-    updateFilters({ statusId });
+    updatePendingFilters({ searchTerm });
   };
 
   const handleDateChange = (dates) => {
     if (dates && dates.length === 2) {
-      updateFilters({
+      updatePendingFilters({
         startDate: dates[0].toDate(),
         endDate: dates[1].toDate()
       });
     } else {
-      updateFilters({
+      updatePendingFilters({
         startDate: null,
         endDate: null
       });
@@ -60,18 +54,10 @@ const OrderHistory = () => {
   };
 
   const handleSortChange = (sortField) => {
-    if (filters.sortBy === sortField) {
-      updateFilters({ sortAscending: !filters.sortAscending });
+    if (filtersPending.sortBy === sortField) {
+      updatePendingFilters({ sortAscending: !filtersPending.sortAscending });
     } else {
-      updateFilters({ sortBy: sortField, sortAscending: false });
-    }
-  };
-
-  const getStatusColor = (statusId) => {
-    switch(statusId) {
-      case 'COMPLETED': return 'bg-green-100 text-green-800';
-      case 'CANCELLED': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      updatePendingFilters({ sortBy: sortField, sortAscending: false });
     }
   };
 
@@ -100,48 +86,48 @@ const OrderHistory = () => {
 
   const Pagination = () => {
     const pageNumbers = [];
-    const { currentPage, totalPages } = pagination;
-    
+    const { currentPage, totalPages } = paginationPending;
+
     let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, startPage + 4);
-    
+
     if (endPage - startPage < 4) {
       startPage = Math.max(1, endPage - 4);
     }
-    
+
     for (let i = startPage; i <= endPage; i++) {
       pageNumbers.push(i);
     }
-    
+
     return (
       <div className="flex items-center justify-between mt-4">
         <div>
           <span className="text-sm text-gray-700">
-            Hiển thị <span className="font-medium">{(currentPage - 1) * pagination.pageSize + 1}</span> đến <span className="font-medium">{Math.min(currentPage * pagination.pageSize, pagination.totalItems)}</span> trong tổng số <span className="font-medium">{pagination.totalItems}</span> đơn hàng
+            Hiển thị <span className="font-medium">{(currentPage - 1) * paginationPending.pageSize + 1}</span> đến <span className="font-medium">{Math.min(currentPage * paginationPending.pageSize, paginationPending.totalItems)}</span> trong tổng số <span className="font-medium">{paginationPending.totalItems}</span> đơn hàng
           </span>
         </div>
         <div>
           <nav className="flex items-center space-x-1">
             <button
-              onClick={() => changePage(Math.max(1, currentPage - 1))}
+              onClick={() => changePendingPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
               className={`px-2 py-1 rounded ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-50'}`}
             >
               Trước
             </button>
-            
+
             {pageNumbers.map(number => (
               <button
                 key={number}
-                onClick={() => changePage(number)}
+                onClick={() => changePendingPage(number)}
                 className={`px-3 py-1 rounded ${currentPage === number ? 'bg-blue-600 text-white' : 'text-blue-600 hover:bg-blue-50'}`}
               >
                 {number}
               </button>
             ))}
-            
+
             <button
-              onClick={() => changePage(Math.min(totalPages, currentPage + 1))}
+              onClick={() => changePendingPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
               className={`px-2 py-1 rounded ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-50'}`}
             >
@@ -154,11 +140,11 @@ const OrderHistory = () => {
   };
 
   const SortIcon = ({ field }) => {
-    if (filters.sortBy !== field) {
+    if (filtersPending.sortBy !== field) {
       return <ArrowUpDown className="w-4 h-4 ml-1" />;
     }
-    return filters.sortAscending ? 
-      <ArrowUp className="w-4 h-4 ml-1" /> : 
+    return filtersPending.sortAscending ?
+      <ArrowUp className="w-4 h-4 ml-1" /> :
       <ArrowDown className="w-4 h-4 ml-1" />;
   };
 
@@ -168,18 +154,18 @@ const OrderHistory = () => {
     }
 
     return (
-      <div className="fixed z-50 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 p-4" 
-           style={{ 
-             top: `${tooltipPosition.top}px`, 
-             left: `${tooltipPosition.left}px`,
-             maxHeight: '400px',
-             overflowY: 'auto'
-           }}>
+      <div className="absolute z-50 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 p-4"
+        style={{
+          top: `${tooltipPosition.top}px`,
+          left: `${tooltipPosition.left}px`,
+          maxHeight: '400px',
+          overflowY: 'auto'
+        }}>
         <div className="flex items-center mb-3">
           <ShoppingBag className="w-5 h-5 text-blue-600 mr-2" />
           <h3 className="text-lg font-semibold text-gray-900">Chi tiết đơn hàng</h3>
         </div>
-        
+
         <div className="space-y-2">
           <div className="grid grid-cols-2 gap-2 mb-3">
             <div>
@@ -199,7 +185,7 @@ const OrderHistory = () => {
               <p className="text-sm text-gray-900">{order.notes || 'Không có'}</p>
             </div>
           </div>
-          
+
           <div className="border-t border-gray-200 pt-3">
             <h4 className="text-sm font-semibold text-gray-700 mb-2">Sản phẩm:</h4>
             {order.orderDetails.map((item, index) => (
@@ -223,7 +209,7 @@ const OrderHistory = () => {
               </div>
             ))}
           </div>
-          
+
           {order.appliedVouchers && order.appliedVouchers.length > 0 && (
             <div className="border-t border-gray-200 pt-3">
               <h4 className="text-sm font-semibold text-gray-700 mb-2">Vouchers áp dụng:</h4>
@@ -234,7 +220,7 @@ const OrderHistory = () => {
               ))}
             </div>
           )}
-          
+
           <div className="border-t border-gray-200 pt-3 mt-2">
             <div className="flex justify-between text-sm font-semibold">
               <span className="text-gray-700">Tổng cộng:</span>
@@ -246,9 +232,23 @@ const OrderHistory = () => {
     );
   };
 
+  // Tạo các hàng trống để giữ chiều cao cố định của bảng
+  const renderEmptyRows = () => {
+    const currentOrders = ordersPending.length;
+    const rowsToRender = paginationPending.pageSize - currentOrders;
+
+    if (rowsToRender <= 0) return null;
+
+    return Array(rowsToRender).fill(0).map((_, index) => (
+      <tr key={`empty-${index}`} className="h-14"> {/* Chiều cao tương đương với một hàng có dữ liệu */}
+        <td colSpan="6" className="px-6 py-4 whitespace-nowrap border-b border-gray-200"></td>
+      </tr>
+    ));
+  };
+
   return (
-    <div className="container mx-auto" ref={containerRef}>
-      
+    <div className="container mx-auto relative" ref={containerRef}>
+
       <div className="mb-6 bg-white p-4 rounded-lg shadow">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative">
@@ -258,29 +258,12 @@ const OrderHistory = () => {
             <input
               type="text"
               placeholder="Tìm kiếm đơn hàng..."
-              value={filters.searchTerm}
+              value={filtersPending.searchTerm}
               onChange={handleSearchChange}
               className="border border-gray-300 rounded-md py-2 pl-10 pr-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Filter className="w-4 h-4 text-gray-500" />
-            </div>
-            <select
-              value={filters.statusId === null ? "null" : filters.statusId}
-              onChange={handleStatusChange}
-              className="border border-gray-300 rounded-md py-2 pl-10 pr-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {HistoryStatuses.map((status) => (
-                <option key={status.id || "null"} value={status.id || "null"}>
-                  {status.value}
-                </option>
-              ))}
-            </select>
-          </div>
-          
+
           <div className="relative">
             <RangePicker
               onChange={handleDateChange}
@@ -290,20 +273,20 @@ const OrderHistory = () => {
               allowClear={true}
               size="large"
               value={[
-                filters.startDate ? moment(filters.startDate) : null,
-                filters.endDate ? moment(filters.endDate) : null
+                filtersPending.startDate ? moment(filtersPending.startDate) : null,
+                filtersPending.endDate ? moment(filtersPending.endDate) : null
               ]}
             />
           </div>
         </div>
       </div>
-      
+
       {error && (
         <div className="bg-red-50 text-red-700 p-3 rounded-md mb-4">
           {error}
         </div>
       )}
-      
+
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -312,7 +295,7 @@ const OrderHistory = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Mã đơn hàng
                 </th>
-                <th 
+                <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSortChange('orderDate')}
                 >
@@ -321,10 +304,7 @@ const OrderHistory = () => {
                     <SortIcon field="orderDate" />
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Trạng thái
-                </th>
-                <th 
+                <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSortChange('totalAmount')}
                 >
@@ -347,62 +327,63 @@ const OrderHistory = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-4 text-center">
+                  <td colSpan="6" className="px-6 py-4 text-center">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                     <p className="mt-2 text-gray-500">Đang tải dữ liệu...</p>
                   </td>
                 </tr>
-              ) : ordersHistory.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
-                    Không có đơn hàng nào
-                  </td>
-                </tr>
-              ) : (
-                ordersHistory.map((order) => (
-                  <tr 
-                    key={order.id} 
-                    className="hover:bg-blue-50"
-                    onMouseLeave={() => setHoveredOrder(null)}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600" onMouseEnter={(e) => handleMouseEnter(order, e)}>
-                      {order.orderNumber || order.id}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {format(new Date(order.orderDate), 'dd/MM/yyyy HH:mm', { locale: vi })}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.statusId)}`}>
-                        {HistoryStatuses.find(s => s.id === order.statusId)?.value || order.statusId}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalPrice)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {order.paymentMethodName || order.paymentMethod}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                      {order.shippingAddress}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                      {order.notes || '-'}
+              ) : ordersPending.length === 0 ? (
+                <>
+                  <tr>
+                    <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+                      Không có đơn hàng nào
                     </td>
                   </tr>
-                ))
+                  {renderEmptyRows()}
+                </>
+              ) : (
+                <>
+                  {ordersPending.map((order) => (
+                    <tr
+                      key={order.id}
+                      className="hover:bg-blue-50"
+                      onMouseLeave={() => setHoveredOrder(null)}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600" onMouseEnter={(e) => handleMouseEnter(order, e)}>
+                        {order.orderNumber || order.id}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {format(new Date(order.orderDate), 'dd/MM/yyyy HH:mm', { locale: vi })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalPrice)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {order.paymentMethodName || order.paymentMethod}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                        {order.shippingAddress}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                        {order.notes || '-'}
+                      </td>
+                    </tr>
+                  ))}
+                  {renderEmptyRows()}
+                </>
               )}
             </tbody>
           </table>
         </div>
-        
+
         <div className="px-6 py-4 border-t border-gray-200">
           <Pagination />
-          
+
           <div className="mt-2 flex items-center">
             <span className="mr-2 text-sm text-gray-700">Hiển thị:</span>
             <select
-              value={pagination.pageSize}
-              onChange={(e) => changePageSize(Number(e.target.value))}
+              value={paginationPending.pageSize}
+              onChange={(e) => changePendingPageSize(Number(e.target.value))}
               className="border border-gray-300 rounded-md text-sm py-1 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {[5, 10, 20, 50].map((size) => (
@@ -414,10 +395,10 @@ const OrderHistory = () => {
           </div>
         </div>
       </div>
-      
+
       {hoveredOrder && <OrderDetailsTooltip order={hoveredOrder} />}
     </div>
   );
 };
 
-export default OrderHistory;
+export default OrderPending;

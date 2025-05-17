@@ -1,29 +1,91 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaCheckCircle, FaCreditCard, FaMoneyBillWave } from 'react-icons/fa';
 import { useLocation, useNavigate } from 'react-router-dom';
+import OrderSummary from './components/OrderSummary';
+import VoucherBox from './components/VoucherBox';
+import OrderService from '@services/Order/OrderService';
+import { message } from 'antd';
 
 const Payment = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [isProcessing, setIsProcessing] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [voucher, setVoucher] = useState(null);
+    const [discountValue, setDiscountValue] = useState(0);
 
     // Get form data from location state
     const formData = location.state?.formData || {};
     const paymentMethod = location.state?.paymentMethod || 'cash';
+    const order = location.state?.order || {};
+
+    // const discountValue = order?.total * (voucher?.discount || 0) / 100 || 0;
+
+    useEffect(() => {
+        if (voucher) {
+            if (order?.total < voucher.minOrder) {
+                setVoucher(null);
+                message.error(`Đơn hàng tối thiểu để áp dụng mã giảm giá là ${formatPrice(voucher?.minOrder || 0)}`);
+                return;
+            }
+            const calculatedDiscount = order?.subtotal * (voucher.discount || 0) / 100;
+            if (voucher.maxDiscount && calculatedDiscount > voucher.maxDiscount) {
+                setDiscountValue(voucher.maxDiscount);
+            }
+            else {
+                setDiscountValue(calculatedDiscount);
+            }
+        }else{
+            setDiscountValue(0);
+        }
+    }, [voucher]);
+
+    const formatPrice = (price) => {
+        return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+        }).format(price);
+    };
 
     const handleProcessPayment = () => {
         setIsProcessing(true);
-        // Simulate payment processing
-        setTimeout(() => {
-            setIsProcessing(false);
-            setIsSuccess(true);
-            // Redirect to order confirmation after 2 seconds
-            setTimeout(() => {
-                navigate('/order-confirmation');
-            }, 2000);
-        }, 3000);
+        const orderData = {
+            shippingAddress: formData.state + ', ' + formData.city,
+            shippingFee: order.shipping,
+            paymentMethod: paymentMethod,
+            notes: '',
+            voucherCodes: voucher?.code ? [voucher.code] : [],
+            orderDetails: order.items.map(item => ({
+                productId: item.productId,
+                quantity: item.quantity,
+            })),
+        }
+        // Call OrderService to create order
+        OrderService.createOrder(orderData)
+            .then((response) => {
+                if (response) {
+                    setIsProcessing(false);
+                    setIsSuccess(true);
+                    // setTimeout(() => {
+                    //     navigate('/order-confirmation');
+                    // }, 2000);
+                } else {
+                    setIsProcessing(false);
+                    setIsSuccess(false);
+                    alert('Payment failed. Please try again.');
+                }
+            })
+            .catch((error) => {
+                console.error('Error processing payment:', error);
+                setIsProcessing(false);
+                setIsSuccess(false);
+                alert('Payment failed. Please try again.');
+            });
+    };
+
+    const handleApplyVoucher = (voucherObj) => {
+        setVoucher(voucherObj);
     };
 
     return (
@@ -53,51 +115,16 @@ const Payment = () => {
 
             {/* Main Content */}
             <div className="max-w-4xl mx-auto px-8 ">
+                <div className="grid md:grid-cols-2 gap-6">
+                    <OrderSummary formData={formData} paymentMethod={paymentMethod} />
+                    <VoucherBox onApply={handleApplyVoucher} />
+                </div>
                 <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.2 }}
                     className="bg-white rounded-xl shadow-lg md:p-6 "
                 >
-                    {/* Order Summary */}
-                    <div className="mb-4">
-                        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Order Summary</h2>
-                        <div className="bg-gray-50 rounded-lg p-4">
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                                <div>
-                                    <p className="text-gray-800">Name:</p>
-                                    <p className="font-medium ">{formData.firstName} {formData.lastName}</p>
-                                </div>
-                                <div>
-                                    <p className="text-gray-800">Email:</p>
-                                    <p className="font-medium">{formData.email}</p>
-                                </div>
-                                <div>
-                                    <p className="text-gray-800">Shipping Address:</p>
-                                    <p className="font-medium">
-                                        {formData.city}, {formData.state} {formData.zipCode}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-gray-800">Payment Method:</p>
-                                    <p className="font-medium flex items-center gap-2">
-                                        {paymentMethod === 'credit' ? (
-                                            <>
-                                                <FaCreditCard className="text-blue-500 text-lg" />
-                                                Credit Card
-                                            </>
-                                        ) : (
-                                            <>
-                                                <FaMoneyBillWave className="text-green-500 text-lg" />
-                                                Cash on Delivery
-                                            </>
-                                        )}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Payment Status */}
                     <div className="text-center">
                         {!isProcessing && !isSuccess && (
@@ -137,19 +164,19 @@ const Payment = () => {
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">Subtotal</span>
-                                <span className="font-medium">$99.00</span>
+                                <span className="font-medium">{formatPrice(order?.subtotal || 0)}</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">Shipping</span>
-                                <span className="font-medium">$5.00</span>
+                                <span className="font-medium">{formatPrice(order.shipping || 0)}</span>
                             </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-gray-600">Tax</span>
-                                <span className="font-medium">$9.90</span>
+                            <div className="flex justify-between text-sm border-t pt-2">
+                                <span className="text-gray-600">Voucher:</span>
+                                <span className="font-medium">-{formatPrice(discountValue)}</span>
                             </div>
                             <div className="border-t pt-4 flex justify-between">
                                 <span className="font-semibold">Total</span>
-                                <span className="font-bold text-lg">$113.90</span>
+                                <span className="font-bold text-lg">{formatPrice(order?.total - discountValue || 0)}</span>
                             </div>
                         </div>
                     </div>

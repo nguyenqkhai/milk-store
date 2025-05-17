@@ -17,17 +17,16 @@ import { DatePicker, Space } from 'antd';
 
 const { RangePicker } = DatePicker;
 
-const OrderHistory = () => {
+const OrderShipping = () => {
   const {
-    ordersHistory,
+    ordersShipping,
     loading,
     error,
-    pagination,
-    filters,
-    HistoryStatuses,
-    updateFilters,
-    changePage,
-    changePageSize,
+    paginationShipping,
+    filtersShipping,
+    updateShippingFilters,
+    changeShippingPage,
+    changeShippingPageSize,
   } = useOrderStore();
 
   const [hoveredOrder, setHoveredOrder] = useState(null);
@@ -37,22 +36,17 @@ const OrderHistory = () => {
 
   const handleSearchChange = (e) => {
     const searchTerm = e.target.value;
-    updateFilters({ searchTerm });
-  };
-
-  const handleStatusChange = (e) => {
-    const statusId = e.target.value === "null" ? null : e.target.value;
-    updateFilters({ statusId });
+    updateShippingFilters({ searchTerm });
   };
 
   const handleDateChange = (dates) => {
     if (dates && dates.length === 2) {
-      updateFilters({
+      updateShippingFilters({
         startDate: dates[0].toDate(),
         endDate: dates[1].toDate()
       });
     } else {
-      updateFilters({
+      updateShippingFilters({
         startDate: null,
         endDate: null
       });
@@ -60,18 +54,10 @@ const OrderHistory = () => {
   };
 
   const handleSortChange = (sortField) => {
-    if (filters.sortBy === sortField) {
-      updateFilters({ sortAscending: !filters.sortAscending });
+    if (filtersShipping.sortBy === sortField) {
+      updateShippingFilters({ sortAscending: !filtersShipping.sortAscending });
     } else {
-      updateFilters({ sortBy: sortField, sortAscending: false });
-    }
-  };
-
-  const getStatusColor = (statusId) => {
-    switch(statusId) {
-      case 'COMPLETED': return 'bg-green-100 text-green-800';
-      case 'CANCELLED': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      updateShippingFilters({ sortBy: sortField, sortAscending: false });
     }
   };
 
@@ -100,8 +86,8 @@ const OrderHistory = () => {
 
   const Pagination = () => {
     const pageNumbers = [];
-    const { currentPage, totalPages } = pagination;
-    
+    const { currentPage, totalPages } = paginationShipping;
+
     let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, startPage + 4);
     
@@ -117,13 +103,13 @@ const OrderHistory = () => {
       <div className="flex items-center justify-between mt-4">
         <div>
           <span className="text-sm text-gray-700">
-            Hiển thị <span className="font-medium">{(currentPage - 1) * pagination.pageSize + 1}</span> đến <span className="font-medium">{Math.min(currentPage * pagination.pageSize, pagination.totalItems)}</span> trong tổng số <span className="font-medium">{pagination.totalItems}</span> đơn hàng
+            Hiển thị <span className="font-medium">{(currentPage - 1) * paginationShipping.pageSize + 1}</span> đến <span className="font-medium">{Math.min(currentPage * paginationShipping.pageSize, paginationShipping.totalItems)}</span> trong tổng số <span className="font-medium">{paginationShipping.totalItems}</span> đơn hàng
           </span>
         </div>
         <div>
           <nav className="flex items-center space-x-1">
             <button
-              onClick={() => changePage(Math.max(1, currentPage - 1))}
+              onClick={() => changeShippingPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
               className={`px-2 py-1 rounded ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-50'}`}
             >
@@ -133,7 +119,7 @@ const OrderHistory = () => {
             {pageNumbers.map(number => (
               <button
                 key={number}
-                onClick={() => changePage(number)}
+                onClick={() => changeShippingPage(number)}
                 className={`px-3 py-1 rounded ${currentPage === number ? 'bg-blue-600 text-white' : 'text-blue-600 hover:bg-blue-50'}`}
               >
                 {number}
@@ -141,7 +127,7 @@ const OrderHistory = () => {
             ))}
             
             <button
-              onClick={() => changePage(Math.min(totalPages, currentPage + 1))}
+              onClick={() => changeShippingPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
               className={`px-2 py-1 rounded ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-50'}`}
             >
@@ -154,10 +140,10 @@ const OrderHistory = () => {
   };
 
   const SortIcon = ({ field }) => {
-    if (filters.sortBy !== field) {
+    if (filtersShipping.sortBy !== field) {
       return <ArrowUpDown className="w-4 h-4 ml-1" />;
     }
-    return filters.sortAscending ? 
+    return filtersShipping.sortAscending ? 
       <ArrowUp className="w-4 h-4 ml-1" /> : 
       <ArrowDown className="w-4 h-4 ml-1" />;
   };
@@ -246,6 +232,20 @@ const OrderHistory = () => {
     );
   };
 
+  // Tạo các hàng trống để giữ chiều cao cố định của bảng
+  const renderEmptyRows = () => {
+    const currentOrders = ordersShipping.length;
+    const rowsToRender = paginationShipping.pageSize - currentOrders;
+    
+    if (rowsToRender <= 0) return null;
+    
+    return Array(rowsToRender).fill(0).map((_, index) => (
+      <tr key={`empty-${index}`} className="h-14"> {/* Chiều cao tương đương với một hàng có dữ liệu */}
+        <td colSpan="6" className="px-6 py-4 whitespace-nowrap border-b border-gray-200"></td>
+      </tr>
+    ));
+  };
+
   return (
     <div className="container mx-auto" ref={containerRef}>
       
@@ -258,27 +258,10 @@ const OrderHistory = () => {
             <input
               type="text"
               placeholder="Tìm kiếm đơn hàng..."
-              value={filters.searchTerm}
+              value={filtersShipping.searchTerm}
               onChange={handleSearchChange}
               className="border border-gray-300 rounded-md py-2 pl-10 pr-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-          
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <Filter className="w-4 h-4 text-gray-500" />
-            </div>
-            <select
-              value={filters.statusId === null ? "null" : filters.statusId}
-              onChange={handleStatusChange}
-              className="border border-gray-300 rounded-md py-2 pl-10 pr-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {HistoryStatuses.map((status) => (
-                <option key={status.id || "null"} value={status.id || "null"}>
-                  {status.value}
-                </option>
-              ))}
-            </select>
           </div>
           
           <div className="relative">
@@ -290,8 +273,8 @@ const OrderHistory = () => {
               allowClear={true}
               size="large"
               value={[
-                filters.startDate ? moment(filters.startDate) : null,
-                filters.endDate ? moment(filters.endDate) : null
+                filtersShipping.startDate ? moment(filtersShipping.startDate) : null,
+                filtersShipping.endDate ? moment(filtersShipping.endDate) : null
               ]}
             />
           </div>
@@ -321,9 +304,6 @@ const OrderHistory = () => {
                     <SortIcon field="orderDate" />
                   </div>
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Trạng thái
-                </th>
                 <th 
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSortChange('totalAmount')}
@@ -347,49 +327,50 @@ const OrderHistory = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-4 text-center">
+                  <td colSpan="6" className="px-6 py-4 text-center">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto" />
                     <p className="mt-2 text-gray-500">Đang tải dữ liệu...</p>
                   </td>
                 </tr>
-              ) : ordersHistory.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
-                    Không có đơn hàng nào
-                  </td>
-                </tr>
-              ) : (
-                ordersHistory.map((order) => (
-                  <tr 
-                    key={order.id} 
-                    className="hover:bg-blue-50"
-                    onMouseLeave={() => setHoveredOrder(null)}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600" onMouseEnter={(e) => handleMouseEnter(order, e)}>
-                      {order.orderNumber || order.id}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {format(new Date(order.orderDate), 'dd/MM/yyyy HH:mm', { locale: vi })}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.statusId)}`}>
-                        {HistoryStatuses.find(s => s.id === order.statusId)?.value || order.statusId}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalPrice)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {order.paymentMethodName || order.paymentMethod}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                      {order.shippingAddress}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                      {order.notes || '-'}
+              ) : ordersShipping.length === 0 ? (
+                <>
+                  <tr>
+                    <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+                      Không có đơn hàng nào
                     </td>
                   </tr>
-                ))
+                  {renderEmptyRows()}
+                </>
+              ) : (
+                <>
+                  {ordersShipping.map((order) => (
+                    <tr
+                      key={order.id}
+                      className="hover:bg-blue-50"
+                      onMouseLeave={() => setHoveredOrder(null)}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600" onMouseEnter={(e) => handleMouseEnter(order, e)}>
+                        {order.orderNumber || order.id}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {format(new Date(order.orderDate), 'dd/MM/yyyy HH:mm', { locale: vi })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalPrice)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {order.paymentMethodName || order.paymentMethod}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                        {order.shippingAddress}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                        {order.notes || '-'}
+                      </td>
+                    </tr>
+                  ))}
+                  {renderEmptyRows()}
+                </>
               )}
             </tbody>
           </table>
@@ -401,8 +382,8 @@ const OrderHistory = () => {
           <div className="mt-2 flex items-center">
             <span className="mr-2 text-sm text-gray-700">Hiển thị:</span>
             <select
-              value={pagination.pageSize}
-              onChange={(e) => changePageSize(Number(e.target.value))}
+              value={paginationShipping.pageSize}
+              onChange={(e) => changeShippingPageSize(Number(e.target.value))}
               className="border border-gray-300 rounded-md text-sm py-1 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {[5, 10, 20, 50].map((size) => (
@@ -420,4 +401,4 @@ const OrderHistory = () => {
   );
 };
 
-export default OrderHistory;
+export default OrderShipping;

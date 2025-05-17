@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Form, Input, DatePicker, Select, Button, message, Spin, Upload } from 'antd';
+import { Form, Input, DatePicker, Select, Button, message, Spin } from 'antd';
 import { FiUser, FiPhone, FiMail, FiMapPin, FiCalendar, FiEdit } from 'react-icons/fi';
 import moment from 'moment';
 
 const ProfilePage = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, updateUserFields } = useAuth();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -38,15 +38,29 @@ const ProfilePage = () => {
         ...values,
         dob: values.dob ? values.dob.format('YYYY-MM-DD') : null,
       };
+      delete formattedValues.email;
 
-      console.log('Submitting form with values:', formattedValues);
-
-      message.success('Cập nhật thông tin thành công!');
-      setIsEditing(false);
-      setUserData({
-        ...userData,
-        ...formattedValues
+      const fieldsToUpdate = {};
+      Object.entries(formattedValues).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          fieldsToUpdate[key] = value;
+        }
       });
+
+      const fields = Object.keys(fieldsToUpdate);
+      const valueArray = Object.values(fieldsToUpdate);
+      const result = await updateUserFields(fields, valueArray);
+
+      if (result.success) {
+        message.success('Cập nhật thông tin thành công!');
+        setIsEditing(false);
+        setUserData({
+          ...userData,
+          ...fieldsToUpdate
+        });
+      } else {
+        message.error(result.error || 'Không thể cập nhật thông tin. Vui lòng thử lại sau.');
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
       message.error('Không thể cập nhật thông tin. Vui lòng thử lại sau.');
@@ -59,7 +73,7 @@ const ProfilePage = () => {
     if (!userData) return <Spin />;
 
     const { surname, middleName, firstName, email, phoneNumber, address, gender, dob } = userData;
-    const fullName = `${surname} ${middleName} ${firstName}`;
+    const fullName = `${surname || ''} ${middleName || ''} ${firstName || ''}`.trim();
 
     return (
       <div className="space-y-6">
@@ -73,7 +87,7 @@ const ProfilePage = () => {
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-gray-500">Họ và tên</p>
-                <p className="font-medium">{fullName}</p>
+                <p className="font-medium">{fullName || 'Chưa cập nhật'}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Giới tính</p>
@@ -94,7 +108,7 @@ const ProfilePage = () => {
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-gray-500">Email</p>
-                <p>{email}</p>
+                <p>{email || 'Chưa cập nhật'}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Số điện thoại</p>
@@ -113,7 +127,7 @@ const ProfilePage = () => {
 
   const renderForm = () => {
     if (!userData) return <Spin />;
-    
+
     return (
       <div className="px-9 py-9 bg-white rounded-lg shadow">
         <Form
@@ -121,13 +135,13 @@ const ProfilePage = () => {
           layout="vertical"
           onFinish={handleSubmit}
           initialValues={{
-            surname: userData.surname,
-            middleName: userData.middleName,
-            firstName: userData.firstName,
-            phoneNumber: userData.phoneNumber,
-            address: userData.address,
-            email: userData.email,
-            gender: userData.gender,
+            surname: userData.surname || '',
+            middleName: userData.middleName || '',
+            firstName: userData.firstName || '',
+            phoneNumber: userData.phoneNumber || '',
+            address: userData.address || '',
+            email: userData.email || '',
+            gender: userData.gender || '',
             dob: userData.dob ? moment(userData.dob) : null,
           }}
         >
@@ -242,10 +256,10 @@ const ProfilePage = () => {
         <div className="flex-1 text-center sm:text-left">
           <h2 className="text-xl font-semibold">
             {userData ?
-              `${userData.surname} ${userData.middleName} ${userData.firstName}` :
+              `${userData.surname || ''} ${userData.middleName || ''} ${userData.firstName || ''}`.trim() :
               'Đang tải...'}
           </h2>
-          <p className="text-gray-600 mt-1">{userData?.email}</p>
+          <p className="text-gray-600 mt-1">{userData?.email || ''}</p>
           <p className="text-gray-500 mt-1">{userData?.phoneNumber || 'Chưa cập nhật số điện thoại'}</p>
 
           {!isEditing && (
