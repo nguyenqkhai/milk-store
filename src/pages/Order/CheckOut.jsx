@@ -20,12 +20,14 @@ const Checkout = () => {
     });
     const location = useLocation();
     const order = location.state?.order || {};
+    const buyNow = location.state?.buyNow || false;
     const handleCheckout = () => {
         navigate('/xac-nhan-thanh-toan', {
             state: {
                 order: order,
                 formData,
-                paymentMethod: onCreditCard ? 'credit' : 'cash'
+                paymentMethod: onCreditCard ? 'credit' : 'cash',
+                buyNow: buyNow
             }
         });
     }

@@ -3,7 +3,7 @@ import CartHeader from './Components/CartHeader';
 import CartItemsList from './Components/CartItemsList';
 import CartSummary from './Components/CartSummary';
 import EmptyCart from './Components/EmptyCart';
-import CartService from '../../services/Cart/cartServices';
+import CartService from '@services/Cart/CartService';
 import Pagination from '@/pages/Products/Components/Pagination';
 import { message } from 'antd';
 
@@ -53,11 +53,13 @@ const Cart = () => {
     hasNext: false
   });
   const [checkedItems, setCheckedItems] = useState([]);
+  const [itemCount, setItemCount] = useState(0);
 
   useEffect(() => {
     const fetchItems = async () => {
       const { items, metadata} = await CartService.fetchCartItems(currentPage, paginationMeta.pageSize);
       setItems(items);
+      setItemCount(metadata.totalCount);
       setPaginationMeta({
         totalPages: metadata.totalPages,
         pageSize: metadata.pageSize,
@@ -108,6 +110,7 @@ const Cart = () => {
       // setItems(updatedItems);
       const newItems = await CartService.fetchCartItems(currentPage, paginationMeta.pageSize);
       setItems(newItems.items);
+      setItemCount(newItems.metadata.totalCount);
       setPaginationMeta({
         totalPages: newItems.metadata.totalPages,
         pageSize: newItems.metadata.pageSize,
@@ -129,7 +132,7 @@ const Cart = () => {
   };
 
   const grandTotal = subTotal + shipping;
-  const itemCount = items.length;
+  // const itemCount = items.length;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">

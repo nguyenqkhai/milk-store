@@ -44,17 +44,19 @@ const CartItemsList = ({ items, itemCount, handleUpdateQuantity, handleRemoveIte
           </div>
           <div className="col-span-5">
             <div className="flex items-center gap-4">
-              <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100">
-                <img 
-                  src={item.image} 
-                  alt={item.name} 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div>
-                <h3 className="font-medium text-gray-800">{item.name}</h3>
-                {/* <p className="text-sm text-gray-500 mt-1">Kích thước: {item.size}</p> */}
-              </div>
+              <Link to={`/san-pham/${item.productId || item.id}`} className="flex items-center gap-4 group">
+                <div className="relative w-20 h-20 rounded-lg overflow-hidden bg-gray-100">
+                  <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  />
+                </div>
+                <div>
+                  <h3 className="font-medium text-gray-800 group-hover:text-blue-600 transition-colors">{item.name}</h3>
+                  {/* <p className="text-sm text-gray-500 mt-1">Kích thước: {item.size}</p> */}
+                </div>
+              </Link>
             </div>
           </div>
           {/* <div className="col-span-2 text-center text-gray-800">{formatPrice(item.price)}</div> */}

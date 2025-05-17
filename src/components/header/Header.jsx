@@ -4,7 +4,7 @@ import { headerClass } from './data';
 import { FiShoppingCart, FiUser, FiLogOut, FiInfo, FiClock, FiTag } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { message } from 'antd';
-import CartService from '@services/Cart/cartServices';
+import CartService from '@services/Cart/cartService';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
