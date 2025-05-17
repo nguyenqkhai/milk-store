@@ -14,7 +14,7 @@ import Contact from './pages/Contact/Contact';
 import Products from './pages/Products/Products';
 import ProductDetail from './pages/ProductDetail/ProductDetail';
 import About from './pages/About/About';
-import Footer from './components/Footer/Footer';
+import Footer from './components/footer/Footer';
 import Payment from './pages/Payment/Payment';
 import Checkout from './pages/Order/CheckOut';
 import Cart from './pages/Cart/Cart';
