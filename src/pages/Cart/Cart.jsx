@@ -3,7 +3,7 @@ import CartHeader from './Components/CartHeader';
 import CartItemsList from './Components/CartItemsList';
 import CartSummary from './Components/CartSummary';
 import EmptyCart from './Components/EmptyCart';
-import CartService from '@services/Cart/CartServices';
+import CartService from '../../services/Cart/cartServices';
 import Pagination from '@/pages/Products/Components/Pagination';
 import { message } from 'antd';
 
