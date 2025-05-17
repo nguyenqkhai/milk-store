@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useOrderStore } from './OrderStore';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -24,7 +24,6 @@ const OrderPending = () => {
     error,
     paginationPending,
     filtersPending,
-    fetchOrdersPending,
     updatePendingFilters,
     changePendingPage,
     changePendingPageSize,
@@ -32,12 +31,8 @@ const OrderPending = () => {
 
   const [hoveredOrder, setHoveredOrder] = useState(null);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
-  
-  const containerRef = useRef(null);
 
-  useEffect(() => {
-    // fetchOrdersPending();
-  }, []);
+  const containerRef = useRef(null);
 
   const handleSearchChange = (e) => {
     const searchTerm = e.target.value;
@@ -67,18 +62,25 @@ const OrderPending = () => {
   };
 
   const handleMouseEnter = (order, e) => {
+    if (!containerRef.current) return;
+    console.log('Mouse enter', order);
     const rect = e.currentTarget.getBoundingClientRect();
     const containerRect = containerRef.current.getBoundingClientRect();
-    let top = rect.bottom - containerRect.top;
-    let left = rect.left - containerRect.left;
+    const tooltipWidth = 384; // w-96 = 24rem = 384px
     const tooltipHeight = 400;
-    const spaceBelow = containerRect.bottom - rect.bottom;
-    
-    if (spaceBelow < tooltipHeight && rect.top - containerRect.top > tooltipHeight) {
-      top = rect.top - containerRect.top - tooltipHeight;
+    let left = rect.left - containerRect.left + rect.width + 10;
+    if (left + tooltipWidth > containerRect.width) {
+      left = rect.left - containerRect.left - tooltipWidth - 10;
     }
-    
-    setTooltipPosition({ top: top - 60, left: left + 1000 });
+    let top = rect.top - containerRect.top + (rect.height / 2) - (tooltipHeight / 2);
+
+    if (top < 0) {
+      top = 10;
+    }
+    if (top + tooltipHeight > containerRect.height) {
+      top = containerRect.height - tooltipHeight - 10;
+    }
+    setTooltipPosition({ top, left });
     setHoveredOrder(order);
   };
 
@@ -88,15 +90,15 @@ const OrderPending = () => {
 
     let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, startPage + 4);
-    
+
     if (endPage - startPage < 4) {
       startPage = Math.max(1, endPage - 4);
     }
-    
+
     for (let i = startPage; i <= endPage; i++) {
       pageNumbers.push(i);
     }
-    
+
     return (
       <div className="flex items-center justify-between mt-4">
         <div>
@@ -113,7 +115,7 @@ const OrderPending = () => {
             >
               Trước
             </button>
-            
+
             {pageNumbers.map(number => (
               <button
                 key={number}
@@ -123,7 +125,7 @@ const OrderPending = () => {
                 {number}
               </button>
             ))}
-            
+
             <button
               onClick={() => changePendingPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
@@ -141,8 +143,8 @@ const OrderPending = () => {
     if (filtersPending.sortBy !== field) {
       return <ArrowUpDown className="w-4 h-4 ml-1" />;
     }
-    return filtersPending.sortAscending ? 
-      <ArrowUp className="w-4 h-4 ml-1" /> : 
+    return filtersPending.sortAscending ?
+      <ArrowUp className="w-4 h-4 ml-1" /> :
       <ArrowDown className="w-4 h-4 ml-1" />;
   };
 
@@ -152,18 +154,18 @@ const OrderPending = () => {
     }
 
     return (
-      <div className="fixed z-50 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 p-4" 
-           style={{ 
-             top: `${tooltipPosition.top}px`, 
-             left: `${tooltipPosition.left}px`,
-             maxHeight: '400px',
-             overflowY: 'auto'
-           }}>
+      <div className="absolute z-50 w-96 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 p-4"
+        style={{
+          top: `${tooltipPosition.top}px`,
+          left: `${tooltipPosition.left}px`,
+          maxHeight: '400px',
+          overflowY: 'auto'
+        }}>
         <div className="flex items-center mb-3">
           <ShoppingBag className="w-5 h-5 text-blue-600 mr-2" />
           <h3 className="text-lg font-semibold text-gray-900">Chi tiết đơn hàng</h3>
         </div>
-        
+
         <div className="space-y-2">
           <div className="grid grid-cols-2 gap-2 mb-3">
             <div>
@@ -183,7 +185,7 @@ const OrderPending = () => {
               <p className="text-sm text-gray-900">{order.notes || 'Không có'}</p>
             </div>
           </div>
-          
+
           <div className="border-t border-gray-200 pt-3">
             <h4 className="text-sm font-semibold text-gray-700 mb-2">Sản phẩm:</h4>
             {order.orderDetails.map((item, index) => (
@@ -207,7 +209,7 @@ const OrderPending = () => {
               </div>
             ))}
           </div>
-          
+
           {order.appliedVouchers && order.appliedVouchers.length > 0 && (
             <div className="border-t border-gray-200 pt-3">
               <h4 className="text-sm font-semibold text-gray-700 mb-2">Vouchers áp dụng:</h4>
@@ -218,7 +220,7 @@ const OrderPending = () => {
               ))}
             </div>
           )}
-          
+
           <div className="border-t border-gray-200 pt-3 mt-2">
             <div className="flex justify-between text-sm font-semibold">
               <span className="text-gray-700">Tổng cộng:</span>
@@ -234,9 +236,9 @@ const OrderPending = () => {
   const renderEmptyRows = () => {
     const currentOrders = ordersPending.length;
     const rowsToRender = paginationPending.pageSize - currentOrders;
-    
+
     if (rowsToRender <= 0) return null;
-    
+
     return Array(rowsToRender).fill(0).map((_, index) => (
       <tr key={`empty-${index}`} className="h-14"> {/* Chiều cao tương đương với một hàng có dữ liệu */}
         <td colSpan="6" className="px-6 py-4 whitespace-nowrap border-b border-gray-200"></td>
@@ -245,8 +247,8 @@ const OrderPending = () => {
   };
 
   return (
-    <div className="container mx-auto" ref={containerRef}>
-      
+    <div className="container mx-auto relative" ref={containerRef}>
+
       <div className="mb-6 bg-white p-4 rounded-lg shadow">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="relative">
@@ -261,7 +263,7 @@ const OrderPending = () => {
               className="border border-gray-300 rounded-md py-2 pl-10 pr-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          
+
           <div className="relative">
             <RangePicker
               onChange={handleDateChange}
@@ -278,13 +280,13 @@ const OrderPending = () => {
           </div>
         </div>
       </div>
-      
+
       {error && (
         <div className="bg-red-50 text-red-700 p-3 rounded-md mb-4">
           {error}
         </div>
       )}
-      
+
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -293,7 +295,7 @@ const OrderPending = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Mã đơn hàng
                 </th>
-                <th 
+                <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSortChange('orderDate')}
                 >
@@ -302,7 +304,7 @@ const OrderPending = () => {
                     <SortIcon field="orderDate" />
                   </div>
                 </th>
-                <th 
+                <th
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                   onClick={() => handleSortChange('totalAmount')}
                 >
@@ -373,10 +375,10 @@ const OrderPending = () => {
             </tbody>
           </table>
         </div>
-        
+
         <div className="px-6 py-4 border-t border-gray-200">
           <Pagination />
-          
+
           <div className="mt-2 flex items-center">
             <span className="mr-2 text-sm text-gray-700">Hiển thị:</span>
             <select
@@ -393,7 +395,7 @@ const OrderPending = () => {
           </div>
         </div>
       </div>
-      
+
       {hoveredOrder && <OrderDetailsTooltip order={hoveredOrder} />}
     </div>
   );

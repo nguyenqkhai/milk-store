@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useOrderStore } from './OrderStore';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -24,7 +24,6 @@ const OrderConfirmed = () => {
     error,
     paginationConfirmed,
     filtersConfirmed,
-    fetchOrdersConfirmed,
     updateConfirmedFilters,
     changeConfirmedPage,
     changeConfirmedPageSize,
@@ -34,10 +33,6 @@ const OrderConfirmed = () => {
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   
   const containerRef = useRef(null);
-
-  useEffect(() => {
-    // fetchOrdersConfirmed();
-  }, []);
 
   const handleSearchChange = (e) => {
     const searchTerm = e.target.value;
@@ -67,18 +62,25 @@ const OrderConfirmed = () => {
   };
 
   const handleMouseEnter = (order, e) => {
+    if (!containerRef.current) return;
+    console.log('Mouse enter', order);
     const rect = e.currentTarget.getBoundingClientRect();
     const containerRect = containerRef.current.getBoundingClientRect();
-    let top = rect.bottom - containerRect.top;
-    let left = rect.left - containerRect.left;
+    const tooltipWidth = 384; // w-96 = 24rem = 384px
     const tooltipHeight = 400;
-    const spaceBelow = containerRect.bottom - rect.bottom;
-    
-    if (spaceBelow < tooltipHeight && rect.top - containerRect.top > tooltipHeight) {
-      top = rect.top - containerRect.top - tooltipHeight;
+    let left = rect.left - containerRect.left + rect.width + 10;
+    if (left + tooltipWidth > containerRect.width) {
+      left = rect.left - containerRect.left - tooltipWidth - 10;
     }
-    
-    setTooltipPosition({ top: top - 60, left: left + 1000 });
+    let top = rect.top - containerRect.top + (rect.height / 2) - (tooltipHeight / 2);
+
+    if (top < 0) {
+      top = 10;
+    }
+    if (top + tooltipHeight > containerRect.height) {
+      top = containerRect.height - tooltipHeight - 10;
+    }
+    setTooltipPosition({ top, left });
     setHoveredOrder(order);
   };
 
