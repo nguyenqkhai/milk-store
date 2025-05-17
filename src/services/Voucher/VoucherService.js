@@ -35,12 +35,14 @@ class VoucherService {
         }
     }
 
-    static async getVouchersUser(SearchTerm = null) {
+    static async getVouchersUser({pageNumber = 1, pageSize = 10, SearchTerm = null} = {}) {
         try {
             const headers = {
                 'Content-Type': 'application/json',
             };
             const params = {
+                pageNumber,
+                pageSize,
                 SearchTerm,
             };
             const response = await api.get('/Voucher/customer-vouchers',params , headers);
