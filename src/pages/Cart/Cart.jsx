@@ -42,7 +42,7 @@ const Cart = () => {
     setTimeout(() => {
       fetchItems();
     }
-    , 200);
+    , 300);
   }, [currentPage, paginationMeta.pageSize]);
 
   // useEffect(() => {
