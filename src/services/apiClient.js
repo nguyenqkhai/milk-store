@@ -24,9 +24,9 @@ apiClient.interceptors.request.use(
 
 // xử lý khi token hết hạn
 const handleExpiredToken = () => {
-    CookieService.removeAuthTokens();
-    const logoutEvent = new Event('auth:logout');
-    window.dispatchEvent(logoutEvent);
+    CookieService.removeAccessTokens();
+    const tokenExpireEvent = new Event('auth:tokenExpire');
+    window.dispatchEvent(tokenExpireEvent);
 };
 
 apiClient.interceptors.response.use(

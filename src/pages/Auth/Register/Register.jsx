@@ -31,7 +31,7 @@ function Register() {
     try {
       const response = await sendOtp(emailAddress);
 
-      if (response.status === 200) {
+      if (response.success) {
         message.success('Mã OTP đã được gửi đến email của bạn!');
         setEmail(emailAddress);
         setOtpModalVisible(true);
@@ -105,7 +105,7 @@ function Register() {
 
       const response = await register(requestData);
 
-      if (response.status === 200) {
+      if (response.success) {
         message.success('Đăng ký thành công!');
         setOtpModalVisible(false);
         navigate('/dang-nhap');

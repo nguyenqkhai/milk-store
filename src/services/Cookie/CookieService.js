@@ -51,6 +51,10 @@ class CookieService {
         return !!this.getAccessToken() && !!this.getRefreshToken();
     }
 
+    removeAccessTokens() {
+        Cookies.remove(TOKEN_KEYS.ACCESS_TOKEN);
+    }
+
     /**
      * Xóa tất cả auth tokens khỏi cookies (dùng khi logout)
      */
