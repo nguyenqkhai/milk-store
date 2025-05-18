@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import ProductService from '../../services/Product/ProductServices';
 import CategoryService from '../../services/Category/CategoryServices';
-import CartService from '@services/Cart/cartService';
+import CartService from '@services/Cart/CartService';
 /**
  * ProductStore - Quản lý trạng thái toàn cục cho các sản phẩm
  * Sử dụng Zustand để tạo store đơn giản và hiệu quả
