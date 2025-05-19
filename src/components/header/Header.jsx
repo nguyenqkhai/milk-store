@@ -164,7 +164,7 @@ const Header = () => {
                     onClick={() => setShowUserMenu(false)}
                   >
                     <FiTag className="mr-2 h-4 w-4" />
-                      Mã giảm giá
+                    Mã giảm giá
                   </Link>
                   <button
                     onClick={handleLogout}
@@ -179,15 +179,14 @@ const Header = () => {
 
             {/* Shopping cart button - only display when authenticated */}
             {isAuthenticated && (
-              <button
-                className={`${headerClass.button} flex cursor-pointer items-center gap-2`}
-              >
-                <Link to='/gio-hang'>
-                  <FiShoppingCart className='h-5 w-5' />
-                  <span className='hidden sm:inline'>Giỏ hàng</span>
-                  <span className='inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs text-blue-700'>
-                    {countItems}
-                  </span>
+              <button className={`${headerClass.button} group relative flex cursor-pointer items-center gap-2 p-2 rounded-md  transition-colors`}>
+                <Link to='/gio-hang' className="flex items-center">
+                  <FiShoppingCart className="h-5 w-5 text-white " />
+                  {countItems > 0 && (
+                    <span className="absolute -top-1 -right-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-xs font-medium text-white ring-2 ring-white">
+                      {countItems}
+                    </span>
+                  )}
                 </Link>
               </button>
             )}

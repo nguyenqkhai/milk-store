@@ -9,7 +9,7 @@ import { Carousel } from 'antd'
 import { IoHome } from 'react-icons/io5'
 import { FaMotorcycle } from 'react-icons/fa'
 import { IoIosWifi } from 'react-icons/io'
-import { MdLaptopMac } from 'react-icons/md'
+import { LuMilk } from "react-icons/lu";
 import { IoChatbubbleEllipsesSharp } from 'react-icons/io5'
 import { MdSecurity } from 'react-icons/md'
 import { MdPolicy } from 'react-icons/md'
@@ -26,7 +26,7 @@ const utilities = [
     label: 'Wifi miễn phí',
   },
   {
-    icon: <MdLaptopMac className='mb-2 size-15 text-red-500' />,
+    icon: <LuMilk className='mb-2 size-15 text-red-500' />,
     label: (
       <>
         Xem và trải nghiệm
@@ -75,9 +75,9 @@ const utilities = [
   },
 ]
 const urlImg = [
-  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1745990380/milkstore_qildau.jpg", alt: 'image1' },
-  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1745990380/milkstore_qildau.jpg", alt: 'image2' },
-  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1745990380/milkstore_qildau.jpg", alt: 'image3' },
+  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1747588508/nguon-hang-sua_mpxzom.webp", alt: 'image1' },
+  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1747588506/anh-mo-ta_ssgavh.jpg", alt: 'image2' },
+  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1747588500/anh_cua_hang_sua_ctfahi.jpg", alt: 'image3' },
 ]
 const Contact = () => {
   const scrollToSection = () => {
