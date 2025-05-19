@@ -1,12 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Carousel } from 'antd'
 import { FaLongArrowAltRight } from "react-icons/fa"
 import { HiOutlineArrowRight } from "react-icons/hi2"
+import { Link } from 'react-router-dom'
+import ProductService from '@services/Product/ProductServices'
 
 const urlImg = [
   { img: "https://res.cloudinary.com/dvxnesld4/image/upload/v1745991785/a2111df8-e321-4ba8-b520-f91b80d048bb_nshigg.png", alt: 'image1' },
-  { img: "https://res.cloudinary.com/dvxnesld4/image/upload/v1745991785/a2111df8-e321-4ba8-b520-f91b80d048bb_nshigg.png", alt: 'image2' },
-  { img: "https://res.cloudinary.com/dvxnesld4/image/upload/v1745991785/a2111df8-e321-4ba8-b520-f91b80d048bb_nshigg.png", alt: 'image3' },
+  { img: "https://d8um25gjecm9v.cloudfront.net/store-front-cms/Hero_1_5cbd9c8358.webp", alt: 'image2' },
+  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1747592344/f91ff7ce-ff16-4c19-8cd9-fee9046a7406_iydza5.jpg", alt: 'image3' },
 ]
 
 const awards = [
@@ -34,7 +36,7 @@ const awards = [
 ];
 const imagePairs = [
 
-  { img: "https://d8um25gjecm9v.cloudfront.net/store-front-cms/New_2_51cba411a8.webp", alt: 'Promotion 1' },
+  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1747605726/%C3%A1nhua_n7h6kg.png", alt: 'Promotion 1' },
   { img: "https://d8um25gjecm9v.cloudfront.net/store-front-cms/New_2_51cba411a8.webp", alt: 'Promotion 2' }
 
 ];
@@ -42,7 +44,7 @@ const promotion = [
   { img: "https://d8um25gjecm9v.cloudfront.net/store-front-cms/Cautien_2_4aef1fd870.webp", alt: "Promotion 1" },
   { img: "https://d8um25gjecm9v.cloudfront.net/store-front-cms/Cautien_3_f42cd34695.webp", alt: "Promotion 2" },
   { img: "https://d8um25gjecm9v.cloudfront.net/store-front-cms/Cautien_5_18c522f89e.webp", alt: "Promotion 3" },
-  { img: "https://d8um25gjecm9v.cloudfront.net/store-front-cms/Cautien_3_f42cd34695.webp", alt: "Promotion 2" },
+  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1747605194/b%C3%B2_cyqsof.jpg", alt: "Promotion 2" },
 ]
 
 const action = [
@@ -84,25 +86,89 @@ const horizontalImages = [
 
 const Home = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch products with default parameters
+        const response = await ProductService.getProducts({
+          pageNumber: 1,
+          pageSize: 10,
+          sortBy: 'ProductName',
+          sortAscending: true
+        });
+
+        setProducts(response.products);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setError('Không thể tải sản phẩm. Vui lòng thử lại sau.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
     <div className='flex  flex-col  bg-gradient-to-b from-blue-50 to-white'>
-      <div className='w-full h-full'>
+      <div className='w-full h-full cursor-pointer'>
         <Carousel
           arrows
           infinite={true}
           autoplay={true}
           autoplaySpeed={3000}
         >
-          {urlImg.map((item, index) => (
-            <div key={index}>
-              <img
-                src={item.img}
-                alt={item.alt}
-                className='h-145 w-full object-cover'
-              />
+          {/* Banner 1 */}
+          <div className="relative">
+            <img
+              src={urlImg[0].img}
+              alt={urlImg[0].alt}
+              className='h-145 w-full object-cover'
+            />
+            <div className="absolute bottom-15 left-1/2 transform -translate-x-1/2 text-center">
+              <p className="text-white text-8xl md:text-4xl font-normal bg-opacity-50 px-6 py-3 rounded-lg">
+                Luôn vắt tươi ngon <br />
+                <span className='text-white font-light text-3xl italic'>từ 5 trang trại xanh toàn quốc</span>
+              </p>
             </div>
-          ))}
+          </div>
+
+          {/* Banner 2 */}
+          <div className="relative">
+            <img
+              src={urlImg[1].img}
+              alt={urlImg[1].alt}
+              className='h-145 w-full object-cover'
+            />
+            <div className="absolute bottom-15 left-1/2 transform -translate-x-1/2 text-center">
+              <p className="text-white text-8xl md:text-4xl font-normal bg-opacity-50 px-6 py-3 rounded-lg">
+                Luôn sạch tinh khiết <br />
+                <span className='text-white font-light text-3xl italic'>từ 2 nhà máy công nghệ hàng đầu</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Banner 3 */}
+          <div className="relative">
+            <img
+              src={urlImg[2].img}
+              alt={urlImg[2].alt}
+              className='h-145 w-full object-cover'
+            />
+            <div className="absolute bottom-15 left-1/2 transform -translate-x-1/2 text-center">
+              <p className="text-white text-8xl md:text-4xl font-normal bg-opacity-50 px-6 py-3 rounded-lg">
+                Milkstore ưu đãi tháng 5 <br />
+                <span className='text-white font-light text-3xl italic'>xem ngay</span>
+              </p>
+            </div>
+          </div>
         </Carousel>
       </div>
       <div className='grid grid-cols-5 bg-blue-900 md:grid-cols-5'>
@@ -126,7 +192,9 @@ const Home = () => {
           <div className="text-[#087E30] text-center bg-[#E1F29D] p-8 rounded-lg">
             <h2 className='text-8xl font-bold mb-4 text-shadow'>Mới! <br />Mới! <br />Mới!</h2>
             <div className='text-xl w-80 text-shadow flex justify-between items-center cursor-pointer'>
-              <span className='font-mono text-blue-900'>Sữa tươi thanh trùng</span>
+              <Link to="/san-pham/P020" className='font-mono text-blue-900 '>
+                Sữa tươi thanh trùng
+              </Link>
               <HiOutlineArrowRight className=' text-blue-900 mt-2 h-5 w-8 ' />
             </div>
             <hr className='w-80 mt-1 px-2 border-blue-900' />
@@ -138,23 +206,58 @@ const Home = () => {
       <div className='mt-10'>
         <div className='w-full flex flex-col items-center justify-center p-10 text-blue-900'>
           <p className='text-6xl font-semibold'>Mời bạn sắm sửa</p>
-          
+
           {/* Horizontal Scrollable Carousel */}
           <div className='w-full mt-12 overflow-x-auto scrollbar-hide'>
-            <div className='flex space-x-6 pb-4 min-w-max'>
-              {horizontalImages.map((item, index) => (
-                <div 
-                  key={index} 
-                  className='flex-none w-64 h-64 rounded-lg cursor-pointer overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300'
-                >
-                  <img 
-                    src={item.img} 
-                    alt={item.alt} 
-                    className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
-                  />
-                </div>
-              ))}
-            </div>
+            {loading ? (
+              <div className='flex justify-center items-center h-64'>
+                <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500'></div>
+              </div>
+            ) : error ? (
+              <div className='flex justify-center items-center h-64 text-red-500'>
+                {error}
+              </div>
+            ) : (
+              <div className='flex space-x-6 pb-4 min-w-max'>
+                {products.length > 0 ? (
+                  products.map((product) => (
+                    <Link
+                      key={product.id}
+                      to={`/san-pham/${product.id}`}
+                      className='flex-none w-64 h-64 rounded-lg cursor-pointer overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300'
+                    >
+                      <div className='relative h-64'>
+                        <img
+                          src={product.thumbnail}
+                          alt={product.title}
+                          className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
+                        />
+                        {product.discountPercentage > 0 && (
+                          <div className='absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-md text-sm font-bold'>
+                            -{product.discountPercentage}%
+                          </div>
+                        )}
+                      </div>
+
+                    </Link>
+                  ))
+                ) : (
+                  // Fallback to static images if no products are available
+                  horizontalImages.map((item, index) => (
+                    <div
+                      key={index}
+                      className='flex-none w-64 h-64 rounded-lg cursor-pointer overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300'
+                    >
+                      <img
+                        src={item.img}
+                        alt={item.alt}
+                        className='w-full h-full object-cover hover:scale-105 transition-transform duration-300'
+                      />
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
 
           <div className='w-full flex justify-center'>
@@ -164,10 +267,10 @@ const Home = () => {
       </div>
 
       <div className='mt-10'>
-      <div className='w-full flex justify-between p-10 text-blue-900'>
+        <div className='w-full flex justify-between p-10 text-blue-900'>
           <p className='text-6xl font-semibold'>Cầu tiến là <br /> bí quyết</p>
           <p className='text-xl p-4 italic'>
-            Không ngừng tìm kiếm, ứng dụng công nghệ sản xuất tiên <br/> tiến nhất để đáp ứng những tiêu chuẩn khắt khe nhất của <br/> chính MilkStore.
+            Không ngừng tìm kiếm, ứng dụng công nghệ sản xuất tiên <br /> tiến nhất để đáp ứng những tiêu chuẩn khắt khe nhất của <br /> chính MilkStore.
           </p>
         </div>
         <div className='grid grid-cols-4 overflow-x-hidden'>
