@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import CookieService from '../services/Cookie/CookieService';
 import AuthService from '../services/Auth/AuthServices';
+import { message } from 'antd';
 
 const AuthContext = createContext();
 
@@ -165,13 +166,16 @@ export const AuthProvider = ({ children }) => {
             const response = await AuthService.sendOtp(email);
             return {
                 success: true,
-                data: response.data
+                data: response.data,
+                statusId: response.statusCode,
+                message: response.data?.message || 'Mã OTP đã được gửi thành công'
             };
         } catch (error) {
             console.error('Lỗi gửi OTP:', error);
             return {
                 success: false,
-                error: error.response?.data?.message || 'Có lỗi xảy ra khi gửi mã OTP'
+                error: error.response?.data?.message || 'Có lỗi xảy ra khi gửi mã OTP',
+                statusId: error.response?.statusCode,
             };
         }
     };

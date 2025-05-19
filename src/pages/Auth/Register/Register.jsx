@@ -53,6 +53,7 @@ function Register() {
 
         return true;
       }
+      message.error(response.error);
       return false;
     } catch (error) {
       console.error('Lỗi gửi OTP:', error);
