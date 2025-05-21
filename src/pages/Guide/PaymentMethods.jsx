@@ -83,7 +83,7 @@ const PaymentMethods = () => {
                         </svg>
                       </div>
                       <p className="text-xs mt-1 text-center text-gray-600">PayPal</p>
-                    </div>
+                    </div>  
                   </div>
                 </div>
                 

@@ -1,30 +1,52 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, message, Divider } from 'antd';
 import { FiLock, FiShield } from 'react-icons/fi';
-import {useAuth} from '../../../context/AuthContext'
+import AuthService from '../../../services/Auth/AuthServices';
 
 const PasswordChangeForm = () => {
-  const { changePassword } = useAuth();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
   const handlePasswordChange = async (values) => {
     setLoading(true);
     try {
-      const { currentPassword, newPassword } = values;
+      const { currentPassword, newPassword, confirmPassword } = values;
       
-      // Gọi API đổi mật khẩu
-      const result = await changePassword(currentPassword, newPassword);
+      const response = await AuthService.changePassword(
+        currentPassword, 
+        newPassword, 
+        confirmPassword
+      );
       
-      if (result.success) {
+      if (response && response.data && response.status === 200) {
         message.success('Đổi mật khẩu thành công!');
         form.resetFields();
       } else {
-        message.error(result.error || 'Không thể đổi mật khẩu. Vui lòng thử lại sau.');
+        message.error('Không thể đổi mật khẩu. Vui lòng thử lại sau.');
       }
     } catch (error) {
       console.error('Error changing password:', error);
-      message.error('Không thể đổi mật khẩu. Vui lòng thử lại sau.');
+      
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            message.error('Mật khẩu hiện tại không đúng hoặc thông tin không hợp lệ');
+            break;
+          case 401:
+            message.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại');
+            break;
+          case 404:
+            message.error('Không tìm thấy thông tin người dùng');
+            break;
+          case 500:
+            message.error('Lỗi server. Vui lòng thử lại sau');
+            break;
+          default:
+            message.error('Không thể đổi mật khẩu. Vui lòng thử lại sau');
+        }
+      } else {
+        message.error('Không thể kết nối đến server. Vui lòng thử lại sau');
+      }
     } finally {
       setLoading(false);
     }
@@ -47,7 +69,6 @@ const PasswordChangeForm = () => {
           label="Mật khẩu hiện tại"
           rules={[
             { required: true, message: 'Vui lòng nhập mật khẩu hiện tại' },
-            { min: 6, message: 'Mật khẩu phải có ít nhất 6 ký tự' }
           ]}
         >
           <Input.Password 

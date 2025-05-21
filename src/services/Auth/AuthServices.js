@@ -175,6 +175,33 @@ class AuthService {
             throw error;
         }
     }
+
+    /**
+     * Đổi mật khẩu người dùng đã đăng nhập
+     * @param {string} currentPassword - Mật khẩu hiện tại
+     * @param {string} newPassword - Mật khẩu mới
+     * @param {string} confirmNewPassword - Xác nhận mật khẩu mới
+     * @returns {Promise} Promise với kết quả đổi mật khẩu
+     */
+    async changePassword(currentPassword, newPassword, confirmNewPassword) {
+        try {
+            const response = await api.post(
+                '/Auth/change-password',
+                {
+                    currentPassword: currentPassword,
+                    newPassword: newPassword,
+                    confirmNewPassword: confirmNewPassword
+                },
+                {
+                    'Content-Type': 'application/json-patch+json'
+                }
+            );
+            return response;
+        } catch (error) {
+            console.error('Error changing password:', error);
+            throw error;
+        }
+    }
 }
 
 export default new AuthService();
