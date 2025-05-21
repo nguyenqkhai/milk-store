@@ -1,20 +1,17 @@
-import shipper from '/src/assets/shipper.webp'
-import bgcity from '/src/assets/bgcity5.jpg'
-import milkstore from '/src/assets/store2.png'
-import { MdLocalPhone } from 'react-icons/md'
-import { MdEmail } from 'react-icons/md'
-import { IoLocationSharp } from 'react-icons/io5'
-import { FaCalendarAlt } from 'react-icons/fa'
 import { Carousel } from 'antd'
-import { IoHome } from 'react-icons/io5'
-import { FaMotorcycle } from 'react-icons/fa'
+import { FaCalendarAlt, FaMotorcycle } from 'react-icons/fa'
 import { IoIosWifi } from 'react-icons/io'
-import { LuMilk } from "react-icons/lu";
-import { IoChatbubbleEllipsesSharp } from 'react-icons/io5'
-import { MdSecurity } from 'react-icons/md'
-import { MdPolicy } from 'react-icons/md'
-import { MdPayment } from 'react-icons/md'
+import {
+  IoChatbubbleEllipsesSharp,
+  IoHome,
+  IoLocationSharp,
+} from 'react-icons/io5'
+import { LuMilk } from 'react-icons/lu'
+import { MdLocalPhone, MdPayment, MdPolicy, MdSecurity } from 'react-icons/md'
 import { TbTruckDelivery } from 'react-icons/tb'
+import bgcity from '/src/assets/bgcity5.jpg'
+import shipper from '/src/assets/shipper.webp'
+import milkstore from '/src/assets/store2.png'
 
 const utilities = [
   {
@@ -75,9 +72,18 @@ const utilities = [
   },
 ]
 const urlImg = [
-  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1747588508/nguon-hang-sua_mpxzom.webp", alt: 'image1' },
-  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1747588506/anh-mo-ta_ssgavh.jpg", alt: 'image2' },
-  { img: "https://res.cloudinary.com/dwbcqjupj/image/upload/v1747588500/anh_cua_hang_sua_ctfahi.jpg", alt: 'image3' },
+  {
+    img: 'https://res.cloudinary.com/dwbcqjupj/image/upload/v1747588508/nguon-hang-sua_mpxzom.webp',
+    alt: 'image1',
+  },
+  {
+    img: 'https://res.cloudinary.com/dwbcqjupj/image/upload/v1747588506/anh-mo-ta_ssgavh.jpg',
+    alt: 'image2',
+  },
+  {
+    img: 'https://res.cloudinary.com/dwbcqjupj/image/upload/v1747588500/anh_cua_hang_sua_ctfahi.jpg',
+    alt: 'image3',
+  },
 ]
 const Contact = () => {
   const scrollToSection = () => {
@@ -93,15 +99,17 @@ const Contact = () => {
       style={{ backgroundImage: `url(${bgcity})` }}
     >
       {/* <div className="absolute inset-0 bg-white/60"></div> */}
-      <div className='absolute top-40 left-5 w-[95vw]'>
+      <div className='absolute top-40 left-10 w-[95vw]'>
         <div className='w-full'>
-          <h1 className='text-4xl font-bold'>HỆ THỐNG SHOWROOM MILKSTORE</h1>
+          <h1 className='text-4xl font-semibold'>
+            HỆ THỐNG SHOWROOM MILKSTORE
+          </h1>
           <h1 className='mt-2 text-xl font-semibold'>
             Địa điểm trải nghiệm và mua sắm sữa uống chất lượng
           </h1>
           <button
             onClick={scrollToSection}
-            className='mt-8 rounded-xl bg-blue-600 px-10 py-3 text-2xl font-semibold text-white transition hover:bg-blue-700'
+            className='text-md mt-8 rounded-xl bg-blue-600 px-10 py-3 font-semibold text-white transition hover:bg-blue-700'
           >
             XEM NGAY
           </button>
@@ -125,10 +133,9 @@ const Contact = () => {
       {/* <div className='absolute -mt-230 w-full'>
         <hr className='border-t-12 border-gray-700' />
       </div> */}
-      <div className='absolute top-[460px] left-0 right-0 z-1000'>
+      <div className='absolute top-[460px] right-0 left-0 z-1000'>
         <hr className='border-t-[8px] border-gray-700' />
       </div>
-      
       <div className='h-[70vh]' /> {/*Tạo khoảng trống để có cái để cuộn*/}
       <div
         id='target-section'
@@ -202,15 +209,15 @@ const Contact = () => {
             </div>
           </div>
         </div>
-        <div className='mt-6 flex w-full flex-col items-center px-6 mb-10'>
-          <h2 className='mb-6 text-5xl font-semibold text-blue-950'>
+        <div className='my-24 flex w-full flex-col items-center px-6'>
+          <h2 className='mb-16 text-4xl font-semibold text-blue-950'>
             CÁC TIỆN ÍCH TẠI SHOWROOM MILKSTORE
           </h2>
           <div className='grid grid-cols-4 gap-6 gap-y-8'>
             {utilities.map((item, index) => (
               <div
                 key={index}
-                className='flex flex-col items-center text-center text-xl font-medium text-blue-950'
+                className='flex flex-col items-center text-center text-lg font-medium text-blue-950'
               >
                 {item.icon}
                 {item.label}

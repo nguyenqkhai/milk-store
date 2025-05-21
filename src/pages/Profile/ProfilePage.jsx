@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Form, Input, DatePicker, Select, Button, message, Spin } from 'antd';
+import { Form, Input, DatePicker, Select, Button, message, Spin, Tabs } from 'antd';
 import { FiUser, FiPhone, FiMail, FiMapPin, FiCalendar, FiEdit } from 'react-icons/fi';
 import moment from 'moment';
+import PasswordChageForm from './components/PasswordChageForm'
+
+const { TabPane } = Tabs;
 
 const ProfilePage = () => {
   const { currentUser, updateUserFields } = useAuth();
@@ -10,14 +13,17 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [activeTab, setActiveTab] = useState('profile');
 
   const { Option } = Select;
 
   useEffect(() => {
     if (currentUser?.data) {
       setUserData(currentUser.data);
+      // console.log(currentUser)
       if (isEditing) {
         form.setFieldsValue({
+          // username: currentUser.data.username,
           surname: currentUser.data.surname,
           middleName: currentUser.data.middleName,
           firstName: currentUser.data.firstName,
@@ -85,6 +91,10 @@ const ProfilePage = () => {
               <h3 className="text-lg font-medium text-gray-800">Thông tin cá nhân</h3>
             </div>
             <div className="space-y-3">
+              {/* <div>
+                <p className="text-sm text-gray-500">Tên đăng nhập</p>
+                <p className="font-medium">{currentUser?.data?.username}</p>
+              </div> */}
               <div>
                 <p className="text-sm text-gray-500">Họ và tên</p>
                 <p className="font-medium">{fullName || 'Chưa cập nhật'}</p>
@@ -262,20 +272,45 @@ const ProfilePage = () => {
           <p className="text-gray-600 mt-1">{userData?.email || ''}</p>
           <p className="text-gray-500 mt-1">{userData?.phoneNumber || 'Chưa cập nhật số điện thoại'}</p>
 
-          {!isEditing && (
+         <div className='mt-4 flex flex-wrap gap-2 justify-center sm:justify-start'>
+         {!isEditing && activeTab === 'profile' && (
             <Button
               type="primary"
               icon={<FiEdit className="mr-1" />}
               onClick={() => setIsEditing(true)}
-              className="mt-4"
             >
               Chỉnh sửa thông tin
             </Button>
           )}
+
+          <Button
+            icon={<FiEdit className="mr-1" />}
+            onClick={() => {
+              setActiveTab('password');
+              setIsEditing(true);
+            }}
+            className={activeTab === 'password' ? 'bg-blue-50' : ''}
+          > 
+            Đổi mật khẩu
+          </Button>
+         </div>
         </div>
       </div>
 
-      {isEditing ? renderForm() : renderUserInfo()}
+      <Tabs activeKey={activeTab} onChange={(key) => {
+        setActiveTab(key);
+        if (key === 'profile') {
+          setIsEditing(false);
+        }
+      }}>
+        <TabPane tab='Thông tin cá nhân' key='profile'>
+          {isEditing ? renderForm() : renderUserInfo()}
+        </TabPane>
+
+        <TabPane tab='Đổi mật khẩu' key='password'>
+          <PasswordChageForm />
+        </TabPane>
+      </Tabs>
     </div>
   );
 };

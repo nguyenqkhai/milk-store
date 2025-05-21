@@ -2,8 +2,8 @@ import React, { useRef, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ProductCard from '../../Products/Components/ProductCard'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import ProductService from '../../../services/Product/ProductServices';
-import { useNavigate } from 'react-router-dom';
+import ProductService from '../../../services/Product/ProductServices'
+import { useNavigate } from 'react-router-dom'
 import LoadingState from '../../Products/Components/LoadingState'
 
 const RelatedProducts = ({ product, title = 'Sản phẩm liên quan' }) => {
@@ -39,9 +39,9 @@ const RelatedProducts = ({ product, title = 'Sản phẩm liên quan' }) => {
         const result = await ProductService.getProducts(queryParams)
 
         // Filter out the current product from related products
-        const filtered = result.products.filter(p =>
-          p.id !== product.id && p.id !== product.productid
-        ).slice(0, 8)
+        const filtered = result.products
+          .filter(p => p.id !== product.id && p.id !== product.productid)
+          .slice(0, 8)
 
         setRelatedProducts(filtered)
       } catch (error) {
@@ -55,7 +55,7 @@ const RelatedProducts = ({ product, title = 'Sản phẩm liên quan' }) => {
 
     fetchRelatedProducts()
   }, [product])
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   // Kiểm tra xem có thể cuộn không
   useEffect(() => {
@@ -67,10 +67,11 @@ const RelatedProducts = ({ product, title = 'Sản phẩm liên quan' }) => {
       setShowLeftArrow(container.scrollLeft > 20)
 
       // Hiển thị/ẩn nút cuộn phải
-      const isAtEnd = Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth - 10
+      const isAtEnd =
+        Math.ceil(container.scrollLeft + container.clientWidth) >=
+        container.scrollWidth - 10
       setShowRightArrow(!isAtEnd)
     }
-
 
     const container = scrollContainerRef.current
     if (container) {
@@ -87,23 +88,23 @@ const RelatedProducts = ({ product, title = 'Sản phẩm liên quan' }) => {
     }
   }, [relatedProducts])
 
-  const scroll = (direction) => {
+  const scroll = direction => {
     const container = scrollContainerRef.current
     if (!container) return
 
     const scrollAmount = container.clientWidth * 0.8
     container.scrollBy({
       left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth'
+      behavior: 'smooth',
     })
   }
 
-  const handleTouchStart = (e) => {
+  const handleTouchStart = e => {
     setTouchEnd(null)
     setTouchStart(e.targetTouches[0].clientX)
   }
 
-  const handleTouchMove = (e) => {
+  const handleTouchMove = e => {
     setTouchEnd(e.targetTouches[0].clientX)
   }
 
@@ -121,25 +122,25 @@ const RelatedProducts = ({ product, title = 'Sản phẩm liên quan' }) => {
     }
   }
 
-  const handleProductClick = (product) => {
-    sessionStorage.setItem('scrollPosition', window.scrollY);
+  const handleProductClick = product => {
+    sessionStorage.setItem('scrollPosition', window.scrollY)
 
     // Simplify navigation to just use the product ID as requested
     navigate(`/san-pham/${product.id}`, {
-      state: { product }
-    });
-  };
+      state: { product },
+    })
+  }
 
   if (loading) {
     return (
-      <div className="mb-8">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6">{title}</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className='mb-8'>
+        <h2 className='mb-6 text-2xl font-semibold text-gray-800'>{title}</h2>
+        <div className='grid grid-cols-2 gap-4 md:grid-cols-4'>
           {[1, 2, 3, 4].map(item => (
-            <div key={item} className="animate-pulse">
-              <div className="bg-gray-200 h-48 rounded-lg mb-2"></div>
-              <div className="bg-gray-200 h-4 rounded w-3/4 mb-2"></div>
-              <div className="bg-gray-200 h-4 rounded w-1/2"></div>
+            <div key={item} className='animate-pulse'>
+              <div className='mb-2 h-48 rounded-lg bg-gray-200'></div>
+              <div className='mb-2 h-4 w-3/4 rounded bg-gray-200'></div>
+              <div className='h-4 w-1/2 rounded bg-gray-200'></div>
             </div>
           ))}
         </div>
@@ -150,18 +151,21 @@ const RelatedProducts = ({ product, title = 'Sản phẩm liên quan' }) => {
   if (!relatedProducts || relatedProducts.length === 0) return null
 
   return (
-    <div className="mb-8 relative overflow-hidden">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">{title}</h2>
+    <div className='relative mt-12 mb-8 overflow-hidden'>
+      <div className='mb-6 flex items-center justify-between'>
+        <h2 className='text-2xl font-semibold text-gray-800'>{title}</h2>
       </div>
 
-      <div className="relative">
+      <div className='relative'>
         {/* Nút cuộn trái */}
         {showLeftArrow && relatedProducts.length > 4 && (
           <button
             onClick={() => scroll('left')}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md text-gray-700 border border-gray-200 hover:bg-gray-50 transition-opacity"
-            style={{ opacity: showLeftArrow ? 1 : 0, pointerEvents: showLeftArrow ? 'auto' : 'none' }}
+            className='absolute top-1/2 left-0 z-10 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-2 text-gray-700 shadow-md transition-opacity hover:bg-gray-50'
+            style={{
+              opacity: showLeftArrow ? 1 : 0,
+              pointerEvents: showLeftArrow ? 'auto' : 'none',
+            }}
           >
             <ChevronLeft size={20} />
           </button>
@@ -170,46 +174,49 @@ const RelatedProducts = ({ product, title = 'Sản phẩm liên quan' }) => {
         {/* Container với thanh cuộn ngang */}
         <div
           ref={scrollContainerRef}
-          className="flex overflow-x-auto scrollbar-hide pb-4 pt-2 px-2 snap-x scroll-pl-6"
+          className='scrollbar-hide flex snap-x scroll-pl-6 overflow-x-auto px-2 pt-2 pb-4'
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
             WebkitOverflowScrolling: 'touch',
-            scrollSnapType: 'x mandatory'
+            scrollSnapType: 'x mandatory',
           }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
           {/* Padding đầu tiên */}
-          <div className="flex-shrink-0 w-1 md:w-3"></div>
+          <div className='w-1 flex-shrink-0 md:w-3'></div>
 
           {relatedProducts.map((product, index) => (
             <div
               key={product.id}
-              className="flex-shrink-0 w-[45%] sm:w-[33%] md:w-[25%] lg:w-[20%] px-2 snap-start"
+              className='w-[45%] flex-shrink-0 snap-start px-2 sm:w-[33%] md:w-[25%] lg:w-[20%]'
               style={{
                 scrollSnapAlign: 'start',
-                animation: `fadeSlideIn 0.5s ease-out ${index * 0.05}s both`
+                animation: `fadeSlideIn 0.5s ease-out ${index * 0.05}s both`,
               }}
               onClick={() => handleProductClick(product)}
             >
-              <div className="h-full transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg bg-white rounded-lg overflow-hidden cursor-pointer">
+              <div className='h-full transform cursor-pointer overflow-hidden rounded-lg bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg'>
                 <ProductCard product={product} />
               </div>
             </div>
           ))}
 
           {/* Padding cuối cùng */}
-          <div className="flex-shrink-0 w-1 md:w-3"></div>
+          <div className='w-1 flex-shrink-0 md:w-3'></div>
         </div>
 
         {/* Nút cuộn phải */}
         {showRightArrow && relatedProducts.length > 4 && (
           <button
             onClick={() => scroll('right')}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md text-gray-700 border border-gray-200 hover:bg-gray-50 transition-opacity"
-            style={{ opacity: showRightArrow ? 1 : 0, pointerEvents: showRightArrow ? 'auto' : 'none' }}
+            className='absolute top-1/2 right-0 z-10 -translate-y-1/2 rounded-full border border-gray-200 bg-white p-2 text-gray-700 shadow-md transition-opacity hover:bg-gray-50'
+            style={{
+              opacity: showRightArrow ? 1 : 0,
+              pointerEvents: showRightArrow ? 'auto' : 'none',
+            }}
           >
             <ChevronRight size={20} />
           </button>
@@ -217,15 +224,15 @@ const RelatedProducts = ({ product, title = 'Sản phẩm liên quan' }) => {
       </div>
 
       {/* Hiệu ứng gradient làm mờ 2 bên */}
-      <div className="absolute top-16 bottom-0 left-0 w-8 bg-gradient-to-r from-white to-transparent pointer-events-none"></div>
-      <div className="absolute top-16 bottom-0 right-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
+      <div className='pointer-events-none absolute top-16 bottom-0 left-0 w-8 bg-gradient-to-r from-white to-transparent'></div>
+      <div className='pointer-events-none absolute top-16 right-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent'></div>
 
       {/* CSS cho hiệu ứng */}
-      <style jsx="true">{`
+      <style jsx='true'>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
         }
-        
+
         @keyframes fadeSlideIn {
           from {
             opacity: 0.5;

@@ -1,43 +1,39 @@
+import { message } from 'antd'
 import React, { useState } from 'react'
-import {
-  FiShoppingCart,
-  FiHeart,
-  FiShare2,
-  FiMinus,
-  FiPlus,
-} from 'react-icons/fi'
-import { useProductStore } from '../../Products/ProductStore';
-import { useAuth } from '../../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { message } from 'antd';
+import { FiMinus, FiPlus, FiShoppingCart } from 'react-icons/fi'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../../context/AuthContext'
+import { useProductStore } from '../../Products/ProductStore'
 
 const ProductInfo = ({ product }) => {
   const [quantity, setQuantity] = useState(1)
-  const { addCart } = useProductStore();
-  const { isAuthenticated } = useAuth();
-  const [shipping] = useState(20000);
-  const navigate = useNavigate();
+  const { addCart } = useProductStore()
+  const { isAuthenticated } = useAuth()
+  const [shipping] = useState(20000)
+  const navigate = useNavigate()
   const increaseQuantity = () => setQuantity(prev => prev + 1)
   const decreaseQuantity = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1))
   const handleAddToCart = () => {
     try {
       if (isAuthenticated) {
-        addCart(product.id, quantity);
-        navigate('/gio-hang');
-      }
-      else {
-        message.error("Vui lòng đăng nhập để mua sản phẩm");
+        addCart(product.id, quantity)
+        navigate('/gio-hang')
+      } else {
+        message.error('Vui lòng đăng nhập để mua sản phẩm')
       }
     } catch (error) {
-      console.error("Lỗi khi thêm vào giỏ hàng:", error);
+      console.error('Lỗi khi thêm vào giỏ hàng:', error)
     }
-  };
+  }
   const discountedPrice = product.discountPercentage
     ? Math.round(product.price * (1 - product.discountPercentage / 100))
     : product.price
 
   // Get dimensions from the product if available
-  const dimensions = product.dimensions && product.dimensions.length > 0 ? product.dimensions[0] : null
+  const dimensions =
+    product.dimensions && product.dimensions.length > 0
+      ? product.dimensions[0]
+      : null
 
   const buyNow = {
     items: [
@@ -59,8 +55,6 @@ const ProductInfo = ({ product }) => {
         </h1>
 
         <div className='flex items-center space-x-4'>
-        
-
           {/* Thông tin khác */}
           <span className='text-gray-500'>Mã SP: {product.sku}</span>
           <span className='text-gray-500'>|</span>
@@ -114,22 +108,25 @@ const ProductInfo = ({ product }) => {
         </div>
       </div>
 
-      <div className='flex flex-wrap gap-4'>
-        <button className='flex flex-1 items-center justify-center rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700' onClick={handleAddToCart}>
+      <div className='mt-12 flex flex-wrap gap-4'>
+        <button
+          className='flex flex-1 items-center justify-center rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700'
+          onClick={handleAddToCart}
+        >
           <FiShoppingCart className='mr-2' /> Thêm vào giỏ hàng
         </button>
-        <button onClick={() => navigate('/thanh-toan', { state: {
-            order: buyNow,
-            buyNow: true,
-        }})} 
-          className='flex flex-1 items-center justify-center rounded-lg bg-orange-500 px-6 py-3 font-medium text-white hover:bg-orange-600'>
+        <button
+          onClick={() =>
+            navigate('/thanh-toan', {
+              state: {
+                order: buyNow,
+                buyNow: true,
+              },
+            })
+          }
+          className='flex flex-1 items-center justify-center rounded-lg bg-orange-500 px-6 py-3 font-medium text-white hover:bg-orange-600'
+        >
           Mua ngay
-        </button>
-        <button className='flex h-12 w-12 items-center justify-center rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100'>
-          <FiHeart />
-        </button>
-        <button className='flex h-12 w-12 items-center justify-center rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100'>
-          <FiShare2 />
         </button>
       </div>
     </div>

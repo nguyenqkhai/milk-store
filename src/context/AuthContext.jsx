@@ -228,6 +228,28 @@ export const AuthProvider = ({ children }) => {
         };
     }, []);
 
+    const changePassword = async (currentPassword, newPassword) => {
+        try {
+            const response = await AuthService.changePassword(currentPassword, newPassword);
+            if (response.status === 200) {
+                message.success('Đổi mật khẩu thành công');
+                return { success: true };
+            }
+            message.error(response.data?.message);
+            return {
+                success: false,
+                error: response.data?.message
+            } 
+        } catch (error) {
+            console.error('Lỗi khi đổi mật khẩu:', error);
+            message.error(error.response?.data?.message);
+            return {
+                success: false,
+                error: error.response?.data?.message
+            };
+        }
+    }
+
     const value = {
         currentUser,
         isAuthenticated,
@@ -237,7 +259,8 @@ export const AuthProvider = ({ children }) => {
         register,
         sendOtp,
         verifyOtpAndRegister,
-        updateUserFields
+        updateUserFields,
+        changePassword,
     };
 
     return (

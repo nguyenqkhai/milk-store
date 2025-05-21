@@ -27,6 +27,7 @@ import ProfilePage from './pages/Profile/ProfilePage';
 import OrderHistory from './pages/Order/History';
 import Order from './pages/Order/Order';
 import Voucher from '@/pages/Voucher/Voucher';
+import PaymentMethods from './pages/Guide/PaymentMethods';
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
@@ -104,6 +105,7 @@ const AppRoutes = () => {
         <Route path='/chinh-sach-van-chuyen' element={<TransferPolicy />} />
         <Route path='/huong-dan-mua-hang' element={<PurchaseGuide />} />
         <Route path='/chinh-sach-doi-tra' element={<ReturnPolicy />} />
+        <Route path='/hinh-thuc-thanh-toan' element={<PaymentMethods/>}/>
         <Route path='/don-hang' element={
           <ProtectedRoute>
             <Order />
