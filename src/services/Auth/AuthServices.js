@@ -202,6 +202,58 @@ class AuthService {
             throw error;
         }
     }
+
+    /**
+     * Gửi yêu cầu đặt lại mật khẩu
+     * @param {string} email - Email của người dùng
+     * @returns {Promise} Promise với kết quả gửi yêu cầu
+     */
+    async forgotPassword(email) {
+        try {
+            const response = await api.public.post(
+                '/Auth/forgot-password',
+                { email: email },
+                {
+                    'Content-Type': 'application/json'
+                }
+            );
+            return response;
+        } catch (error) {
+            console.error('Error requesting password reset:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Đặt lại mật khẩu với token
+     * @param {string} token - Token xác thực từ email
+     * @param {string} newPassword - Mật khẩu mới
+     * @param {string} confirmPassword - Xác nhận mật khẩu mới
+     * @returns {Promise} Promise với kết quả đặt lại mật khẩu
+     */
+    async resetPassword(token, newPassword, confirmPassword) {
+        try {
+            console.log("Sending reset password request with token:", token);
+            const response = await api.public.post(
+                '/Auth/reset-password',
+                {
+                    token: token,
+                    newPassword: newPassword,
+                    confirmPassword: confirmPassword
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            console.log("Reset password response:", response);
+            return response;
+        } catch (error) {
+            console.error('Error resetting password:', error);
+            throw error;
+        }
+    }
 }
 
 export default new AuthService();
