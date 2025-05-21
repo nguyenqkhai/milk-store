@@ -51,9 +51,9 @@ export const AuthProvider = ({ children }) => {
             }
 
             if (updateFields.length !== updateValues.length) {
-                console.error('Mismatched arrays length:', { 
-                    fieldsLength: updateFields.length, 
-                    valuesLength: updateValues.length 
+                console.error('Mismatched arrays length:', {
+                    fieldsLength: updateFields.length,
+                    valuesLength: updateValues.length
                 });
                 return {
                     success: false,
@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }) => {
             }
 
             const response = await AuthService.updateInfo(patchData);
-            
+
             if (response.status === 200) {
                 await fetchUserInfo();
                 return { success: true, data: response.data };
@@ -211,7 +211,7 @@ export const AuthProvider = ({ children }) => {
             window.removeEventListener('auth:tokenExpire', handleAuthTokenExpire);
         };
     }, []);
-    
+
     useEffect(() => {
         if (!CookieService.hasAuthTokens()) return;
 
@@ -239,7 +239,7 @@ export const AuthProvider = ({ children }) => {
             return {
                 success: false,
                 error: response.data?.message
-            } 
+            }
         } catch (error) {
             console.error('Lỗi khi đổi mật khẩu:', error);
             message.error(error.response?.data?.message);
@@ -249,7 +249,53 @@ export const AuthProvider = ({ children }) => {
             };
         }
     }
-    
+
+    const forgotPassword = async (email) => {
+        try {
+            const response = await AuthService.forgotPassword(email);
+            if (response.status === 200) {
+                return {
+                    success: true,
+                    message: response.data?.message || 'Hướng dẫn đặt lại mật khẩu đã được gửi đến email của bạn'
+                };
+            }
+            return {
+                success: false,
+                error: response.data?.message || 'Có lỗi xảy ra khi gửi yêu cầu đặt lại mật khẩu'
+            };
+        } catch (error) {
+            console.error('Lỗi khi gửi yêu cầu đặt lại mật khẩu:', error);
+            return {
+                success: false,
+                error: error.response?.data?.message || 'Có lỗi xảy ra khi gửi yêu cầu đặt lại mật khẩu'
+            };
+        }
+    }
+
+    const resetPassword = async (token, newPassword, confirmPassword) => {
+        try {
+            console.log("AuthContext resetPassword called with token:", token);
+            const response = await AuthService.resetPassword(token, newPassword, confirmPassword);
+            console.log("AuthContext resetPassword response:", response);
+
+            if (response.status === 200) {
+                return {
+                    success: true,
+                    message: response.data?.message || 'Đặt lại mật khẩu thành công'
+                };
+            }
+            return {
+                success: false,
+                error: response.data?.message || 'Có lỗi xảy ra khi đặt lại mật khẩu'
+            };
+        } catch (error) {
+            console.error('Lỗi khi đặt lại mật khẩu:', error);
+            return {
+                success: false,
+                error: error.response?.data?.message || 'Có lỗi xảy ra khi đặt lại mật khẩu'
+            };
+        }
+    }
 
     const value = {
         currentUser,
@@ -262,6 +308,8 @@ export const AuthProvider = ({ children }) => {
         verifyOtpAndRegister,
         updateUserFields,
         changePassword,
+        forgotPassword,
+        resetPassword,
     };
 
     return (

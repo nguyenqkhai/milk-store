@@ -9,6 +9,8 @@ import {
 import Header from './components/header/Header';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register/Register';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import ResetPassword from './pages/Auth/ResetPassword';
 import Home from './pages/Home/Home';
 import Contact from './pages/Contact/Contact';
 import Products from './pages/Products/Products';
@@ -50,7 +52,7 @@ const ProtectedRoute = ({ children }) => {
 const AuthRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -58,17 +60,17 @@ const AuthRoute = ({ children }) => {
       </div>
     );
   }
-  
+
   if (isAuthenticated) {
     return <Navigate to={location.state?.from?.pathname || "/"} replace />;
   }
-  
+
   return children;
 };
 
 const Layout = ({ children }) => {
   const location = useLocation();
-  const hideHeaderRoutes = ['/dang-nhap', '/dang-ky', '/quen-mat-khau', '/not-found'];
+  const hideHeaderRoutes = ['/dang-nhap', '/dang-ky', '/quen-mat-khau', '/reset-password', '/not-found'];
 
   return (
     <>
@@ -94,7 +96,9 @@ const AppRoutes = () => {
             <Register />
           </AuthRoute>
         } />
-        
+        <Route path='/quen-mat-khau' element={<ForgotPassword />} />
+        <Route path='/reset-password' element={<ResetPassword />} />
+
         {/* Public routes */}
         <Route path='/' element={<Home />} />
         <Route path='/trang-chu' element={<Home />} />
@@ -138,7 +142,7 @@ const AppRoutes = () => {
             <Voucher />
           </ProtectedRoute>
         } />
-        
+
         {/* 404 route */}
         <Route path='*' element={<NotFound />} />
       </Routes>
