@@ -3,7 +3,6 @@ import api from "@services/apiClient";
 class CartService {
   static async fetchCartItems(PageNumber = 1, PageSize = 10) {
     try {
-
       const headers = {
         'Content-Type': 'application/json',
       }
@@ -38,6 +37,59 @@ class CartService {
     } catch (error) {
       console.error('Error fetching cart items:', error);
       return [];
+    }
+  }
+
+  static async fetchAllCartItems() {
+    try {
+      // Lấy tổng số sản phẩm trước để biết cần lấy bao nhiêu
+      const initialResponse = await api.get('/CartItem/get-list-cart-item', {
+        PageNumber: 1,
+        PageSize: 1
+      }, {
+        'Content-Type': 'application/json'
+      });
+
+      const totalCount = initialResponse.data.data.metadata.totalCount;
+
+      // Nếu không có sản phẩm nào, trả về mảng rỗng
+      if (totalCount === 0) {
+        return { items: [], metadata: { totalCount: 0 } };
+      }
+
+      // Lấy tất cả sản phẩm trong một lần gọi API
+      const response = await api.get('/CartItem/get-list-cart-item', {
+        PageNumber: 1,
+        PageSize: totalCount > 0 ? totalCount : 100 // Đảm bảo lấy tất cả sản phẩm
+      }, {
+        'Content-Type': 'application/json'
+      });
+
+      const cartItems = response.data.data.items.map(item => ({
+        id: item.id,
+        productId: item.productId,
+        name: item.getProductToCart.productName,
+        priceDefault: item.getProductToCart.productPriceIsDefault,
+        price: item.getProductToCart.productPriceIsActive,
+        quantity: item.quantity,
+        image: item.getProductToCart.productImgData,
+        size: item.size || "",
+        available: item.availableStock
+      }));
+
+      return {
+        items: cartItems,
+        metadata: {
+          totalCount: cartItems.length,
+          totalPages: 1,
+          pageSize: cartItems.length,
+          hasPrevious: false,
+          hasNext: false
+        }
+      };
+    } catch (error) {
+      console.error('Error fetching all cart items:', error);
+      return { items: [], metadata: { totalCount: 0 } };
     }
   }
 

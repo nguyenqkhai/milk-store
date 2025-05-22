@@ -27,7 +27,7 @@ const CartSummary = ({ subTotal, shipping, grandTotal, checkedItems }) => {
     navigate('/thanh-toan', { state: { order } });
   };
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white rounded-lg shadow p-6 h-full">
       <h2 className="text-xl font-semibold mb-6">Tóm tắt đơn hàng</h2>
       <div className="mb-4 text-sm">
         <span className="text-gray-600">Sản phẩm đã chọn: </span>

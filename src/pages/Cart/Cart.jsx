@@ -4,7 +4,6 @@ import CartItemsList from './Components/CartItemsList';
 import CartSummary from './Components/CartSummary';
 import EmptyCart from './Components/EmptyCart';
 import CartService from '@services/Cart/CartService';
-import Pagination from '@/pages/Products/Components/Pagination';
 import { message } from 'antd';
 import { setGlobalCartCount } from '@/hooks/useCart';
 
@@ -12,37 +11,22 @@ const Cart = () => {
   const [items, setItems] = useState([]);
   const [shipping] = useState(20000);
   const [subTotal, setSubTotal] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [paginationMeta, setPaginationMeta] = useState({
-    totalPages: 1,
-    pageSize: 2,
-    totalCount: 0,
-    hasPrevious: false,
-    hasNext: false
-  });
   const [checkedItems, setCheckedItems] = useState([]);
   const [itemCount, setItemCount] = useState(0);
 
   const fetchItems = async () => {
-    const { items, metadata } = await CartService.fetchCartItems(currentPage, paginationMeta.pageSize);
+    // Lấy tất cả sản phẩm trong giỏ hàng (không phân trang)
+    const { items, metadata } = await CartService.fetchAllCartItems();
     setItems(items);
     setItemCount(metadata.totalCount);
-    setPaginationMeta({
-      totalPages: metadata.totalPages,
-      pageSize: metadata.pageSize,
-      totalCount: metadata.totalCount,
-      hasPrevious: metadata.hasPrevious,
-      hasNext: metadata.hasNext
-    });
     setGlobalCartCount(metadata.totalCount);
   };
 
   useEffect(() => {
     setTimeout(() => {
       fetchItems();
-    }
-    , 300);
-  }, [currentPage, paginationMeta.pageSize]);
+    }, 300);
+  }, []);
 
   // useEffect(() => {
   //   console.log('items', items);
@@ -76,26 +60,14 @@ const Cart = () => {
     const { statusCode, message: apiMessage } = await CartService.deleteCartItem(itemId);
     if (statusCode === 200) {
       message.success(apiMessage);
-      // const updatedItems = items.filter(item => item.id !== itemId);
-      // setItems(updatedItems);
-      const newItems = await CartService.fetchCartItems(currentPage, paginationMeta.pageSize);
+      // Lấy lại tất cả sản phẩm sau khi xóa
+      const newItems = await CartService.fetchAllCartItems();
       setItems(newItems.items);
       setItemCount(newItems.metadata.totalCount);
-      setPaginationMeta({
-        totalPages: newItems.metadata.totalPages,
-        pageSize: newItems.metadata.pageSize,
-        totalCount: newItems.metadata.totalCount,
-        hasPrevious: newItems.metadata.hasPrevious,
-        hasNext: newItems.metadata.hasNext
-      });
       setGlobalCartCount(newItems.metadata.totalCount);
     } else {
       message.error(apiMessage);
     }
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
   };
 
   const handleCheckedItemsChange = (newChecked) => {
@@ -115,7 +87,7 @@ const Cart = () => {
         ) : (
           <div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-2" style={{ height: '450px' }}>
                 <CartItemsList
                   items={items}
                   itemCount={itemCount}
@@ -125,27 +97,17 @@ const Cart = () => {
                   onCheckedItemsChange={handleCheckedItemsChange}
                 />
               </div>
-              
-              <div className="lg:col-span-1">
-                <CartSummary 
-                  subTotal={subTotal} 
-                  shipping={shipping} 
+
+              <div className="lg:col-span-1" style={{ height: '450px' }}>
+                <CartSummary
+                  subTotal={subTotal}
+                  shipping={shipping}
                   grandTotal={grandTotal}
                   checkedItems={checkedItems}
                 />
               </div>
             </div>
-            <div className="mt-8">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={paginationMeta.totalPages}
-                onPageChange={handlePageChange}
-                itemsPerPage={paginationMeta.pageSize}
-                totalItems={paginationMeta.totalCount}
-                hasPrevious={paginationMeta.hasPrevious}
-                hasNext={paginationMeta.hasNext}
-              />
-            </div>
+
           </div>
         )}
       </div>
