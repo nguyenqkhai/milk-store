@@ -1,37 +1,41 @@
-import React from "react";
-import { FaCreditCard, FaMoneyBillWave } from "react-icons/fa";
+import React from 'react'
+import { FaCreditCard, FaMoneyBillWave } from 'react-icons/fa'
 
 const OrderSummary = ({ formData, paymentMethod }) => (
-  <div className="mb-4 bg-white rounded-xl shadow p-6">
-    <h2 className="text-2xl font-semibold mb-4 text-gray-800">Order Summary</h2>
-    <div className="bg-gray-50 rounded-lg p-4">
-      <div className="grid grid-cols-2 gap-4 text-sm">
+  <div className='mb-4 rounded-xl bg-white p-6 shadow'>
+    <h2 className='mb-4 text-2xl font-semibold text-gray-800'>
+      Tóm tắt đơn hàng
+    </h2>
+    <div className='rounded-lg bg-gray-50 p-4'>
+      <div className='grid grid-cols-2 gap-4 text-sm'>
         <div>
-          <p className="text-gray-800">Name:</p>
-          <p className="font-medium">{formData.firstName} {formData.lastName}</p>
+          <p className='text-gray-800'>Tên:</p>
+          <p className='font-medium'>
+            {formData.firstName} {formData.lastName}
+          </p>
         </div>
         <div>
-          <p className="text-gray-800">Email:</p>
-          <p className="font-medium">{formData.email}</p>
+          <p className='text-gray-800'>Email:</p>
+          <p className='font-medium'>{formData.email}</p>
         </div>
         <div>
-          <p className="text-gray-800">Shipping Address:</p>
-          <p className="font-medium">
+          <p className='text-gray-800'>Địa chỉ giao hàng:</p>
+          <p className='font-medium'>
             {formData.city}, {formData.state} {formData.zipCode}
           </p>
         </div>
         <div>
-          <p className="text-gray-800">Payment Method:</p>
-          <p className="font-medium flex items-center gap-2">
+          <p className='text-gray-800'>Phương thức thanh toán:</p>
+          <p className='flex items-center gap-2 font-medium'>
             {paymentMethod === 'credit' ? (
               <>
-                <FaCreditCard className="text-blue-500 text-lg" />
-                Credit Card
+                <FaCreditCard className='text-lg text-blue-500' />
+                Thẻ tín dụng
               </>
             ) : (
               <>
-                <FaMoneyBillWave className="text-green-500 text-lg" />
-                Cash on Delivery
+                <FaMoneyBillWave className='text-lg text-green-500' />
+                Thanh toán khi nhận hàng
               </>
             )}
           </p>
@@ -39,6 +43,6 @@ const OrderSummary = ({ formData, paymentMethod }) => (
       </div>
     </div>
   </div>
-);
+)
 
-export default OrderSummary;
+export default OrderSummary
