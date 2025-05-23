@@ -22,10 +22,10 @@ class PaymentService {
             const headers = {
                 'Content-Type': 'application/json-patch+json',
             }
-            params ={
+            params = {
                 orderId: params.orderId,
-                returnUrl: RETURN_URL | 'https://milk-store-h6ra.vercel.app/don-hang',
-                cancelUrl: CANCEL_URL | 'https://milk-store-h6ra.vercel.app/san-pham'
+                returnUrl: RETURN_URL || 'https://milk-store-h6ra.vercel.app/don-hang',
+                cancelUrl: CANCEL_URL || 'https://milk-store-h6ra.vercel.app/san-pham'
             }
             console.log('params', params);
             const response = await api.post('/Payos/create-payment', params, headers);
