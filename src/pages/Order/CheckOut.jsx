@@ -8,9 +8,6 @@ const Checkout = () => {
   const navigate = useNavigate()
   const [onPayOS, setOnPayOS] = useState(true)
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
     state: '',
     city: '',
     zipCode: '',
@@ -138,30 +135,6 @@ const Checkout = () => {
             <div className='space-y-4'>
               <div>
                 <label className='block text-sm font-medium text-gray-700'>
-                  Họ
-                </label>
-                <input
-                  type='text'
-                  name='firstName'
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  className='w-full rounded-lg border border-gray-300 px-4 py-2 transition focus:border-transparent focus:ring-1 focus:outline-none'
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700'>
-                  Email
-                </label>
-                <input
-                  type='email'
-                  name='email'
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className='w-full rounded-lg border border-gray-300 px-4 py-2 transition focus:border-transparent focus:ring-1 focus:outline-none'
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700'>
                   Tỉnh/Thành phố
                 </label>
                 <input
@@ -176,18 +149,6 @@ const Checkout = () => {
             <div className='space-y-4'>
               <div>
                 <label className='block text-sm font-medium text-gray-700'>
-                  Tên
-                </label>
-                <input
-                  type='text'
-                  name='lastName'
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  className='w-full rounded-lg border border-gray-300 px-4 py-2 transition focus:border-transparent focus:ring-1 focus:outline-none'
-                />
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700'>
                   Địa chỉ
                 </label>
                 <input
@@ -198,18 +159,21 @@ const Checkout = () => {
                   className='w-full rounded-lg border border-gray-300 px-4 py-2 transition focus:border-transparent focus:ring-1 focus:outline-none'
                 />
               </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700'>
-                  Mã bưu chính
-                </label>
-                <input
-                  type='text'
-                  name='zipCode'
-                  value={formData.zipCode}
-                  onChange={handleInputChange}
-                  className='w-full rounded-lg border border-gray-300 px-4 py-2 transition focus:border-transparent focus:ring-1 focus:outline-none'
-                />
-              </div>
+            </div>
+          </div>
+          
+          <div className='mt-4'>
+            <div>
+              <label className='block text-sm font-medium text-gray-700'>
+                Mã bưu chính
+              </label>
+              <input
+                type='text'
+                name='zipCode'
+                value={formData.zipCode}
+                onChange={handleInputChange}
+                className='w-full rounded-lg border border-gray-300 px-4 py-2 transition focus:border-transparent focus:ring-1 focus:outline-none'
+              />
             </div>
           </div>
 
