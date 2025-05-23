@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { AppstoreOutlined, MailOutlined, SettingOutlined } from '@ant-design/icons';
-import { Menu } from 'antd';
-import OrderHistory from './History';
-import OrderPending from './Pending';
-import OrderConfirmed from './Confirmed';
-import OrderShipping from './Shipping';
-import { useOrderStore } from './OrderStore';
+import React, { useEffect, useState } from 'react'
+import {
+  AppstoreOutlined,
+  MailOutlined,
+  SettingOutlined,
+} from '@ant-design/icons'
+import { Menu } from 'antd'
+import OrderHistory from './History'
+import OrderPending from './Pending'
+import OrderConfirmed from './Confirmed'
+import OrderShipping from './Shipping'
+import { useOrderStore } from './OrderStore'
 
 const items = [
   {
@@ -16,27 +20,27 @@ const items = [
   {
     label: 'Đã xác nhận',
     key: 'CONFIRMED',
-    icon: <AppstoreOutlined />
+    icon: <AppstoreOutlined />,
   },
   {
     label: 'Đang giao',
     key: 'SHIPPING',
-    icon: <SettingOutlined />
+    icon: <SettingOutlined />,
   },
   {
     label: 'Lịch sử đơn hàng',
     key: 'HISTORY',
-    icon: <SettingOutlined />
-  }
-];
+    icon: <SettingOutlined />,
+  },
+]
 
 const Order = () => {
   const {
     fetchOrdersShipping,
     fetchOrdersConfirmed,
     fetchOrdersHistory,
-    fetchOrdersPending
-  } = useOrderStore();
+    fetchOrdersPending,
+  } = useOrderStore()
   useEffect(() => {
     const loadAllOrders = async () => {
       try {
@@ -44,55 +48,64 @@ const Order = () => {
           fetchOrdersPending(),
           fetchOrdersConfirmed(),
           fetchOrdersShipping(),
-          fetchOrdersHistory()
-        ]);
-      } catch (error) {
+          fetchOrdersHistory(),
+        ])
+      } catch (error) {}
+    }
 
-      }
-    };
-
-    loadAllOrders();
-  }, [fetchOrdersPending, fetchOrdersConfirmed, fetchOrdersShipping, fetchOrdersHistory]);
-  const [current, setCurrent] = useState('PENDING');
+    loadAllOrders()
+  }, [
+    fetchOrdersPending,
+    fetchOrdersConfirmed,
+    fetchOrdersShipping,
+    fetchOrdersHistory,
+  ])
+  const [current, setCurrent] = useState('PENDING')
 
   const onClick = e => {
-    setCurrent(e.key);
-  };
+    setCurrent(e.key)
+  }
 
   const renderContent = () => {
     switch (current) {
       case 'PENDING':
-        return <OrderPending />;
+        return <OrderPending />
       case 'CONFIRMED':
-        return <OrderConfirmed />;
+        return <OrderConfirmed />
       case 'SHIPPING':
-        return <OrderShipping />;
+        return <OrderShipping />
       case 'HISTORY':
-        return <OrderHistory />;
+        return <OrderHistory />
       default:
-        return <OrderPending />;
-
+        return <OrderPending />
     }
-  };
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
       <Menu
         onClick={onClick}
         selectedKeys={[current]}
-        mode="horizontal"
+        mode='horizontal'
         items={items}
         style={{
           width: '100%',
           display: 'flex',
-          justifyContent: 'center'
+          justifyContent: 'center',
         }}
       />
-      <div style={{ padding: '20px', width: '100%', display: 'flex', justifyContent: 'center' }}>
+      <div
+        style={{
+          padding: '20px',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
         {renderContent()}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Order;
+export default Order
