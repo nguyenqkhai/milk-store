@@ -24,8 +24,8 @@ class PaymentService {
             }
             params ={
                 orderId: params.orderId,
-                returnUrl: RETURN_URL | 'http://localhost:5173/don-hang',
-                cancelUrl: CANCEL_URL | 'http://localhost:5173/san-pham'
+                returnUrl: RETURN_URL | 'https://milk-store-h6ra.vercel.app/don-hang',
+                cancelUrl: CANCEL_URL | 'https://milk-store-h6ra.vercel.app/san-pham'
             }
             console.log('params', params);
             const response = await api.post('/Payos/create-payment', params, headers);
