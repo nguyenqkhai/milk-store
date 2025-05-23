@@ -117,24 +117,41 @@ const ProductCard = ({ product }) => {
           {product.discountPercentage > 0 ? (
             <>
               <span className='text-lg font-bold text-red-600'>
-                {formatPrice(
-                  calculateDiscountedPrice(
-                    product.price,
-                    product.discountPercentage
-                  )
-                )}
+                {product.priceActive.toLocaleString()} đ
               </span>
               <span className='ml-2 text-xs text-gray-400 line-through'>
-                {formatPrice(product.price)}
+                {product.priceDefault.toLocaleString()} đ
+              </span>
+              <span className='ml-2 rounded-md bg-red-100 px-2 py-1 text-sm font-medium text-red-600'>
+                -{Math.round(product.discountPercentage)}%
               </span>
             </>
           ) : (
             <span className='text-lg font-bold text-gray-800'>
-              {formatPrice(product.price)}
+              {product.priceDefault.toLocaleString()} đ
             </span>
           )}
         </div>
       </div>
+      {/* <div className='rounded-lg bg-gray-50 p-4'>
+        {product.discountPercentage > 0 ? (
+          <div className='flex items-center'>
+            <span className='text-3xl font-bold text-blue-600'>
+              {product.priceActive.toLocaleString()} đ
+            </span>
+            <span className='ml-2 text-lg text-gray-400 line-through'>
+              {product.priceDefault.toLocaleString()} đ
+            </span>
+            <span className='ml-2 rounded-md bg-red-100 px-2 py-1 text-sm font-medium text-red-600'>
+              -{Math.round(product.discountPercentage)}%
+            </span>
+          </div>
+        ) : (
+          <span className='text-3xl font-bold text-gray-800'>
+            {product.priceDefault.toLocaleString()} đ
+          </span>
+        )}
+      </div> */}
 
       {/* Nút mua hàng */}
       <div className='mt-1 px-4 pt-0 pb-4'>

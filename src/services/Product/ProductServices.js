@@ -32,7 +32,8 @@ class ProductService {
                 title: item.productName,
                 description: item.description || '',
                 rating: item.rate || 0,
-                price: item.priceActive || item.priceDefault || 0,
+                priceActive: item.priceActive|| 0,
+                priceDefault: item.priceDefault || 0,
                 thumbnail: item.imageDTOs && item.imageDTOs.length > 0
                     ? item.imageDTOs[0].imageData
                     : 'https://via.placeholder.com/150',
@@ -80,7 +81,8 @@ class ProductService {
                 id: item.productid,
                 name: item.productName,
                 description: item.description || '',
-                price: item.priceActive || item.priceDefault || 0,
+                priceActive: item.priceActive  || 0,
+                priceDefault: item.priceDefault || 0,
                 images: item.imageDTOs?.map(img => ({
                     id: img.imageid,
                     url: img.imageData,
@@ -90,7 +92,6 @@ class ProductService {
                 thumbnail: item.imageDTOs && item.imageDTOs.length > 0
                     ? item.imageDTOs[0].imageData
                     : 'https://via.placeholder.com/150',
-                rating: 4.5, // Default rating
                 discountPercentage: item.priceDefault && item.priceActive && item.priceDefault > item.priceActive
                     ? Math.round(((item.priceDefault - item.priceActive) / item.priceDefault) * 100)
                     : 0,

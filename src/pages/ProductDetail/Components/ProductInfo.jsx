@@ -66,10 +66,10 @@ const ProductInfo = ({ product }) => {
         {product.discountPercentage > 0 ? (
           <div className='flex items-center'>
             <span className='text-3xl font-bold text-blue-600'>
-              {discountedPrice.toLocaleString()} đ
+              {product.priceActive.toLocaleString()} đ
             </span>
             <span className='ml-2 text-lg text-gray-400 line-through'>
-              {product.price.toLocaleString()} đ
+              {product.priceDefault.toLocaleString()} đ
             </span>
             <span className='ml-2 rounded-md bg-red-100 px-2 py-1 text-sm font-medium text-red-600'>
               -{Math.round(product.discountPercentage)}%
@@ -77,7 +77,7 @@ const ProductInfo = ({ product }) => {
           </div>
         ) : (
           <span className='text-3xl font-bold text-gray-800'>
-            {product.price.toLocaleString()} đ
+            {product.priceDefault.toLocaleString()} đ
           </span>
         )}
       </div>
