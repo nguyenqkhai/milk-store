@@ -27,6 +27,7 @@ const OrderPending = () => {
     updatePendingFilters,
     changePendingPage,
     changePendingPageSize,
+    cancelOrder
   } = useOrderStore()
 
   const [hoveredOrder, setHoveredOrder] = useState(null)
@@ -389,6 +390,9 @@ const OrderPending = () => {
                 <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
                   Ghi chú
                 </th>
+                <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
+                  Hủy đơn hàng
+                </th>
               </tr>
             </thead>
             <tbody className='divide-y divide-gray-200 bg-white'>
@@ -444,6 +448,22 @@ const OrderPending = () => {
                       </td>
                       <td className='max-w-xs truncate px-6 py-4 text-sm text-gray-500'>
                         {order.notes || '-'}
+                      </td>
+                      <td className='px-6 py-4 text-sm whitespace-nowrap'>
+                        <button
+                          onClick={async () => {
+                            try {
+                              await cancelOrder(order.id);
+                              alert(`Đã hủy đơn hàng ${order.orderNumber || order.id}`);
+                            } catch (err) {
+                              alert(`Lỗi khi hủy đơn hàng: ${err.message}`);
+                            }
+                          }}
+                          className='rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 disabled:opacity-50'
+                          disabled={loading} // Disable button while another action is loading
+                        >
+                          Hủy đơn
+                        </button>
                       </td>
                     </tr>
                   ))}
