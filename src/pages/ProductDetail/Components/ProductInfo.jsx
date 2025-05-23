@@ -82,8 +82,6 @@ const ProductInfo = ({ product }) => {
         )}
       </div>
 
-      <p className='text-gray-600'>{product.description}</p>
-
       <div className='flex items-center'>
         <span className='mr-4 font-medium text-gray-700'>Số lượng:</span>
         <div className='flex items-center overflow-hidden rounded-lg border border-gray-300'>

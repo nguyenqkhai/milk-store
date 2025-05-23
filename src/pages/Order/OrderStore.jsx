@@ -22,7 +22,7 @@ export const useOrderStore = create((set, get) => ({
     startDate: null,
     endDate: null
   },
-  
+
   // Thêm state cho CONFIRMED
   ordersConfirmed: [],
   paginationConfirmed: {
@@ -39,7 +39,7 @@ export const useOrderStore = create((set, get) => ({
     startDate: null,
     endDate: null
   },
-  
+
   // Thêm state cho SHIPPING
   ordersShipping: [],
   paginationShipping: {
@@ -56,7 +56,7 @@ export const useOrderStore = create((set, get) => ({
     startDate: null,
     endDate: null
   },
-  
+
   ordersHistory: [],
   loading: false,
   error: null,
@@ -104,7 +104,7 @@ export const useOrderStore = create((set, get) => ({
       };
 
       const response = await OrderService.getPendingOrders(queryParams);
-      
+
       set({
         ordersPending: response.orders,
         paginationPending: {
@@ -114,13 +114,13 @@ export const useOrderStore = create((set, get) => ({
         },
         loading: false
       });
-      
+
       return response;
     } catch (error) {
       console.error('Error in OrderStore.fetchOrdersPending:', error);
-      set({ 
-        error: error.message || 'Có lỗi xảy ra khi tải danh sách đơn hàng đang xử lý', 
-        loading: false 
+      set({
+        error: error.message || 'Có lỗi xảy ra khi tải danh sách đơn hàng đang xử lý',
+        loading: false
       });
       throw error;
     }
@@ -192,7 +192,7 @@ export const useOrderStore = create((set, get) => ({
       };
 
       const response = await OrderService.getConfirmedOrders(queryParams);
-      
+
       set({
         ordersConfirmed: response.orders,
         paginationConfirmed: {
@@ -202,13 +202,13 @@ export const useOrderStore = create((set, get) => ({
         },
         loading: false
       });
-      
+
       return response;
     } catch (error) {
       console.error('Error in OrderStore.fetchOrdersConfirmed:', error);
-      set({ 
-        error: error.message || 'Có lỗi xảy ra khi tải danh sách đơn hàng đã xác nhận', 
-        loading: false 
+      set({
+        error: error.message || 'Có lỗi xảy ra khi tải danh sách đơn hàng đã xác nhận',
+        loading: false
       });
       throw error;
     }
@@ -280,7 +280,7 @@ export const useOrderStore = create((set, get) => ({
       };
 
       const response = await OrderService.getShippingOrders(queryParams);
-      
+
       set({
         ordersShipping: response.orders,
         paginationShipping: {
@@ -290,13 +290,13 @@ export const useOrderStore = create((set, get) => ({
         },
         loading: false
       });
-      
+
       return response;
     } catch (error) {
       console.error('Error in OrderStore.fetchOrdersShipping:', error);
-      set({ 
-        error: error.message || 'Có lỗi xảy ra khi tải danh sách đơn hàng đang giao', 
-        loading: false 
+      set({
+        error: error.message || 'Có lỗi xảy ra khi tải danh sách đơn hàng đang giao',
+        loading: false
       });
       throw error;
     }
@@ -358,7 +358,7 @@ export const useOrderStore = create((set, get) => ({
   fetchOrdersHistory: async () => {
     try {
       set({ loading: true, error: null });
-      
+
       const { filters, pagination } = get();
       const queryParams = {
         pageNumber: pagination.currentPage,
@@ -367,7 +367,7 @@ export const useOrderStore = create((set, get) => ({
       };
 
       const response = await OrderService.getOrdersHistory(queryParams);
-      
+
       set({
         ordersHistory: response.orders,
         pagination: {
@@ -377,13 +377,13 @@ export const useOrderStore = create((set, get) => ({
         },
         loading: false
       });
-      
+
       return response;
     } catch (error) {
       console.error('Error in OrderStore.fetchOrdersHistory:', error);
-      set({ 
-        error: error.message || 'Có lỗi xảy ra khi tải danh sách lịch sử đơn hàng', 
-        loading: false 
+      set({
+        error: error.message || 'Có lỗi xảy ra khi tải danh sách lịch sử đơn hàng',
+        loading: false
       });
       throw error;
     }
@@ -404,7 +404,7 @@ export const useOrderStore = create((set, get) => ({
         currentPage: 1 // Reset về trang đầu tiên khi thay đổi bộ lọc
       }
     }));
-    
+
     return await get().fetchOrdersHistory();
   },
 
@@ -419,7 +419,7 @@ export const useOrderStore = create((set, get) => ({
         currentPage: pageNumber
       }
     }));
-    
+
     return await get().fetchOrdersHistory();
   },
 
@@ -435,7 +435,7 @@ export const useOrderStore = create((set, get) => ({
         currentPage: 1
       }
     }));
-    
+
     return await get().fetchOrdersHistory();
   },
 
@@ -459,7 +459,7 @@ export const useOrderStore = create((set, get) => ({
         startDate: null,
         endDate: null
       },
-      
+
       ordersConfirmed: [],
       paginationConfirmed: {
         currentPage: 1,
@@ -475,7 +475,7 @@ export const useOrderStore = create((set, get) => ({
         startDate: null,
         endDate: null
       },
-      
+
       ordersShipping: [],
       paginationShipping: {
         currentPage: 1,
@@ -491,7 +491,7 @@ export const useOrderStore = create((set, get) => ({
         startDate: null,
         endDate: null
       },
-      
+
       ordersHistory: [],
       loading: false,
       error: null,
