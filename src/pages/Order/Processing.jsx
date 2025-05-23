@@ -27,6 +27,7 @@ const OrderProcessing = () => {
     updateProcessingFilters,
     changeProcessingPage,
     changeProcessingPageSize,
+    cancelOrder
   } = useOrderStore()
 
   const [hoveredOrder, setHoveredOrder] = useState(null)
@@ -315,9 +316,6 @@ const OrderProcessing = () => {
   return (
     <div className='container mx-auto' ref={containerRef}>
       <div className='mb-6 rounded-lg bg-white p-4 shadow'>
-        <h1 className='mb-4 text-xl font-semibold text-gray-800'>
-          Đơn hàng đang xử lý
-        </h1>
         <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
           <div className='relative'>
             <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
@@ -391,6 +389,9 @@ const OrderProcessing = () => {
                 <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
                   Trạng thái
                 </th>
+                <th className='px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase'>
+                  Hủy đơn
+                </th>
               </tr>
             </thead>
             <tbody className='divide-y divide-gray-200 bg-white'>
@@ -445,6 +446,27 @@ const OrderProcessing = () => {
                         <span className='inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800'>
                           Đang xử lý
                         </span>
+                      </td>
+                      <td className='px-6 py-4 text-sm whitespace-nowrap'>
+                        <button
+                          onClick={async () => {
+                            // Optional: Add a confirmation dialog here
+                            // if (window.confirm(`Bạn có chắc chắn muốn hủy đơn hàng ${order.orderNumber || order.id}?`)) {
+                            try {
+                              await cancelOrder(order.id);
+                              // Optionally, show a success notification
+                              alert(`Đã hủy đơn hàng ${order.orderNumber || order.id}`);
+                            } catch (err) {
+                              // Error is already handled in the store, but you can show a notification here too
+                              alert(`Lỗi khi hủy đơn hàng: ${err.message}`);
+                            }
+                            // }
+                          }}
+                          className='rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 disabled:opacity-50'
+                          disabled={loading} // Disable button while another action is loading
+                        >
+                          Hủy đơn
+                        </button>
                       </td>
                     </tr>
                   ))}

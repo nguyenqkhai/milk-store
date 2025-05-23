@@ -89,6 +89,21 @@ class OrderService {
     }
   }
 
+  /**
+   * Cancel an order by orderId
+   * @param {string|number} orderId - The ID of the order to cancel
+   * @returns {Promise} Promise containing the result of the cancellation
+   */
+  async cancelOrder(orderId) {
+    try {
+      const response = await api.post(`/Order/${orderId}/cancel`);
+      return response.data;
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+      throw error;
+    }
+  }
+
   async getConfirmedOrders(queryParams) {
     try {
       const response = await api.get('/Order/user/status/CONFIRMED', {

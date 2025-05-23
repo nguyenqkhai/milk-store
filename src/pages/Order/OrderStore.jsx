@@ -554,6 +554,38 @@ export const useOrderStore = create((set, get) => ({
   },
 
   /**
+   * Hủy đơn hàng theo orderId
+   * @param {string|number} orderId - ID của đơn hàng cần hủy
+   * @returns {Promise} Promise chứa kết quả của việc hủy đơn hàng
+   */
+  cancelOrder: async (orderId) => {
+    try {
+      set({ loading: true, error: null })
+
+      const response = await OrderService.cancelOrder(orderId)
+
+      // Refresh tất cả các danh sách đơn hàng để cập nhật trạng thái
+      await Promise.all([
+        get().fetchOrdersPending(),
+        get().fetchOrdersProcessing(), 
+        get().fetchOrdersConfirmed(),
+        get().fetchOrdersShipping(),
+        get().fetchOrdersHistory()
+      ])
+
+      set({ loading: false })
+      return response
+    } catch (error) {
+      console.error('Error in OrderStore.cancelOrder:', error)
+      set({
+        error: error.message || 'Có lỗi xảy ra khi hủy đơn hàng',
+        loading: false,
+      })
+      throw error
+    }
+  },
+
+  /**
    * Reset trạng thái của store về giá trị mặc định
    */
   resetStore: () => {
