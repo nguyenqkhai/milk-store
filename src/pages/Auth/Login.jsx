@@ -34,13 +34,24 @@ function Login() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-600 flex items-center justify-center p-4">
+            <motion.button
+                onClick={() => navigate('/')}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="fixed top-4 left-4 z-10 bg-white/90 backdrop-blur-sm hover:bg-white text-blue-600 font-medium px-4 py-2 rounded-lg shadow-lg transition duration-200 flex items-center gap-2 cursor-pointer"
+            >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Trang chủ
+            </motion.button>
+
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
                 className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row"
             >
-                {/* Left Side - Form */}
                 <div className="w-full md:w-1/2 p-6 md:p-8 flex flex-col">
                     <div className="text-center mb-6">
                         <motion.h1
@@ -130,7 +141,6 @@ function Login() {
                     </div>
                 </div>
 
-                {/* Right Side - Image */}
                 <div className="hidden md:block w-1/2 relative bg-blue-600">
                     <img
                         src={"https://res.cloudinary.com/dwbcqjupj/image/upload/v1745990380/milkstore_qildau.jpg"}
