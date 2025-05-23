@@ -228,36 +228,32 @@ class OrderService {
         appliedVouchers: item.appliedVouchers || [],
       }))
 
-      return {
-        metadata: response.data.data.metadata,
-        orders: mappedOrders,
-      }
-    } catch (error) {
-      console.error('Error fetching orders:', error)
-      throw error
+            return {
+                metadata: response.data.data.metadata,
+                orders: mappedOrders
+            };
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            throw error;
+        }
     }
-  }
-  /**
-   * Create a new order
-   * @param {Object} orderData - Order data to be created
-   * @returns {Promise} Promise containing the result of the order creation
-   */
-  async createOrder(orderData) {
-    try {
-      const headers = {
-        'Content-Type': 'application/json',
-      }
-      const response = await api.post('/Order', orderData, headers)
-      if (response.data.statusCode === 200) {
-        return true
-      } else {
-        return false
-      }
-    } catch (error) {
-      console.error('Error creating order:', error)
-      throw error
+    /**
+     * Create a new order
+     * @param {Object} orderData - Order data to be created
+     * @returns {Promise} Promise containing the result of the order creation
+     */
+    async createOrder(orderData) {
+        try {
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            const response = await api.post('/Order', orderData, headers);
+            return response.data;
+        } catch (error) {
+            console.error('Error creating order:', error);
+            throw error;
+        }
     }
-  }
 }
 
 export default new OrderService()
