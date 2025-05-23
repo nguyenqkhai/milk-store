@@ -11,8 +11,10 @@ const ProductInfo = ({ product }) => {
   const { isAuthenticated } = useAuth()
   const [shipping] = useState(20000)
   const navigate = useNavigate()
+  
   const increaseQuantity = () => setQuantity(prev => prev + 1)
   const decreaseQuantity = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1))
+  
   const handleAddToCart = () => {
     try {
       if (isAuthenticated) {
@@ -25,9 +27,11 @@ const ProductInfo = ({ product }) => {
       console.error('Lỗi khi thêm vào giỏ hàng:', error)
     }
   }
-  const discountedPrice = product.discountPercentage
-    ? Math.round(product.price * (1 - product.discountPercentage / 100))
-    : product.price
+
+  // FIX: Sử dụng giá đúng từ product
+  const currentPrice = product.discountPercentage > 0 ? product.priceActive : product.priceDefault
+  const subtotal = currentPrice * quantity
+  const total = subtotal + shipping
 
   // Get dimensions from the product if available
   const dimensions =
@@ -35,16 +39,43 @@ const ProductInfo = ({ product }) => {
       ? product.dimensions[0]
       : null
 
+  // FIX: Tạo buyNow object với dữ liệu đúng
   const buyNow = {
     items: [
       {
         productId: product.id,
         quantity: quantity,
+        price: currentPrice,
+        name: product.name, // Thêm tên sản phẩm để debug
       },
     ],
     shipping: shipping,
-    subtotal: discountedPrice * quantity,
-    total: discountedPrice * quantity + shipping,
+    subtotal: subtotal,
+    total: total,
+  }
+
+  // FIX: Thêm function để handle buy now
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      message.error('Vui lòng đăng nhập để mua sản phẩm')
+      return
+    }
+
+    console.log('Buy Now Data:', buyNow) // Debug log
+    
+    navigate('/thanh-toan', {
+      state: {
+        order: buyNow,
+        buyNow: true,
+        // Thêm thông tin sản phẩm để debug
+        productInfo: {
+          id: product.id,
+          name: product.name,
+          price: currentPrice,
+          quantity: quantity
+        }
+      },
+    })
   }
 
   return (
@@ -106,6 +137,17 @@ const ProductInfo = ({ product }) => {
         </div>
       </div>
 
+      {/* FIX: Debug info - có thể xóa sau khi fix xong */}
+      <div className='rounded border bg-yellow-50 p-2 text-xs'>
+        <strong>Debug Info:</strong>
+        <br />
+        Current Price: {currentPrice?.toLocaleString()} đ
+        <br />
+        Subtotal: {subtotal?.toLocaleString()} đ
+        <br />
+        Total: {total?.toLocaleString()} đ
+      </div>
+
       <div className='mt-12 flex flex-wrap gap-4'>
         <button
           className='flex flex-1 items-center justify-center rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700'
@@ -114,14 +156,7 @@ const ProductInfo = ({ product }) => {
           <FiShoppingCart className='mr-2' /> Thêm vào giỏ hàng
         </button>
         <button
-          onClick={() =>
-            navigate('/thanh-toan', {
-              state: {
-                order: buyNow,
-                buyNow: true,
-              },
-            })
-          }
+          onClick={handleBuyNow}
           className='flex flex-1 items-center justify-center rounded-lg bg-orange-500 px-6 py-3 font-medium text-white hover:bg-orange-600'
         >
           Mua ngay
