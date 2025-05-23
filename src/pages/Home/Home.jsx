@@ -14,7 +14,7 @@ const urlImg = [
     alt: 'image2',
   },
   {
-    img: 'https://res.cloudinary.com/dwbcqjupj/image/upload/v1747592344/f91ff7ce-ff16-4c19-8cd9-fee9046a7406_iydza5.jpg',
+    img: 'https://sieuthisuachinhhang.vn/wp-content/uploads/2024/03/banner-anh-sieuthisuachinhhang-diasure-2048x1311.jpg',
     alt: 'image3',
   },
 ]
@@ -224,7 +224,7 @@ const Home = () => {
             />
             <div className='absolute bottom-15 left-1/2 -translate-x-1/2 transform text-center'>
               <p className='bg-opacity-50 rounded-lg bg-green-800/30 px-6 py-3 text-8xl font-normal text-white shadow-lg backdrop-blur-[1px] md:text-4xl'>
-                Milkstore ưu đãi tháng 5 <br />
+                Sữa Tươi Nguyên Chất – Vị Tự Nhiên Thuần Khiết <br />
                 <span className='text-3xl font-light text-white italic'>
                   xem ngay
                 </span>
