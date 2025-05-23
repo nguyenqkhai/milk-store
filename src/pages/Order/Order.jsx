@@ -3,17 +3,19 @@ import {
   AppstoreOutlined,
   MailOutlined,
   SettingOutlined,
+  SyncOutlined,
 } from '@ant-design/icons'
 import { Menu } from 'antd'
 import OrderHistory from './History'
 import OrderPending from './Pending'
 import OrderConfirmed from './Confirmed'
 import OrderShipping from './Shipping'
+import OrderProcessing from './Processing'
 import { useOrderStore } from './OrderStore'
 
 const items = [
   {
-    label: 'Đang xử lý',
+    label: 'Chờ xác nhận',
     key: 'PENDING',
     icon: <MailOutlined />,
   },
@@ -21,6 +23,11 @@ const items = [
     label: 'Đã xác nhận',
     key: 'CONFIRMED',
     icon: <AppstoreOutlined />,
+  },
+  {
+    label: 'Đang xử lý',
+    key: 'PROCESSING',
+    icon: <SyncOutlined />,
   },
   {
     label: 'Đang giao',
@@ -40,12 +47,14 @@ const Order = () => {
     fetchOrdersConfirmed,
     fetchOrdersHistory,
     fetchOrdersPending,
+    fetchOrdersProcessing,
   } = useOrderStore()
   useEffect(() => {
     const loadAllOrders = async () => {
       try {
         await Promise.all([
           fetchOrdersPending(),
+          fetchOrdersProcessing(),
           fetchOrdersConfirmed(),
           fetchOrdersShipping(),
           fetchOrdersHistory(),
@@ -56,6 +65,7 @@ const Order = () => {
     loadAllOrders()
   }, [
     fetchOrdersPending,
+    fetchOrdersProcessing,
     fetchOrdersConfirmed,
     fetchOrdersShipping,
     fetchOrdersHistory,
@@ -70,6 +80,8 @@ const Order = () => {
     switch (current) {
       case 'PENDING':
         return <OrderPending />
+      case 'PROCESSING':
+        return <OrderProcessing />
       case 'CONFIRMED':
         return <OrderConfirmed />
       case 'SHIPPING':
