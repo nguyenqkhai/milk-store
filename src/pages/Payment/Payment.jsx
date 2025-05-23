@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FaCheckCircle, FaCreditCard, FaMoneyBillWave } from 'react-icons/fa'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import OrderSummary from './components/OrderSummary'
 import VoucherBox from './components/VoucherBox'
 import OrderService from '@services/Order/OrderService'
 import CartService from '@services/Cart/CartService'
 import PaymentService from '@services/Payment/PaymentService'
 import { message } from 'antd'
+import { set } from 'date-fns'
 
 const Payment = () => {
   const location = useLocation()
@@ -16,6 +17,9 @@ const Payment = () => {
   const [isSuccess, setIsSuccess] = useState(false)
   const [voucher, setVoucher] = useState(null)
   const [discountValue, setDiscountValue] = useState(0)
+  const [searchParams] = useSearchParams()
+  const [checkStatusPayment, setCheckStatusPayment] = useState(false)
+  const [orderNumber, setOrderNumber] = useState(null)
 
   // Get form data from location state
   const formData = location.state?.formData || {}
@@ -24,6 +28,24 @@ const Payment = () => {
   const buyNow = location.state?.buyNow || false
 
   // const discountValue = order?.total * (voucher?.discount || 0) / 100 || 0;
+
+  useEffect(() => {
+    console.log(searchParams);
+    const fetchStatus = async () => {
+      if (code && id && status && orderCode) {
+        setCheckStatusPayment(true);
+        const response = await PaymentService.getStatusPayos(orderCode);
+        console.log(response);
+      }
+    };
+
+    const code = searchParams.get('code');
+    const id = searchParams.get('id');
+    const status = searchParams.get('status');
+    const orderCode = searchParams.get('orderCode');
+
+    fetchStatus();
+  }, [searchParams])
 
   useEffect(() => {
     if (voucher) {
@@ -54,6 +76,7 @@ const Payment = () => {
   }
 
   const handleProcessPayment = () => {
+    setCheckStatusPayment(true)
     setIsProcessing(true)
     const orderData = {
       shippingAddress: formData.state + ', ' + formData.city,
@@ -70,6 +93,7 @@ const Payment = () => {
     OrderService.createOrder(orderData)
       .then(async response => {
         if (response) {
+          console.log('Order created successfully:', response)
           if (paymentMethod.toUpperCase() === 'PAYOS') {
             const payosRes = await PaymentService.createPaymentPayos({
               orderId: response.data.orderId,
@@ -93,11 +117,12 @@ const Payment = () => {
               }
             }
           }
+          setOrderNumber(response.data.orderNumber)
           setIsProcessing(false)
           setIsSuccess(true)
-          setTimeout(() => {
-            navigate('/don-hang')
-          }, 2000)
+          // setTimeout(() => {
+          //   navigate('/don-hang')
+          // }, 2000)
         } else {
           setIsProcessing(false)
           setIsSuccess(false)
@@ -206,20 +231,20 @@ const Payment = () => {
       </div>
 
       {/* Main Content */}
-      <div className='mx-auto max-w-4xl px-8'>
-        <div className='grid gap-6 md:grid-cols-2'>
-          <OrderSummary formData={formData} paymentMethod={paymentMethod} />
-          <VoucherBox onApply={handleApplyVoucher} />
-        </div>
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className='rounded-xl bg-white shadow-lg md:p-6'
-        >
-          {/* Payment Status */}
-          <div className='text-center'>
-            {!isProcessing && !isSuccess && (
+      {!checkStatusPayment ? (
+        <div className='mx-auto max-w-4xl px-8'>
+          <div className='grid gap-6 md:grid-cols-2'>
+            <OrderSummary formData={formData} paymentMethod={paymentMethod} />
+            <VoucherBox onApply={handleApplyVoucher} />
+          </div>
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className='rounded-xl bg-white shadow-lg md:p-6'
+          >
+            {/* Payment Status */}
+            <div className='text-center'>
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -228,64 +253,118 @@ const Payment = () => {
               >
                 Xác nhận thanh toán
               </motion.button>
-            )}
+            </div>
 
+            {/* Order Details */}
+            <div className='mt-4 border-t pt-2'>
+              <h3 className='mb-2 text-lg font-semibold'>📦 Chi tiết đơn hàng</h3>
+              <div className='space-y-2'>
+                <div className='flex justify-between text-sm'>
+                  <span className='text-gray-600'>Tạm tính</span>
+                  <span className='font-medium'>
+                    {formatPrice(order?.subtotal || 0)}
+                  </span>
+                </div>
+                <div className='flex justify-between text-sm'>
+                  <span className='text-gray-600'>Phí vận chuyển</span>
+                  <span className='font-medium'>
+                    {formatPrice(order.shipping || 0)}
+                  </span>
+                </div>
+                <div className='flex justify-between border-t pt-2 text-sm'>
+                  <span className='text-gray-600'>Voucher:</span>
+                  <span className='font-medium'>
+                    -{formatPrice(discountValue)}
+                  </span>
+                </div>
+                <div className='flex justify-between border-t pt-4'>
+                  <span className='font-semibold'>Tổng cộng</span>
+                  <span className='text-lg font-bold'>
+                    {formatPrice(order?.total - discountValue || 0)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center min-h-[300px]">
+          <div className="bg-white rounded-xl shadow-lg px-8 py-10 flex flex-col items-center max-w-md w-full">
+            {/* Thông tin đơn hàng */}
+            <div className="mb-4 w-full text-center border-b pb-4">
+              <div className="flex items-center justify-center gap-2 text-base font-semibold text-gray-700">
+                <span>🧾</span>
+                <span>Mã giao dịch:</span>
+                <span className="text-blue-600 font-bold">
+                  {searchParams.get('orderCode')
+                    ? "ORD-" + searchParams.get('orderCode')
+                    : orderNumber || '---'}
+                </span>
+              </div>
+              {/* <div className="mt-2 text-sm text-gray-500">
+                Tổng tiền:&nbsp;
+                <span className="font-semibold text-gray-800">
+                  {formatPrice(order?.total || 0)}
+                </span>
+              </div>
+              <div className="mt-1 text-sm text-gray-500">
+                Phương thức:&nbsp;
+                <span className="font-semibold text-gray-800 capitalize">
+                  {paymentMethod === 'PAYOS' ? 'PayOS' : 'Thanh toán khi nhận hàng'}
+                </span>
+              </div> */}
+            </div>
+            {/* Trạng thái */}
             {isProcessing && (
-              <div className='space-y-4'>
+              <div className='space-y-4 flex flex-col items-center'>
                 <div className='mx-auto h-16 w-16 animate-spin rounded-full border-4 border-blue-500 border-t-transparent'></div>
                 <p className='text-lg text-gray-600'>
-                  Quá trình thanh toán đang được xử lý...
+                  Đang xử lý thanh toán...
                 </p>
               </div>
             )}
-
             {isSuccess && (
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className='space-y-4'
+                className='space-y-4 flex flex-col items-center'
               >
                 <FaCheckCircle className='mx-auto h-16 w-16 text-green-500' />
-                <p className='text-lg text-gray-600'>Thanh toán thành công</p>
-                <p className='text-sm text-gray-500'>
-                  Đang chuyển hướng tới trang đơn hàng...
+                <p className='text-lg text-green-600 font-semibold flex items-center gap-2'>
+                  Đặt hàng thành công!
                 </p>
               </motion.div>
             )}
-          </div>
-
-          {/* Order Details */}
-          <div className='mt-4 border-t pt-2'>
-            <h3 className='mb-2 text-lg font-semibold'>📦 Chi tiết đơn hàng</h3>
-            <div className='space-y-2'>
-              <div className='flex justify-between text-sm'>
-                <span className='text-gray-600'>Tạm tính</span>
-                <span className='font-medium'>
-                  {formatPrice(order?.subtotal || 0)}
+            {!isProcessing && !isSuccess && (
+              <div className='space-y-4 flex flex-col items-center'>
+                <span className="mx-auto">
+                  <svg className="h-16 w-16 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white"/>
+                    <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" d="M9 9l6 6m0-6l-6 6"/>
+                  </svg>
                 </span>
+                <p className='text-lg text-red-600 font-semibold flex items-center gap-2'>
+                  <span className="inline-block">❌</span> Đặt hàng thất bại hoặc đã hủy!
+                </p>
               </div>
-              <div className='flex justify-between text-sm'>
-                <span className='text-gray-600'>Phí vận chuyển</span>
-                <span className='font-medium'>
-                  {formatPrice(order.shipping || 0)}
-                </span>
-              </div>
-              <div className='flex justify-between border-t pt-2 text-sm'>
-                <span className='text-gray-600'>Voucher:</span>
-                <span className='font-medium'>
-                  -{formatPrice(discountValue)}
-                </span>
-              </div>
-              <div className='flex justify-between border-t pt-4'>
-                <span className='font-semibold'>Tổng cộng</span>
-                <span className='text-lg font-bold'>
-                  {formatPrice(order?.total - discountValue || 0)}
-                </span>
-              </div>
+            )}
+            <div className="flex gap-3 mt-6">
+              <button
+                className="flex items-center gap-2 px-5 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+                onClick={() => navigate('/don-hang')}
+              >
+                <span>🧾</span> Xem đơn hàng
+              </button>
+              <button
+                className="flex items-center gap-2 px-5 py-2 rounded bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition"
+                onClick={() => navigate('/san-pham')}
+              >
+                <span>🛒</span> Về trang sản phẩm
+              </button>
             </div>
           </div>
-        </motion.div>
-      </div>
+        </div>
+      )}
     </div>
   )
 }
