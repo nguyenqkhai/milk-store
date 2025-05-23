@@ -4,7 +4,7 @@ import CartItemsList from './Components/CartItemsList'
 import CartSummary from './Components/CartSummary'
 import EmptyCart from './Components/EmptyCart'
 import CartService from '@services/Cart/CartService'
-import { message } from 'antd'
+import { message, Spin } from 'antd'
 import { setGlobalCartCount } from '@/hooks/useCart'
 
 const Cart = () => {
@@ -13,13 +13,22 @@ const Cart = () => {
   const [subTotal, setSubTotal] = useState(0)
   const [checkedItems, setCheckedItems] = useState([])
   const [itemCount, setItemCount] = useState(0)
+  const [loading, setLoading] = useState(true) // Add loading state
 
   const fetchItems = async () => {
-    // Lấy tất cả sản phẩm trong giỏ hàng (không phân trang)
-    const { items, metadata } = await CartService.fetchAllCartItems()
-    setItems(items)
-    setItemCount(metadata.totalCount)
-    setGlobalCartCount(metadata.totalCount)
+    try {
+      setLoading(true) // Set loading to true when starting fetch
+      // Lấy tất cả sản phẩm trong giỏ hàng (không phân trang)
+      const { items, metadata } = await CartService.fetchAllCartItems()
+      setItems(items)
+      setItemCount(metadata.totalCount)
+      setGlobalCartCount(metadata.totalCount)
+    } catch (error) {
+      console.error('Error fetching cart items:', error)
+      message.error('Không thể tải giỏ hàng. Vui lòng thử lại!')
+    } finally {
+      setLoading(false) // Set loading to false when fetch completes
+    }
   }
 
   useEffect(() => {
@@ -27,12 +36,6 @@ const Cart = () => {
       fetchItems()
     }, 300)
   }, [])
-
-  // useEffect(() => {
-  //   console.log('items', items);
-  //   const newTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  //   setSubTotal(newTotal);
-  // }, [items]);
 
   useEffect(() => {
     const newTotal = checkedItems.reduce(
@@ -82,14 +85,18 @@ const Cart = () => {
   }
 
   const grandTotal = subTotal + shipping
-  // const itemCount = items.length;
 
   return (
     <div className='min-h-screen bg-gradient-to-b from-blue-50 to-white'>
       <CartHeader />
 
       <div className='container mx-auto px-4 pb-12'>
-        {items.length === 0 ? (
+        {loading ? (
+          // Loading spinner when data is being fetched
+          <div className='flex justify-center items-center' style={{ height: '500px' }}>
+            <Spin size="large" tip="Đang tải giỏ hàng..." />
+          </div>
+        ) : items.length === 0 ? (
           <EmptyCart />
         ) : (
           <div>
