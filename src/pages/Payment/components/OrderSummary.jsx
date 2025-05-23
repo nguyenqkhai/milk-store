@@ -27,10 +27,10 @@ const OrderSummary = ({ formData, paymentMethod }) => (
         <div>
           <p className='text-gray-800'>Phương thức thanh toán:</p>
           <p className='flex items-center gap-2 font-medium'>
-            {paymentMethod === 'credit' ? (
+            {paymentMethod === 'payos' ? (
               <>
                 <FaCreditCard className='text-lg text-blue-500' />
-                Thẻ tín dụng
+                Thanh toán trước
               </>
             ) : (
               <>

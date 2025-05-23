@@ -9,8 +9,11 @@ class PaymentService {
             const headers = {
                 'Content-Type': 'application/json',
             }
-            const response = await api.get(`/Payos/check-status${paymentLinkId}`, headers);
-            return response.data.data;
+            const response = await api.get(`/Payos/check-status/${paymentLinkId}`, headers);
+            if(response.data.data === "CANCELLED"){
+                return false;
+            }
+            return true;
         } catch (error) {
             console.error('Error fetching status payo:', error);
             return [];
