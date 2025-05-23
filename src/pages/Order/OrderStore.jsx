@@ -23,6 +23,8 @@ export const useOrderStore = create((set, get) => ({
     endDate: null,
   },
 
+<<<<<<< HEAD
+=======
   // Thêm state cho PROCESSING
   ordersProcessing: [],
   paginationProcessing: {
@@ -40,6 +42,7 @@ export const useOrderStore = create((set, get) => ({
     endDate: null,
   },
 
+>>>>>>> 2d753818d68bee604697c9263d1b00868af7bed7
   // Thêm state cho CONFIRMED
   ordersConfirmed: [],
   paginationConfirmed: {
@@ -123,6 +126,11 @@ export const useOrderStore = create((set, get) => ({
 
       const response = await OrderService.getPendingOrders(queryParams)
 
+<<<<<<< HEAD
+      const response = await OrderService.getPendingOrders(queryParams);
+
+=======
+>>>>>>> 2d753818d68bee604697c9263d1b00868af7bed7
       set({
         ordersPending: response.orders,
         paginationPending: {
@@ -130,6 +138,19 @@ export const useOrderStore = create((set, get) => ({
           totalItems: response.metadata.totalCount,
           totalPages: response.metadata.totalPages,
         },
+<<<<<<< HEAD
+        loading: false
+      });
+
+      return response;
+    } catch (error) {
+      console.error('Error in OrderStore.fetchOrdersPending:', error);
+      set({
+        error: error.message || 'Có lỗi xảy ra khi tải danh sách đơn hàng đang xử lý',
+        loading: false
+      });
+      throw error;
+=======
         loading: false,
       })
 
@@ -143,6 +164,7 @@ export const useOrderStore = create((set, get) => ({
         loading: false,
       })
       throw error
+>>>>>>> 2d753818d68bee604697c9263d1b00868af7bed7
     }
   },
 
@@ -303,6 +325,11 @@ export const useOrderStore = create((set, get) => ({
 
       const response = await OrderService.getConfirmedOrders(queryParams)
 
+<<<<<<< HEAD
+      const response = await OrderService.getConfirmedOrders(queryParams);
+
+=======
+>>>>>>> 2d753818d68bee604697c9263d1b00868af7bed7
       set({
         ordersConfirmed: response.orders,
         paginationConfirmed: {
@@ -310,6 +337,19 @@ export const useOrderStore = create((set, get) => ({
           totalItems: response.metadata.totalCount,
           totalPages: response.metadata.totalPages,
         },
+<<<<<<< HEAD
+        loading: false
+      });
+
+      return response;
+    } catch (error) {
+      console.error('Error in OrderStore.fetchOrdersConfirmed:', error);
+      set({
+        error: error.message || 'Có lỗi xảy ra khi tải danh sách đơn hàng đã xác nhận',
+        loading: false
+      });
+      throw error;
+=======
         loading: false,
       })
 
@@ -323,6 +363,7 @@ export const useOrderStore = create((set, get) => ({
         loading: false,
       })
       throw error
+>>>>>>> 2d753818d68bee604697c9263d1b00868af7bed7
     }
   },
 
@@ -393,6 +434,11 @@ export const useOrderStore = create((set, get) => ({
 
       const response = await OrderService.getShippingOrders(queryParams)
 
+<<<<<<< HEAD
+      const response = await OrderService.getShippingOrders(queryParams);
+
+=======
+>>>>>>> 2d753818d68bee604697c9263d1b00868af7bed7
       set({
         ordersShipping: response.orders,
         paginationShipping: {
@@ -400,6 +446,19 @@ export const useOrderStore = create((set, get) => ({
           totalItems: response.metadata.totalCount,
           totalPages: response.metadata.totalPages,
         },
+<<<<<<< HEAD
+        loading: false
+      });
+
+      return response;
+    } catch (error) {
+      console.error('Error in OrderStore.fetchOrdersShipping:', error);
+      set({
+        error: error.message || 'Có lỗi xảy ra khi tải danh sách đơn hàng đang giao',
+        loading: false
+      });
+      throw error;
+=======
         loading: false,
       })
 
@@ -412,6 +471,7 @@ export const useOrderStore = create((set, get) => ({
         loading: false,
       })
       throw error
+>>>>>>> 2d753818d68bee604697c9263d1b00868af7bed7
     }
   },
 
@@ -470,9 +530,15 @@ export const useOrderStore = create((set, get) => ({
    */
   fetchOrdersHistory: async () => {
     try {
+<<<<<<< HEAD
+      set({ loading: true, error: null });
+
+      const { filters, pagination } = get();
+=======
       set({ loading: true, error: null })
 
       const { filters, pagination } = get()
+>>>>>>> 2d753818d68bee604697c9263d1b00868af7bed7
       const queryParams = {
         pageNumber: pagination.currentPage,
         pageSize: pagination.pageSize,
@@ -481,6 +547,11 @@ export const useOrderStore = create((set, get) => ({
 
       const response = await OrderService.getOrdersHistory(queryParams)
 
+<<<<<<< HEAD
+      const response = await OrderService.getOrdersHistory(queryParams);
+
+=======
+>>>>>>> 2d753818d68bee604697c9263d1b00868af7bed7
       set({
         ordersHistory: response.orders,
         pagination: {
@@ -488,6 +559,19 @@ export const useOrderStore = create((set, get) => ({
           totalItems: response.metadata.totalCount,
           totalPages: response.metadata.totalPages,
         },
+<<<<<<< HEAD
+        loading: false
+      });
+
+      return response;
+    } catch (error) {
+      console.error('Error in OrderStore.fetchOrdersHistory:', error);
+      set({
+        error: error.message || 'Có lỗi xảy ra khi tải danh sách lịch sử đơn hàng',
+        loading: false
+      });
+      throw error;
+=======
         loading: false,
       })
 
@@ -500,6 +584,7 @@ export const useOrderStore = create((set, get) => ({
         loading: false,
       })
       throw error
+>>>>>>> 2d753818d68bee604697c9263d1b00868af7bed7
     }
   },
 
@@ -515,11 +600,19 @@ export const useOrderStore = create((set, get) => ({
       },
       pagination: {
         ...state.pagination,
+<<<<<<< HEAD
+        currentPage: 1 // Reset về trang đầu tiên khi thay đổi bộ lọc
+      }
+    }));
+
+    return await get().fetchOrdersHistory();
+=======
         currentPage: 1, // Reset về trang đầu tiên khi thay đổi bộ lọc
       },
     }))
 
     return await get().fetchOrdersHistory()
+>>>>>>> 2d753818d68bee604697c9263d1b00868af7bed7
   },
 
   /**
@@ -530,11 +623,19 @@ export const useOrderStore = create((set, get) => ({
     set(state => ({
       pagination: {
         ...state.pagination,
+<<<<<<< HEAD
+        currentPage: pageNumber
+      }
+    }));
+
+    return await get().fetchOrdersHistory();
+=======
         currentPage: pageNumber,
       },
     }))
 
     return await get().fetchOrdersHistory()
+>>>>>>> 2d753818d68bee604697c9263d1b00868af7bed7
   },
 
   /**
@@ -546,11 +647,19 @@ export const useOrderStore = create((set, get) => ({
       pagination: {
         ...state.pagination,
         pageSize,
+<<<<<<< HEAD
+        currentPage: 1
+      }
+    }));
+
+    return await get().fetchOrdersHistory();
+=======
         currentPage: 1,
       },
     }))
 
     return await get().fetchOrdersHistory()
+>>>>>>> 2d753818d68bee604697c9263d1b00868af7bed7
   },
 
   /**
@@ -574,6 +683,8 @@ export const useOrderStore = create((set, get) => ({
         endDate: null,
       },
 
+<<<<<<< HEAD
+=======
       ordersProcessing: [],
       paginationProcessing: {
         currentPage: 1,
@@ -590,6 +701,7 @@ export const useOrderStore = create((set, get) => ({
         endDate: null,
       },
 
+>>>>>>> 2d753818d68bee604697c9263d1b00868af7bed7
       ordersConfirmed: [],
       paginationConfirmed: {
         currentPage: 1,
