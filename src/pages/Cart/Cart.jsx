@@ -27,7 +27,7 @@ const Cart = () => {
       console.error('Error fetching cart items:', error)
       message.error('Không thể tải giỏ hàng. Vui lòng thử lại!')
     } finally {
-      setLoading(false) // Set loading to false when fetch completes
+      setLoading(false)
     }
   }
 
@@ -70,7 +70,6 @@ const Cart = () => {
       await CartService.deleteCartItem(itemId)
     if (statusCode === 200) {
       message.success(apiMessage)
-      // Lấy lại tất cả sản phẩm sau khi xóa
       const newItems = await CartService.fetchAllCartItems()
       setItems(newItems.items)
       setItemCount(newItems.metadata.totalCount)
@@ -93,8 +92,11 @@ const Cart = () => {
       <div className='container mx-auto px-4 pb-12'>
         {loading ? (
           // Loading spinner when data is being fetched
-          <div className='flex justify-center items-center' style={{ height: '500px' }}>
-            <Spin size="large" tip="Đang tải giỏ hàng..." />
+          <div
+            className='flex items-center justify-center'
+            style={{ height: '500px' }}
+          >
+            <Spin size='large' tip='Đang tải giỏ hàng...' />
           </div>
         ) : items.length === 0 ? (
           <EmptyCart />
