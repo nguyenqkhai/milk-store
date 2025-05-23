@@ -6,6 +6,7 @@ import OrderSummary from './components/OrderSummary'
 import VoucherBox from './components/VoucherBox'
 import OrderService from '@services/Order/OrderService'
 import CartService from '@services/Cart/CartService'
+import PaymentService from '@services/Payment/PaymentService'
 import { message } from 'antd'
 
 const Payment = () => {
@@ -20,7 +21,7 @@ const Payment = () => {
   const formData = location.state?.formData || {}
   const paymentMethod = location.state?.paymentMethod || 'cash'
   const order = location.state?.order || {}
-  const buyNow = location.state?.buyNow || {}
+  const buyNow = location.state?.buyNow || false
 
   // const discountValue = order?.total * (voucher?.discount || 0) / 100 || 0;
 
@@ -57,7 +58,7 @@ const Payment = () => {
     const orderData = {
       shippingAddress: formData.state + ', ' + formData.city,
       shippingFee: order.shipping,
-      paymentMethod: paymentMethod,
+      paymentMethod: paymentMethod.toUpperCase(),
       notes: '',
       voucherCodes: voucher?.code ? [voucher.code] : [],
       orderDetails: order.items.map(item => ({
@@ -69,6 +70,20 @@ const Payment = () => {
     OrderService.createOrder(orderData)
       .then(async response => {
         if (response) {
+          if (paymentMethod.toUpperCase() === 'PAYOS') {
+            const payosRes = await PaymentService.createPaymentPayos({
+              orderId: response.data.orderId,
+            })
+            if (payosRes && payosRes.data.paymentLinkId && payosRes.data.checkoutUrl && payosRes.data.expiredAt) {
+              window.location.href = payosRes.data.checkoutUrl;
+              return;
+            } else {
+              setIsProcessing(false);
+              setIsSuccess(false);
+              message.error('Không tạo được link thanh toán PayOS!');
+              return;
+            }
+          }
           if (!buyNow) {
             for (const item of order.items) {
               try {

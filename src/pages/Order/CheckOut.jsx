@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import creditImage from '/src/assets/creditImage.png'
 import { FaArrowRight } from 'react-icons/fa6'
 import { FaCreditCard, FaMoneyBillWave, FaCashRegister } from 'react-icons/fa'
 import { motion } from 'framer-motion'
 import { useNavigate, useLocation } from 'react-router-dom'
+
 const Checkout = () => {
   const navigate = useNavigate()
-  const [onCreditCard, setOnCreditCard] = useState(false)
+  const [onPayOS, setOnPayOS] = useState(true)
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -14,23 +14,22 @@ const Checkout = () => {
     state: '',
     city: '',
     zipCode: '',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
   })
   const location = useLocation()
   const order = location.state?.order || {}
   const buyNow = location.state?.buyNow || false
+
   const handleCheckout = () => {
     navigate('/xac-nhan-thanh-toan', {
       state: {
         order: order,
         formData,
-        paymentMethod: onCreditCard ? 'credit' : 'cash',
+        paymentMethod: onPayOS ? 'payos' : 'cash',
         buyNow: buyNow,
       },
     })
   }
+
   const handleInputChange = e => {
     const { name, value } = e.target
     setFormData(prev => ({
@@ -223,93 +222,37 @@ const Checkout = () => {
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 className={`cursor-pointer rounded-lg border-2 p-4 transition-colors ${
-                  onCreditCard
+                  onPayOS
                     ? 'border-blue-500 bg-blue-50'
                     : 'border-gray-200 hover:border-blue-300'
                 }`}
-                onClick={() => setOnCreditCard(true)}
+                onClick={() => setOnPayOS(true)}
               >
-                <div className='flex items-center justify-between'>
-                  <div className='flex items-center space-x-3'>
-                    <FaCreditCard
-                      className={`text-xl ${onCreditCard ? 'text-blue-500' : 'text-gray-400'}`}
-                    />
-                    <span className='font-medium'>Thẻ tín dụng</span>
-                  </div>
-                  <img src={creditImage} className='h-6' alt='credit cards' />
+                <div className='flex items-center space-x-3'>
+                  <FaCreditCard
+                    className={`text-xl ${onPayOS ? 'text-blue-500' : 'text-gray-400'}`}
+                  />
+                  <span className='font-medium'>PayOS</span>
                 </div>
               </motion.div>
 
               <motion.div
                 whileHover={{ scale: 1.02 }}
                 className={`cursor-pointer rounded-lg border-2 p-4 transition-colors ${
-                  !onCreditCard
+                  !onPayOS
                     ? 'border-blue-500 bg-blue-50'
                     : 'border-gray-200 hover:border-blue-300'
                 }`}
-                onClick={() => setOnCreditCard(false)}
+                onClick={() => setOnPayOS(false)}
               >
                 <div className='flex items-center space-x-3'>
                   <FaMoneyBillWave
-                    className={`text-xl ${!onCreditCard ? 'text-blue-500' : 'text-gray-400'}`}
+                    className={`text-xl ${!onPayOS ? 'text-blue-500' : 'text-gray-400'}`}
                   />
                   <span className='font-medium'>Thanh toán khi nhận hàng</span>
                 </div>
               </motion.div>
             </div>
-
-            {/* Credit Card Form */}
-            {onCreditCard && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className='mt-6 space-y-4'
-              >
-                <div>
-                  <label className='block text-sm font-medium text-gray-700'>
-                    Số thẻ
-                  </label>
-                  <input
-                    type='text'
-                    name='cardNumber'
-                    value={formData.cardNumber}
-                    onChange={handleInputChange}
-                    placeholder='1234 5678 9012 3456'
-                    className='w-full rounded-lg border border-gray-300 px-4 py-2 transition focus:border-transparent focus:ring-1 focus:outline-none'
-                  />
-                </div>
-                <div className='grid grid-cols-2 gap-4'>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700'>
-                      Ngày hết hạn
-                    </label>
-                    <input
-                      type='text'
-                      name='expiryDate'
-                      value={formData.expiryDate}
-                      onChange={handleInputChange}
-                      placeholder='MM/YY'
-                      className='w-full rounded-lg border border-gray-300 px-4 py-2 transition focus:border-transparent focus:ring-1 focus:outline-none'
-                    />
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700'>
-                      CVV
-                    </label>
-                    <input
-                      type='text'
-                      name='cvv'
-                      value={formData.cvv}
-                      onChange={handleInputChange}
-                      placeholder='123'
-                      className='w-full rounded-lg border border-gray-300 px-4 py-2 transition focus:border-transparent focus:ring-1 focus:outline-none'
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            )}
           </div>
 
           {/* Checkout Button */}
