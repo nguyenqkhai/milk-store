@@ -137,17 +137,6 @@ const ProductInfo = ({ product }) => {
         </div>
       </div>
 
-      {/* FIX: Debug info - có thể xóa sau khi fix xong */}
-      <div className='rounded border bg-yellow-50 p-2 text-xs'>
-        <strong>Debug Info:</strong>
-        <br />
-        Current Price: {currentPrice?.toLocaleString()} đ
-        <br />
-        Subtotal: {subtotal?.toLocaleString()} đ
-        <br />
-        Total: {total?.toLocaleString()} đ
-      </div>
-
       <div className='mt-12 flex flex-wrap gap-4'>
         <button
           className='flex flex-1 items-center justify-center rounded-lg bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-700'
