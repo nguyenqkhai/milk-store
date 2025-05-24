@@ -8,7 +8,6 @@ import OrderService from '@services/Order/OrderService'
 import CartService from '@services/Cart/CartService'
 import PaymentService from '@services/Payment/PaymentService'
 import { message } from 'antd'
-import { set } from 'date-fns'
 
 const Payment = () => {
   const location = useLocation()
@@ -35,7 +34,12 @@ const Payment = () => {
       if (code && id && status && orderCode) {
         setCheckStatusPayment(true);
         const response = await PaymentService.getStatusPayos(orderCode);
-        console.log(response);
+        if (response === false) {
+          setIsProcessing(false);
+          setIsSuccess(false);
+        }
+        setIsProcessing(false);
+        setIsSuccess(true);
       }
     };
 
