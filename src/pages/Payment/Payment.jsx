@@ -37,6 +37,7 @@ const Payment = () => {
         if (response === false) {
           setIsProcessing(false);
           setIsSuccess(false);
+          return;
         }
         setIsProcessing(false);
         setIsSuccess(true);
